@@ -29,5 +29,4 @@ proguard/
 
 *.bin
 
-.idea
 .gradle
