@@ -26,3 +26,5 @@ proguard/
 *.iml
 *.ipr
 *.iws
+
+*.bin

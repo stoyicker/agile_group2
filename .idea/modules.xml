@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AgileAppModule/AgileAppModule.iml" filepath="$PROJECT_DIR$/AgileAppModule/AgileAppModule.iml" />
-      <module fileurl="file://$PROJECT_DIR$/AgileAppProject.iml" filepath="$PROJECT_DIR$/AgileAppProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agile_group2.iml" filepath="$PROJECT_DIR$/agile_group2.iml" />
     </modules>
   </component>
 </project>
