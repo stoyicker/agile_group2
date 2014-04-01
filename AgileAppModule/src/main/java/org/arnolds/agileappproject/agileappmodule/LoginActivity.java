@@ -1,6 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule;
 
 import android.accounts.Account;
+import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,7 +39,7 @@ import java.util.List;
  * A login screen that offers login via email/password.
 
  */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>{
+public class LoginActivity extends AccountAuthenticatorActivity implements LoaderCallbacks<Cursor>{
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -46,6 +48,15 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>{
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+    public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
+    public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
+    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
+    public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
+
+    public static final String KEY_ERROR_MESSAGE = "ERR_MSG";
+
+    public final static String PARAM_USER_PASS = "USER_PASS";
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -284,10 +295,27 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>{
             String mockpw = "password";
 
             if (mEmail.equals(mockemail) && mPassword.equals(mockpw)) {
-                AccountManager mAccountManager = AccountManager.get(getBaseContext());
-                Account github = new Account(mEmail, "github");
-                mAccountManager.addAccountExplicitly(github, mEmail, null);
-                return true;
+                Log.d("", "> Started authenticating");
+
+                final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+
+                String authtoken = null;
+                Bundle data = new Bundle();
+                try {
+                    authtoken = "mock token";
+
+                    data.putString(AccountManager.KEY_ACCOUNT_NAME, mEmail);
+                    data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+                    data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
+                    data.putString(PARAM_USER_PASS, mPassword);
+
+                } catch (Exception e) {
+                    data.putString(KEY_ERROR_MESSAGE, e.getMessage());
+                }
+
+                final Intent res = new Intent();
+                res.putExtras(data);
+                return res;
             }
             else {
                 return false;
