@@ -22,17 +22,29 @@ public class GitHubBroker implements IGitHubBroker {
             LISTENER_NOT_REGISTERED_MESSAGE = "listener is not registered", IO_EXCEPTION_LOG =
             "io exception", ALREADY_CONNECTED = "there is already a connected session",
             ALREADY_DISCONNECTED = "there is not a connected session", NOT_CONNECTED =
-            "not connected", REPO_NOT_FOUND = "not a repo", REPO_NULL = "repo is null",
-            REPO_NOT_SELECTED = "there is not a working repo";
+            "not connected", REPO_NULL = "repo is null",
+            REPO_NOT_SELECTED = "there is not a working repo", INVALID_CREDENTIALS =
+            "incorrect username/password";
     private final Collection<IGitHubBrokerListener> listeners =
             new HashSet<IGitHubBrokerListener>();
     private GitHub session;
     private GHUser user;
     private GHRepository repository;
+    private static IGitHubBroker instance;
+
+    private GitHubBroker() {
+    }
+
+    public static IGitHubBroker getInstance() {
+        if (instance == null) {
+            instance = new GitHubBroker();
+        }
+        return instance;
+    }
 
     @Override
     public boolean isConnected() {
-        return session == null;
+        return session != null;
     }
 
     @Override
@@ -44,9 +56,17 @@ public class GitHubBroker implements IGitHubBroker {
 
             @Override
             protected Void doInBackground(String... params) {
+                GitHub tempSession;
                 try {
-                    session = GitHub.connectUsingPassword(params[0], params[1]);
-                    user = session.getMyself();
+                    if ((tempSession = GitHub.connectUsingPassword(params[0], params[1]))
+                            .isCredentialValid()) {
+                        session = tempSession;
+                        user = session.getMyself();
+                    }
+                    else {
+                        for (IGitHubBrokerListener listener : listeners)
+                            listener.onConnectionRefused(INVALID_CREDENTIALS);
+                    }
                 }
                 catch (IOException e) {
                     Log.wtf(IO_EXCEPTION_LOG, e);
@@ -75,7 +95,7 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void subscribe(IGitHubBrokerListener listener) throws IllegalArgumentException {
+    public void addSubscriber(IGitHubBrokerListener listener) throws IllegalArgumentException {
         if (listener == null) {
             throw new IllegalArgumentException(LISTENER_NULL_MESSAGE);
         }
@@ -87,7 +107,7 @@ public class GitHubBroker implements IGitHubBroker {
 
 
     @Override
-    public void unsubscribe(IGitHubBrokerListener listener) throws IllegalArgumentException {
+    public void removeSubscriber(IGitHubBrokerListener listener) throws IllegalArgumentException {
         if (listener == null) {
             throw new IllegalArgumentException(LISTENER_NULL_MESSAGE);
         }
@@ -104,7 +124,7 @@ public class GitHubBroker implements IGitHubBroker {
             throw new IllegalStateException(NOT_CONNECTED);
         }
         if (repo == null) {
-            throw new IllegalStateException(REPO_NULL);
+            throw new IllegalArgumentException(REPO_NULL);
         }
         new AsyncTask<GHRepository, Void, Void>() {
             @Override
@@ -113,13 +133,14 @@ public class GitHubBroker implements IGitHubBroker {
                     Map<String, GHRepository> repositories = user.getRepositories();
                     boolean success = repositories.values().contains(params[0]);
                     if (success) {
+                        Log.d("debug", "repository set to: " + params[0].toString());
                         repository = params[0];
                     }
                     for (IGitHubBrokerListener listener : listeners)
                         listener.onRepoSelected(success);
                 }
                 catch (IOException e) {
-                    Log.wtf(IO_EXCEPTION_LOG, e);
+                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 return null;
             }
@@ -127,7 +148,7 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public Collection<GHBranch> getAllBranches() throws IllegalStateException {
+    public void getAllBranches() throws IllegalStateException {
         if (!isConnected()) {
             throw new IllegalStateException(NOT_CONNECTED);
         }
@@ -142,7 +163,7 @@ public class GitHubBroker implements IGitHubBroker {
                     branches = repository.getBranches();
                 }
                 catch (IOException e) {
-                    Log.wtf(IO_EXCEPTION_LOG, e);
+                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 boolean success = branches != null;
                 for (IGitHubBrokerListener listener : listeners)
@@ -151,11 +172,10 @@ public class GitHubBroker implements IGitHubBroker {
                 return null;
             }
         }.execute();
-        return null;
     }
 
     @Override
-    public Collection<GHRepository> getAllRepos() throws IllegalStateException {
+    public void getAllRepos() throws IllegalStateException {
         if (!isConnected()) {
             throw new IllegalStateException(NOT_CONNECTED);
         }
@@ -167,7 +187,7 @@ public class GitHubBroker implements IGitHubBroker {
                     repos = user.getRepositories();
                 }
                 catch (IOException e) {
-                    Log.wtf(IO_EXCEPTION_LOG, e);
+                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 boolean success = repos != null;
                 for (IGitHubBrokerListener listener : listeners)
@@ -176,11 +196,10 @@ public class GitHubBroker implements IGitHubBroker {
                 return null;
             }
         }.execute();
-        return null;
     }
 
     @Override
-    public Collection<GHIssue> getAllIssues() throws IllegalStateException {
+    public void getAllIssues() throws IllegalStateException {
         if (!isConnected()) {
             throw new IllegalStateException(NOT_CONNECTED);
         }
@@ -196,7 +215,7 @@ public class GitHubBroker implements IGitHubBroker {
                     openIssues.addAll(repository.getIssues(GHIssueState.CLOSED));
                 }
                 catch (IOException e) {
-                    Log.wtf(IO_EXCEPTION_LOG, e);
+                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 boolean success = openIssues != null;
                 for (IGitHubBrokerListener listener : listeners)
@@ -205,6 +224,5 @@ public class GitHubBroker implements IGitHubBroker {
                 return null;
             }
         }.execute();
-        return null;
     }
 }

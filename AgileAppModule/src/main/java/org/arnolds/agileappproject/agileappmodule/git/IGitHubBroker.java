@@ -1,10 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
-
-import java.util.Collection;
 
 public interface IGitHubBroker {
 
@@ -34,25 +30,25 @@ public interface IGitHubBroker {
     /**
      * Subscribes to the broker.
      *
-     * @param listener {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} The object that wants to subscribe.
+     * @param listener {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} The object that wants to addSubscriber.
      * @throws IllegalArgumentException If listener is null or is already susbscribed.
      */
-    public void subscribe(IGitHubBrokerListener listener) throws IllegalArgumentException;
+    public void addSubscriber(IGitHubBrokerListener listener) throws IllegalArgumentException;
 
     /**
      * Removes the suscription to the broker.
      *
-     * @param listener {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} The object that wants to unsubscribe.
+     * @param listener {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} The object that wants to removeSubscriber.
      * @throws IllegalArgumentException If listener is null or is not subscribed.
      */
-    public void unsubscribe(IGitHubBrokerListener listener) throws IllegalArgumentException;
+    public void removeSubscriber(IGitHubBrokerListener listener) throws IllegalArgumentException;
 
 
     /**
      * Asynchronously selects a repo to work with.
      *
      * @param repo {@link org.kohsuke.github.GHRepository} The repository to select.
-     * @throws IllegalArgumentException If the repo is not found or is null.
+     * @throws IllegalArgumentException If the repo is null.
      * @throws IllegalStateException    If there is not a connected session.
      */
     public void selectRepo(GHRepository repo)
@@ -61,25 +57,22 @@ public interface IGitHubBroker {
     /**
      * Asynchronously return all branches of the working repository.
      *
-     * @return {@link java.util.Collection-{@link org.kohsuke.github.GHBranch}-} All branches in the working repository.
      * @throws IllegalStateException If there is not a connected session or if there is not a working repo selected.
      */
-    public Collection<GHBranch> getAllBranches() throws IllegalStateException;
+    public void getAllBranches() throws IllegalStateException;
 
     /**
      * Asynchronously return all repos of the currently logged in user.
      *
-     * @return {@link java.util.Collection-{@link org.kohsuke.github.GHRepository}-} All repositories of the logged in user.
      * @throws IllegalStateException If there is not a connected session.
      */
-    public Collection<GHRepository> getAllRepos() throws IllegalStateException;
+    public void getAllRepos() throws IllegalStateException;
 
     /**
      * Asynchronously return all issues of the working repository.
      *
-     * @return {@link java.util.Collection-{@link org.kohsuke.github.GHIssue}-} All issues in the working repository.
      * @throws IllegalStateException If there is not a connected session or if there is not a working repo selected.
      */
-    public Collection<GHIssue> getAllIssues() throws IllegalStateException;
+    public void getAllIssues() throws IllegalStateException;
 
 }
