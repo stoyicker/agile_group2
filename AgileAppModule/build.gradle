@@ -29,5 +29,7 @@ android {
 dependencies {
     compile 'org.kohsuke:github-api:+'
     compile 'com.android.support:support-v4:+'
+    compile 'org.mockito:mockito-all:+'
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
