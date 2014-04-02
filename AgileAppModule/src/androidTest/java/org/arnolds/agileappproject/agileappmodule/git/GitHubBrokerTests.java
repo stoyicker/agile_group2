@@ -23,6 +23,7 @@ import static org.mockito.Mockito.timeout;
 
 public class GitHubBrokerTests extends InstrumentationTestCase {
 
+	private static final int TIMEOUT = 1000;
     private IGitHubBroker broker;
     private IGitHubBrokerListener listener;
     private static GHRepository repo;
@@ -86,7 +87,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_getRepositories_connected() {
         broker.getAllRepos();
-        Mockito.verify(listener, timeout(1000))
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT))
                 .onAllReposRetrieved(true, repositories.values());
     }
 
@@ -113,12 +114,12 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_getIssues_connected_selected() {
         broker.selectRepo(repo);
-        Mockito.verify(listener, timeout(1000).only()).onRepoSelected(true);
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(true);
         broker.getAllIssues();
         Collection<GHIssue> expectedIssues = new LinkedList<GHIssue>();
         expectedIssues.addAll(openIssues);
         expectedIssues.addAll(closedIssues);
-        Mockito.verify(listener, timeout(1000))
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT))
                 .onAllIssuesRetrieved(true, expectedIssues);
     }
 
@@ -143,9 +144,9 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_getBranches_connected_selected() {
         broker.selectRepo(repo);
-        Mockito.verify(listener, timeout(1000).only()).onRepoSelected(true);
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(true);
         broker.getAllBranches();
-        Mockito.verify(listener, timeout(1000))
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT))
                 .onAllBranchesRetrieved(true, branches.values());
     }
 
@@ -170,7 +171,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_select_repo_not_found() {
         broker.selectRepo(Mockito.mock(GHRepository.class));
-        Mockito.verify(listener, Mockito.timeout(1000).only()).onRepoSelected(false);
+        Mockito.verify(listener, Mockito.timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(false);
     }
 
     public void test_select_repo_null() {
@@ -194,7 +195,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_select_repo_valid() {
         broker.selectRepo(repo);
-        Mockito.verify(listener, Mockito.timeout(1000).only()).onRepoSelected(true);
+        Mockito.verify(listener, Mockito.timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(true);
     }
 
     public void test_remove_subscriber_when_null() {
