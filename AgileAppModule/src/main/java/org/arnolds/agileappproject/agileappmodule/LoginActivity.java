@@ -9,6 +9,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -32,7 +33,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GHRepository;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -40,7 +49,7 @@ import java.util.List;
  * A login screen that offers login via email/password.
 
  */
-public class LoginActivity extends AccountAuthenticatorActivity implements LoaderCallbacks<Cursor>{
+public class LoginActivity extends AccountAuthenticatorActivity implements LoaderCallbacks<Cursor> {
 
     private static final String TAG = "LoginActivity";
 
@@ -74,10 +83,14 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
     private String mEmail;
     private String mPassword;
 
+    private Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mContext = getBaseContext();
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -163,7 +176,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
     }
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        //return email.contains("@");
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
@@ -267,28 +281,67 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
          * Represents an asynchronous login/registration task used to authenticate
          * the user.
          */
-        new AsyncTask<String, Void, Intent>() {
+        // TODO: attempt authentication against a network service.
+
+        IGitHubBroker mGitHubBroker = GitHubBroker.getInstance();
+        mGitHubBroker.addSubscriber(new IGitHubBrokerListener() {
 
             @Override
-            protected Intent doInBackground(String... params) {
-                // TODO: attempt authentication against a network service.
-/*
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+            public void onConnected() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        showProgress(false);
+                        Toast.makeText(mContext, "Connected",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+            }
+            @Override
+            public void onConnectionRefused(String reason) {
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        showProgress(false);
+                        Toast.makeText(mContext, "Connection refused",
+                                Toast.LENGTH_SHORT).show();
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                });
+
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }*/
+            @Override
+            public void onDisconnected() {
 
-                String mockemail = "hej@hej.se";
+            }
+
+            @Override
+            public void onAllIssuesRetrieved(boolean success, Collection<GHIssue> issues) {
+
+            }
+
+            @Override
+            public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
+
+            }
+
+            @Override
+            public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
+
+            }
+
+            @Override
+            public void onRepoSelected(boolean result) {
+
+            }
+        });
+
+        mGitHubBroker.connect(mEmail, mPassword);
+
+                /*String mockemail = "hej@hej.se";
                 String mockpw = "password";
 
 
@@ -311,36 +364,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
                 } catch (Exception e) {
                     data.putString(KEY_ERROR_MESSAGE, e.getMessage());
                 }
-
-                final Intent res = new Intent();
-                res.putExtras(data);
-                return res;
+                 */
 
 
-
-
-            }
-
-            @Override
-            protected void onPostExecute(Intent intent) {
-                showProgress(false);
-
-
-                if (intent.hasExtra(KEY_ERROR_MESSAGE)) {
-                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mPasswordView.requestFocus();
-                }
-                else {
-                    Toast.makeText(getBaseContext(), "Hej",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            protected void onCancelled() {
-                showProgress(false);
-            }
-        }.execute();
     }
 
     private void finishLogin(Intent intent) {
