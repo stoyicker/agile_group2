@@ -70,7 +70,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
     public final static String PARAM_USER_PASS = "USER_PASS";
 
     public static final String TOKEN_TYPE = "GITHUB";
-    public static final String ACCOUNT_TYPE = "GITHUB";
+    public static final String ACCOUNT_TYPE = "org.arnolds.agileappproject.agileappmodule.account";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.

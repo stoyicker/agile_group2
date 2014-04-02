@@ -23,7 +23,7 @@
         </activity>
 
         <service
-            android:name=".auth.GitHubAuthenticatorService" >
+            android:name=".auth.GitHubAuthenticatorService" android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
