@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -41,6 +42,8 @@ import java.util.List;
  */
 public class LoginActivity extends AccountAuthenticatorActivity implements LoaderCallbacks<Cursor>{
 
+    private static final String TAG = "LoginActivity";
+
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -60,13 +63,16 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private String mEmail;
+    private String mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,35 +118,33 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
+
 
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        mEmail = mEmailView.getText().toString();
+        mPassword = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(mPassword) && !isPasswordValid(mPassword)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(mEmail)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!isEmailValid(mEmail)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -154,8 +158,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            submit();
         }
     }
     private boolean isEmailValid(String email) {
@@ -258,23 +261,17 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
         mEmailView.setAdapter(adapter);
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
+    public void submit() {
+        /**
+         * Represents an asynchronous login/registration task used to authenticate
+         * the user.
+         */
+        new AsyncTask<String, Void, Intent>() {
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+            @Override
+            protected Intent doInBackground(String... params) {
+                // TODO: attempt authentication against a network service.
 /*
             try {
                 // Simulate network access.
@@ -291,13 +288,15 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
                 }
             }*/
 
-            String mockemail = "hej@hej.se";
-            String mockpw = "password";
+                String mockemail = "hej@hej.se";
+                String mockpw = "password";
 
-            if (mEmail.equals(mockemail) && mPassword.equals(mockpw)) {
-                Log.d("", "> Started authenticating");
+
+                Log.d(TAG, "> Started authenticating");
 
                 final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+
+                Log.d(TAG, getIntent().getStringExtra(ARG_ACCOUNT_TYPE));
 
                 String authtoken = null;
                 Bundle data = new Bundle();
@@ -316,33 +315,36 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
                 final Intent res = new Intent();
                 res.putExtras(data);
                 return res;
+
+
+
+
             }
-            else {
-                return false;
+
+            @Override
+            protected void onPostExecute(Intent intent) {
+                showProgress(false);
+
+
+                if (intent.hasExtra(KEY_ERROR_MESSAGE)) {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mPasswordView.requestFocus();
+                }
+                else {
+                    Toast.makeText(getBaseContext(), "Hej",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
 
-
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                Toast.makeText(getBaseContext(), "Hej",
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+            @Override
+            protected void onCancelled() {
+                showProgress(false);
             }
-        }
+        }.execute();
+    }
 
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
+    private void finishLogin(Intent intent) {
+
     }
 }
 
