@@ -3,7 +3,10 @@
 <resources>
     <!-- Colours for the Drawer and Drawer Items -->
     <color name="drawer_bg">#111</color>
-    <color name="drawer_item_bg">#777</color>
-    <color name="drawer_item_bg_pressed">#555</color>
-    <color name="drawer_item_text">#f32</color>
+    <color name="drawer_item_bg">#444</color>
+    <color name="drawer_item_bg_pressed">#09cdda</color>
+    <color name="drawer_item_text">#eee</color>
+    <color name="drawer_list_divider">#111</color>
+
+    <color name="it_section_colour">#09cdda</color>
 </resources>
