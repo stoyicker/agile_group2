@@ -54,4 +54,9 @@ public class InitialActivity extends Activity implements IGitHubBrokerListener {
     public void onRepoSelected(boolean result) {
 
     }
+
+    @Override
+    public void onTokenCreated(boolean success, String token) {
+
+    }
 }

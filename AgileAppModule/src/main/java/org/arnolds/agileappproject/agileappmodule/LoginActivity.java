@@ -293,9 +293,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
             public void onConnected() {
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        showProgress(false);
                         Toast.makeText(mContext, "Connected",
                                 Toast.LENGTH_SHORT).show();
-                        mGitHubBroker.createToken();
+                        finishLogin();
                     }
                 });
 
@@ -350,7 +351,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
                     public void run() {
                         showProgress(false);
                         if (success) {
-                            finishLogin(token);
+                            Toast.makeText(mContext, "Token created "+token,
+                                    Toast.LENGTH_SHORT).show();
+                            //finishLogin(token);
                         }
                         else {
                             Toast.makeText(mContext, "Couldnt create token.",
@@ -364,35 +367,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
         mGitHubBroker.connect(mEmail, mPassword);
 
-                /*String mockemail = "hej@hej.se";
-                String mockpw = "password";
-
-
-                Log.d(TAG, "> Started authenticating");
-
-                final String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
-
-                Log.d(TAG, getIntent().getStringExtra(ARG_ACCOUNT_TYPE));
-
-                String authtoken = null;
-                Bundle data = new Bundle();
-                try {
-                    authtoken = "mock token";
-
-                    data.putString(AccountManager.KEY_ACCOUNT_NAME, mEmail);
-                    data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-                    data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
-                    data.putString(PARAM_USER_PASS, mPassword);
-
-                } catch (Exception e) {
-                    data.putString(KEY_ERROR_MESSAGE, e.getMessage());
-                }
-                 */
-
-
     }
 
-    private void finishLogin(String token) {
+    private void finishLogin() {
 
         final Account account = new Account(mEmail, ACCOUNT_TYPE);
 
@@ -400,19 +377,18 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
         Intent intent = new Intent();
         intent.putExtras(bundle);
 
-        Log.d("udinic", TAG + "> finishLogin > addAccountExplicitly");
-
-
-
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
         mAccountManager.addAccountExplicitly(account, mPassword, null);
-        mAccountManager.setAuthToken(account, TOKEN_TYPE, token);
+        //mAccountManager.setAuthToken(account, TOKEN_TYPE, token);
 
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
-        //finish();
+
+        Log.d("LoginActivity", "finished login");
+        //Log.d("LoginActivity", "token for: "+mEmail+"="+token);
+        finish();
     }
 }
 
