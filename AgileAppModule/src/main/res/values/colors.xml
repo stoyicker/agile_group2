@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colours for the Drawer Items -->
+    <color name="drawer_item_bg">#777</color>
+    <color name="drawer_item_bg_pressed">#555</color>
+    <color name="drawer_item_text">#f3f</color>
+</resources>

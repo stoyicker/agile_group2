@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="navigation_drawer_items_names">
+        <item>GitHub View</item>
+        <item>Pivotal Tracker View</item>
+        <item>Planning Poker</item>
+    </string-array>
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_arnold</item>
+        <item>@drawable/ic_pivotal</item>
+        <item>@drawable/ic_pivotal</item>
+    </array>
+</resources>
