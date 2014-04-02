@@ -9,9 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DrawerItemAdapter extends BaseAdapter {
-    private ArrayList<DrawerItem> mDrawerItems;
+    private List<DrawerItem> mDrawerItems;
     private Context mContext;
 
     public DrawerItemAdapter(Context context, ArrayList<DrawerItem> drawerItems) {

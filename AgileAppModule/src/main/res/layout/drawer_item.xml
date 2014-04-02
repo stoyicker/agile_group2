@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/drawer_item_icon"
         android:layout_width="25dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
@@ -20,8 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/drawer_item_icon"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:text="@string/app_name"
         android:textColor="@color/drawer_item_text"
         android:gravity="center_vertical"
         android:paddingRight="40dp"/>
