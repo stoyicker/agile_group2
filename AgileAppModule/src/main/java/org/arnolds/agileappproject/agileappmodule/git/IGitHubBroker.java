@@ -2,6 +2,8 @@ package org.arnolds.agileappproject.agileappmodule.git;
 
 import org.kohsuke.github.GHRepository;
 
+import java.io.IOException;
+
 public interface IGitHubBroker {
 
     /**
@@ -74,5 +76,9 @@ public interface IGitHubBroker {
      * @throws IllegalStateException If there is not a connected session or if there is not a working repo selected.
      */
     public void getAllIssues() throws IllegalStateException;
+
+
+    public void createToken();
+
 
 }

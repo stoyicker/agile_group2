@@ -30,10 +30,6 @@ public class TestActivity extends Activity {
             Log.d("TestActivity",  acc.name);
             Log.d("TestActivity",  acc.type);
         }
-
-
-
-
     }
 
 

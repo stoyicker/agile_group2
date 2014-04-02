@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule.git;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.kohsuke.github.GHAuthorization;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueState;
@@ -13,6 +14,9 @@ import org.kohsuke.github.GitHub;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import static java.util.Arrays.asList;
+
+import java.util.List;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
@@ -32,7 +36,11 @@ public class GitHubBroker implements IGitHubBroker {
     private GHRepository repository;
     private static IGitHubBroker instance;
 
+    // GitHub permissions when to be given to a created token.
+    private static List<String> scopes = asList("user", "repo");
+
     private GitHubBroker() {
+
     }
 
     public static IGitHubBroker getInstance() {
@@ -225,4 +233,31 @@ public class GitHubBroker implements IGitHubBroker {
             }
         }.execute();
     }
+
+
+
+    @Override
+    public void createToken() {
+        if (!isConnected()) {
+            throw new IllegalStateException(NOT_CONNECTED);
+        }
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                String token = null;
+                try {
+                    token = session.createToken(scopes, "", "").getToken();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                boolean success = token != null;
+
+                for (IGitHubBrokerListener listener : listeners)
+                    listener.onTokenCreated(success, token);
+                return null;
+            }
+        }.execute();
+    }
+
+
 }

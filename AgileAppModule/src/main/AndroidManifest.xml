@@ -31,12 +31,13 @@
         <activity
             android:name="org.arnolds.agileappproject.agileappmodule.TestActivity"
             android:label="@string/title_activity_test" >
-        </activity>
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->

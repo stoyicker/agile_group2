@@ -55,4 +55,7 @@ public interface IGitHubBrokerListener {
      * @param result {@link java.lang.Boolean} The success of the operation.
      */
     public void onRepoSelected(boolean result);
+
+    public void onTokenCreated(boolean success, String token);
+
 }

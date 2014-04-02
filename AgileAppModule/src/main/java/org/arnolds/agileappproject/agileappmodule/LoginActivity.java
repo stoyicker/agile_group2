@@ -286,17 +286,16 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
     public void submit() {
 
-        IGitHubBroker mGitHubBroker = GitHubBroker.getInstance();
+        final IGitHubBroker mGitHubBroker = GitHubBroker.getInstance();
         mGitHubBroker.addSubscriber(new IGitHubBrokerListener() {
 
             @Override
             public void onConnected() {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        showProgress(false);
                         Toast.makeText(mContext, "Connected",
                                 Toast.LENGTH_SHORT).show();
-                        finishLogin();
+                        mGitHubBroker.createToken();
                     }
                 });
 
@@ -342,6 +341,25 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
             public void onRepoSelected(boolean result) {
 
             }
+
+            @Override
+            public void onTokenCreated(final boolean success, final String token) {
+
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        showProgress(false);
+                        if (success) {
+                            finishLogin(token);
+                        }
+                        else {
+                            Toast.makeText(mContext, "Couldnt create token.",
+                                    Toast.LENGTH_SHORT).show();
+                            mPasswordView.requestFocus();
+                        }
+                    }
+                });
+            }
         });
 
         mGitHubBroker.connect(mEmail, mPassword);
@@ -374,7 +392,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
     }
 
-    private void finishLogin() {
+    private void finishLogin(String token) {
 
         final Account account = new Account(mEmail, ACCOUNT_TYPE);
 
@@ -384,13 +402,13 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
         Log.d("udinic", TAG + "> finishLogin > addAccountExplicitly");
 
-        // TODO: Get token from github broker.
-        String authtoken = "1234";
+
+
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
         mAccountManager.addAccountExplicitly(account, mPassword, null);
-        mAccountManager.setAuthToken(account, TOKEN_TYPE, authtoken);
+        mAccountManager.setAuthToken(account, TOKEN_TYPE, token);
 
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
