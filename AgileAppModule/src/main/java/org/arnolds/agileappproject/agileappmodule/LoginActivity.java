@@ -69,6 +69,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
     public final static String PARAM_USER_PASS = "USER_PASS";
 
+    public static final String TOKEN_TYPE = "GITHUB";
+    public static final String ACCOUNT_TYPE = "GITHUB";
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -79,6 +82,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private AccountManager mAccountManager;
+
 
     private String mEmail;
     private String mPassword;
@@ -91,6 +97,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
         setContentView(R.layout.activity_login);
 
         mContext = getBaseContext();
+
+        mAccountManager = AccountManager.get(getBaseContext());
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -277,11 +285,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
 
     public void submit() {
-        /**
-         * Represents an asynchronous login/registration task used to authenticate
-         * the user.
-         */
-        // TODO: attempt authentication against a network service.
 
         IGitHubBroker mGitHubBroker = GitHubBroker.getInstance();
         mGitHubBroker.addSubscriber(new IGitHubBrokerListener() {
@@ -293,8 +296,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
                         showProgress(false);
                         Toast.makeText(mContext, "Connected",
                                 Toast.LENGTH_SHORT).show();
+                        finishLogin();
                     }
                 });
+
 
 
             }
@@ -369,8 +374,27 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Loade
 
     }
 
-    private void finishLogin(Intent intent) {
+    private void finishLogin() {
 
+        final Account account = new Account(mEmail, ACCOUNT_TYPE);
+
+        Bundle bundle = new Bundle();
+        Intent intent = new Intent();
+        intent.putExtras(bundle);
+
+        Log.d("udinic", TAG + "> finishLogin > addAccountExplicitly");
+
+        // TODO: Get token from github broker.
+        String authtoken = "1234";
+
+        // Creating the account on the device and setting the auth token we got
+        // (Not setting the auth token will cause another call to the server to authenticate the user)
+        mAccountManager.addAccountExplicitly(account, mPassword, null);
+        mAccountManager.setAuthToken(account, TOKEN_TYPE, authtoken);
+
+        setAccountAuthenticatorResult(intent.getExtras());
+        setResult(RESULT_OK, intent);
+        //finish();
     }
 }
 
