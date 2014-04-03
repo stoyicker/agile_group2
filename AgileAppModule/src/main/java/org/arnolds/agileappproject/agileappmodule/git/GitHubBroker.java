@@ -1,5 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,20 +12,66 @@ import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
 
-    private static final String LISTENER_NULL_MESSAGE = "listener is null",
-            LISTENER_ALREADY_REGISTERED_MESSAGE = "listener is already registered",
-            LISTENER_NOT_REGISTERED_MESSAGE = "listener is not registered", IO_EXCEPTION_LOG =
-            "io exception", ALREADY_CONNECTED = "there is already a connected session",
-            ALREADY_DISCONNECTED = "there is not a connected session", NOT_CONNECTED =
-            "not connected", REPO_NULL = "repo is null",
-            REPO_NOT_SELECTED = "there is not a working repo", INVALID_CREDENTIALS =
-            "incorrect username/password";
+    private abstract class GitHubBrokerException extends Exception {
+        protected String reason;
+
+        public GitHubBrokerException(String _reason) {
+            reason = _reason;
+        }
+
+        public final String getReason() {
+            StringWriter stringWriter = new StringWriter();
+            printStackTrace(new PrintWriter(stringWriter));
+            return reason + "\n" + stringWriter.toString();
+        }
+    }
+
+    public class ListenerAlreadyRegisteredException extends GitHubBrokerException {
+        public ListenerAlreadyRegisteredException() {
+            super("Listener already registered.");
+        }
+    }
+
+    public class ListenerNotRegisteredException extends GitHubBrokerException {
+        public ListenerNotRegisteredException() {
+            super("Listener is not registered.");
+        }
+    }
+
+    public class AlreadyConnectedException extends GitHubBrokerException {
+        public AlreadyConnectedException() {
+            super("There is already a connected session.");
+        }
+    }
+
+    public class AlreadyNotConnectedException extends GitHubBrokerException {
+        public AlreadyNotConnectedException() {
+            super("There is not a connected session.");
+        }
+    }
+
+    public class RepositoryNotSelectedException extends GitHubBrokerException {
+        public RepositoryNotSelectedException() {
+            super("There is not a repository selected to work with.");
+        }
+    }
+
+    public class NullArgumentException extends GitHubBrokerException {
+        public NullArgumentException() {
+            super("The argument is null.");
+        }
+    }
+
+    private final static String IO_EXCEPTION_LOG = "IOException.", INVALID_CREDENTIALS =
+            "Wrong username or password.";
     private final Collection<IGitHubBrokerListener> listeners =
             new HashSet<IGitHubBrokerListener>();
     private GitHub session;
@@ -48,9 +95,10 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void connect(String username, String password) throws IllegalStateException {
+    public void connect(String username, String password, final Context context)
+            throws AlreadyConnectedException {
         if (isConnected()) {
-            throw new IllegalStateException(ALREADY_CONNECTED);
+            throw new AlreadyConnectedException();
         }
         new AsyncTask<String, Void, Void>() {
 
@@ -69,7 +117,7 @@ public class GitHubBroker implements IGitHubBroker {
                     }
                 }
                 catch (IOException e) {
-                    Log.wtf(IO_EXCEPTION_LOG, e);
+                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
                     for (IGitHubBrokerListener listener : listeners)
                         listener.onConnectionRefused(e.getMessage());
                 }
@@ -83,9 +131,9 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void disconnect() throws IllegalStateException {
+    public void disconnect() throws AlreadyNotConnectedException {
         if (!isConnected()) {
-            throw new IllegalStateException(ALREADY_DISCONNECTED);
+            throw new AlreadyNotConnectedException();
         }
         session = null;
         user = null;
@@ -95,36 +143,38 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void addSubscriber(IGitHubBrokerListener listener) throws IllegalArgumentException {
+    public void addSubscriber(IGitHubBrokerListener listener)
+            throws NullArgumentException, ListenerAlreadyRegisteredException {
         if (listener == null) {
-            throw new IllegalArgumentException(LISTENER_NULL_MESSAGE);
+            throw new NullArgumentException();
         }
         if (listeners.contains(listener)) {
-            throw new IllegalArgumentException(LISTENER_ALREADY_REGISTERED_MESSAGE);
+            throw new ListenerAlreadyRegisteredException();
         }
         listeners.add(listener);
     }
 
 
     @Override
-    public void removeSubscriber(IGitHubBrokerListener listener) throws IllegalArgumentException {
+    public void removeSubscriber(IGitHubBrokerListener listener)
+            throws ListenerNotRegisteredException, NullArgumentException {
         if (listener == null) {
-            throw new IllegalArgumentException(LISTENER_NULL_MESSAGE);
+            throw new NullArgumentException();
         }
         if (!listeners.contains(listener)) {
-            throw new IllegalArgumentException(LISTENER_NOT_REGISTERED_MESSAGE);
+            throw new ListenerNotRegisteredException();
         }
         listeners.remove(listener);
     }
 
     @Override
     public void selectRepo(GHRepository repo)
-            throws IllegalArgumentException, IllegalStateException {
+            throws NullArgumentException, AlreadyNotConnectedException {
         if (!isConnected()) {
-            throw new IllegalStateException(NOT_CONNECTED);
+            throw new AlreadyNotConnectedException();
         }
         if (repo == null) {
-            throw new IllegalArgumentException(REPO_NULL);
+            throw new NullArgumentException();
         }
         new AsyncTask<GHRepository, Void, Void>() {
             @Override
@@ -148,12 +198,13 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllBranches() throws IllegalStateException {
+    public void getAllBranches() throws RepositoryNotSelectedException,
+            AlreadyNotConnectedException {
         if (!isConnected()) {
-            throw new IllegalStateException(NOT_CONNECTED);
+            throw new AlreadyNotConnectedException();
         }
         if (repository == null) {
-            throw new IllegalStateException(REPO_NOT_SELECTED);
+            throw new RepositoryNotSelectedException();
         }
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -175,9 +226,9 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllRepos() throws IllegalStateException {
+    public void getAllRepos() throws AlreadyNotConnectedException {
         if (!isConnected()) {
-            throw new IllegalStateException(NOT_CONNECTED);
+            throw new AlreadyNotConnectedException();
         }
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -199,12 +250,12 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllIssues() throws IllegalStateException {
+    public void getAllIssues() throws RepositoryNotSelectedException, AlreadyNotConnectedException {
         if (!isConnected()) {
-            throw new IllegalStateException(NOT_CONNECTED);
+            throw new AlreadyNotConnectedException();
         }
         if (repository == null) {
-            throw new IllegalStateException(REPO_NOT_SELECTED);
+            throw new RepositoryNotSelectedException();
         }
         new AsyncTask<Void, Void, Void>() {
             @Override

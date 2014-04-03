@@ -23,6 +23,7 @@ import static org.mockito.Mockito.timeout;
 
 public class GitHubBrokerTests extends InstrumentationTestCase {
 
+    private static final int TIMEOUT_MILLIS = 1000;
     private IGitHubBroker broker;
     private IGitHubBrokerListener listener;
     private static GHRepository repo;
@@ -45,7 +46,9 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
         repositories.put("customRepo", repo);
     }
 
-    public void setUp() throws IllegalAccessException, NoSuchFieldException, IOException {
+    public void setUp() throws IllegalAccessException, NoSuchFieldException,
+            GitHubBroker.ListenerAlreadyRegisteredException, GitHubBroker.NullArgumentException,
+            IOException {
         if (firstRun) {
             firstRun = false;
             init();
@@ -79,46 +82,79 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_remove_subscriber_when_subscribed() {
-        broker.removeSubscriber(listener);
-        broker.disconnect();
-        Mockito.verifyZeroInteractions(listener);
+        try {
+            broker.disconnect();
+            broker.removeSubscriber(listener);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, only()).onDisconnected();
     }
 
     public void test_getRepositories_connected() {
-        broker.getAllRepos();
-        Mockito.verify(listener, timeout(1000))
-                .onAllReposRetrieved(true, repositories.values());
+        try {
+            broker.getAllRepos();
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS)).onAllReposRetrieved(true,
+                repositories.values());
     }
 
     public void test_getRepositories_not_connected() {
-        broker.disconnect();
+        try {
+            broker.disconnect();
+        }
+        catch (Exception e) {
+            fail();
+        }
         try {
             broker.getAllRepos();
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
         }
     }
 
 
     public void test_getIssues_not_connected() {
-        broker.disconnect();
+        try {
+            broker.disconnect();
+        }
+        catch (Exception e) {
+            fail();
+        }
         try {
             broker.getAllIssues();
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
         }
     }
 
     public void test_getIssues_connected_selected() {
-        broker.selectRepo(repo);
-        Mockito.verify(listener, timeout(1000).only()).onRepoSelected(true);
-        broker.getAllIssues();
+        try {
+            broker.selectRepo(repo);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        try {
+            broker.getAllIssues();
+        }
+        catch (Exception e) {
+            fail();
+        }
         Collection<GHIssue> expectedIssues = new LinkedList<GHIssue>();
         expectedIssues.addAll(openIssues);
         expectedIssues.addAll(closedIssues);
-        Mockito.verify(listener, timeout(1000))
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT_MILLIS))
                 .onAllIssuesRetrieved(true, expectedIssues);
     }
 
@@ -127,25 +163,46 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             broker.getAllIssues();
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
         }
     }
 
     public void test_getBranches_not_connected() {
-        broker.disconnect();
+        try {
+            broker.disconnect();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
         try {
             broker.getAllBranches();
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
         }
     }
 
     public void test_getBranches_connected_selected() {
-        broker.selectRepo(repo);
-        Mockito.verify(listener, timeout(1000).only()).onRepoSelected(true);
-        broker.getAllBranches();
-        Mockito.verify(listener, timeout(1000))
+        try {
+            broker.selectRepo(repo);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        try {
+            broker.getAllBranches();
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS))
                 .onAllBranchesRetrieved(true, branches.values());
     }
 
@@ -154,23 +211,39 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             broker.getAllBranches();
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
         }
     }
 
     public void test_remove_subscriber_when_not_subscribed() {
-        broker.removeSubscriber(listener);
+        try {
+            broker.removeSubscriber(listener);
+        }
+        catch (Exception e) {
+            fail();
+        }
         try {
             broker.removeSubscriber(listener);
             fail();
         }
-        catch (IllegalArgumentException e) {
+        catch (GitHubBroker.ListenerNotRegisteredException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
+            fail();
         }
     }
 
     public void test_select_repo_not_found() {
-        broker.selectRepo(Mockito.mock(GHRepository.class));
-        Mockito.verify(listener, Mockito.timeout(1000).only()).onRepoSelected(false);
+        try {
+            broker.selectRepo(Mockito.mock(GHRepository.class));
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(false);
     }
 
     public void test_select_repo_null() {
@@ -178,23 +251,39 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             broker.selectRepo(null);
             fail();
         }
-        catch (IllegalArgumentException e) {
+        catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
         }
     }
 
     public void test_select_repo_not_connected() {
-        broker.disconnect();
+        try {
+            broker.disconnect();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
         try {
             broker.selectRepo(Mockito.mock(GHRepository.class));
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
         }
     }
 
     public void test_select_repo_valid() {
-        broker.selectRepo(repo);
-        Mockito.verify(listener, Mockito.timeout(1000).only()).onRepoSelected(true);
+        try {
+            broker.selectRepo(repo);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
     }
 
     public void test_remove_subscriber_when_null() {
@@ -202,22 +291,35 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             broker.removeSubscriber(null);
             fail();
         }
-        catch (IllegalArgumentException e) {
+        catch (GitHubBroker.ListenerNotRegisteredException e) {
+            fail();
+        }
+        catch (GitHubBroker.NullArgumentException e) {
         }
     }
 
     public void test_disconnect_when_not_connected() {
-        broker.disconnect();
+        try {
+            broker.disconnect();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
         try {
             broker.disconnect();
             fail();
         }
-        catch (IllegalStateException e) {
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
         }
     }
 
     public void test_disconnect_when_connected() {
-        broker.disconnect();
+        try {
+            broker.disconnect();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
         Mockito.verify(listener, only()).onDisconnected();
     }
 
