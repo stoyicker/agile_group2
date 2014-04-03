@@ -1,5 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -26,7 +28,7 @@ public class GitHubBroker implements IGitHubBroker {
             reason = _reason;
         }
 
-        protected final String getReason() {
+        public final String getReason() {
             StringWriter stringWriter = new StringWriter();
             printStackTrace(new PrintWriter(stringWriter));
             return reason + "\n" + stringWriter.toString();
@@ -94,7 +96,8 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void connect(String username, String password) throws AlreadyConnectedException {
+    public void connect(String username, String password, final Context context)
+            throws AlreadyConnectedException {
         if (isConnected()) {
             throw new AlreadyConnectedException();
         }
@@ -120,6 +123,7 @@ public class GitHubBroker implements IGitHubBroker {
                         listener.onConnectionRefused(e.getMessage());
                 }
                 if (isConnected()) {
+                    context.startService(new Intent(context, GitHubConnectionUpService.class));
                     for (IGitHubBrokerListener listener : listeners)
                         listener.onConnected();
                 }

@@ -1,5 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import android.content.Context;
+
 import org.kohsuke.github.GHRepository;
 
 public interface IGitHubBroker {
@@ -16,9 +18,10 @@ public interface IGitHubBroker {
      *
      * @param username {@link String} GitHub username.
      * @param password {@link String} GitHub password.
+     * @param context  {@link Context} Context of the application. Use getApplicationContext() {@link android.app.Activity} object.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyConnectedException} If already connected.
      */
-    public void connect(String username, String password)
+    public void connect(String username, String password, Context context)
             throws GitHubBroker.AlreadyConnectedException;
 
     /**
