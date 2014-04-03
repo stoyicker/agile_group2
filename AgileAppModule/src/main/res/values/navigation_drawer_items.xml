@@ -8,7 +8,7 @@
 
     <array name="nav_drawer_icons">
         <item>@drawable/ic_arnold</item>
-        <item>@drawable/ic_pivotal</item>
-        <item>@drawable/ic_pivotal</item>
+        <item>@drawable/ic_arnold</item>
+        <item>@drawable/ic_arnold</item>
     </array>
 </resources>
