@@ -2,11 +2,12 @@
 
 <resources>
     <!-- Colours for the Drawer and Drawer Items -->
-    <color name="drawer_bg">#111</color>
+    <color name="drawer_bg">#444</color>
     <color name="drawer_item_bg">#444</color>
-    <color name="drawer_item_bg_pressed">#09cdda</color>
+    <color name="drawer_item_bg_pressed">#ff2400</color>
     <color name="drawer_item_text">#eee</color>
-    <color name="drawer_list_divider">#111</color>
+    <color name="drawer_list_divider">#333</color>
 
     <color name="it_section_colour">#09cdda</color>
+    <color name="socialist_red">#ff2400</color>
 </resources>
