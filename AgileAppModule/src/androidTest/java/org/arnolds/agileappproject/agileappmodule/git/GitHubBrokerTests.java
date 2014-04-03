@@ -23,7 +23,7 @@ import static org.mockito.Mockito.timeout;
 
 public class GitHubBrokerTests extends InstrumentationTestCase {
 
-	private static final int TIMEOUT = 1000;
+    private static final int TIMEOUT_MILLIS = 1000;
     private IGitHubBroker broker;
     private IGitHubBrokerListener listener;
     private static GHRepository repo;
@@ -93,19 +93,14 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getRepositories_connected() {
-<<<<<<< Updated upstream
-        broker.getAllRepos();
-        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT))
-=======
         try {
             broker.getAllRepos();
         }
         catch (Exception e) {
             fail();
         }
-        Mockito.verify(listener, timeout(1000))
->>>>>>> Stashed changes
-                .onAllReposRetrieved(true, repositories.values());
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS)).onAllReposRetrieved(true,
+                repositories.values());
     }
 
     public void test_getRepositories_not_connected() {
@@ -143,29 +138,23 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getIssues_connected_selected() {
-<<<<<<< Updated upstream
-        broker.selectRepo(repo);
-        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(true);
-        broker.getAllIssues();
-=======
         try {
             broker.selectRepo(repo);
         }
         catch (Exception e) {
             fail();
         }
-        Mockito.verify(listener, timeout(1000).only()).onRepoSelected(true);
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
         try {
             broker.getAllIssues();
         }
         catch (Exception e) {
             fail();
         }
->>>>>>> Stashed changes
         Collection<GHIssue> expectedIssues = new LinkedList<GHIssue>();
         expectedIssues.addAll(openIssues);
         expectedIssues.addAll(closedIssues);
-        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT))
+        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT_MILLIS))
                 .onAllIssuesRetrieved(true, expectedIssues);
     }
 
@@ -200,27 +189,20 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getBranches_connected_selected() {
-<<<<<<< Updated upstream
-        broker.selectRepo(repo);
-        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(true);
-        broker.getAllBranches();
-        Mockito.verify(listener, timeout(GitHubBrokerTests.TIMEOUT))
-=======
         try {
             broker.selectRepo(repo);
         }
         catch (Exception e) {
             fail();
         }
-        Mockito.verify(listener, timeout(1000).only()).onRepoSelected(true);
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
         try {
             broker.getAllBranches();
         }
         catch (Exception e) {
             fail();
         }
-        Mockito.verify(listener, timeout(1000))
->>>>>>> Stashed changes
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS))
                 .onAllBranchesRetrieved(true, branches.values());
     }
 
@@ -255,18 +237,13 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_select_repo_not_found() {
-<<<<<<< Updated upstream
-        broker.selectRepo(Mockito.mock(GHRepository.class));
-        Mockito.verify(listener, Mockito.timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(false);
-=======
         try {
             broker.selectRepo(Mockito.mock(GHRepository.class));
         }
         catch (Exception e) {
             fail();
         }
-        Mockito.verify(listener, Mockito.timeout(1000).only()).onRepoSelected(false);
->>>>>>> Stashed changes
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(false);
     }
 
     public void test_select_repo_null() {
@@ -300,18 +277,13 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_select_repo_valid() {
-<<<<<<< Updated upstream
-        broker.selectRepo(repo);
-        Mockito.verify(listener, Mockito.timeout(GitHubBrokerTests.TIMEOUT).only()).onRepoSelected(true);
-=======
         try {
             broker.selectRepo(repo);
         }
         catch (Exception e) {
             fail();
         }
-        Mockito.verify(listener, Mockito.timeout(1000).only()).onRepoSelected(true);
->>>>>>> Stashed changes
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
     }
 
     public void test_remove_subscriber_when_null() {
