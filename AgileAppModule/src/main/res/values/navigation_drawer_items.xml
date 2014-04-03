@@ -4,9 +4,11 @@
         <item>GitHub View</item>
         <item>Pivotal Tracker View</item>
         <item>Planning Poker</item>
+        <item>Temp Test Activity</item>
     </string-array>
 
     <array name="nav_drawer_icons">
+        <item>@drawable/ic_arnold</item>
         <item>@drawable/ic_arnold</item>
         <item>@drawable/ic_arnold</item>
         <item>@drawable/ic_arnold</item>

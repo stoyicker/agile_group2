@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -164,8 +165,10 @@ public class MainActivity extends Activity {
     private void selectItem(int position) {
         Fragment fragment;
         switch(position) {
-            case 0:
-
+            case 3:
+                Intent intent = new Intent(this, TestActivity.class);
+                startActivity(intent);
+                return;
             default:
                 fragment = null;
         }
