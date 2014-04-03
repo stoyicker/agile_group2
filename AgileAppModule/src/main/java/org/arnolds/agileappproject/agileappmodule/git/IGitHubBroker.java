@@ -18,7 +18,7 @@ public interface IGitHubBroker {
      *
      * @param username {@link String} GitHub username.
      * @param password {@link String} GitHub password.
-     * @param context  {@link android.content.Context} Context of the application. Use getApplicationContext() {@link android.app.Activity} object.
+     * @param context  {@link Context} Context of the application. Use getApplicationContext() {@link android.app.Activity} object.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyConnectedException} If already connected.
      */
     public void connect(String username, String password, Context context)
@@ -34,7 +34,7 @@ public interface IGitHubBroker {
     /**
      * Subscribes an object to the broker.
      *
-     * @param listener {@link IGitHubBrokerListener} The object that wants to addSubscriber.
+     * @param listener {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} The object that wants to addSubscriber.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.NullArgumentException} If listener is null.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.ListenerAlreadyRegisteredException} If the listener is already susbscribed.
      */
@@ -45,7 +45,7 @@ public interface IGitHubBroker {
     /**
      * Removes the suscription to the broker.
      *
-     * @param listener {@link IGitHubBrokerListener} The object that wants to removeSubscriber.
+     * @param listener {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} The object that wants to removeSubscriber.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.NullArgumentException} If listener is null.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.ListenerNotRegisteredException} If listener is not subscribed.
      */
