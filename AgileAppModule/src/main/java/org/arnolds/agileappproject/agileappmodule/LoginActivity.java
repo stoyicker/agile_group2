@@ -228,9 +228,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                         finishLogin();
                     }
                 });
-
-
-
             }
             @Override
             public void onConnectionRefused(String reason) {
