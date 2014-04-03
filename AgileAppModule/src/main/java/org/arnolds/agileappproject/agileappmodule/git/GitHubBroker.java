@@ -1,7 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -123,7 +122,6 @@ public class GitHubBroker implements IGitHubBroker {
                         listener.onConnectionRefused(e.getMessage());
                 }
                 if (isConnected()) {
-                    context.startService(new Intent(context, GitHubConnectionUpService.class));
                     for (IGitHubBrokerListener listener : listeners)
                         listener.onConnected();
                 }
