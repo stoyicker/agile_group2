@@ -216,61 +216,65 @@ public class LoginActivity extends AccountAuthenticatorActivity {
     public void submit() {
 
         final IGitHubBroker mGitHubBroker = GitHubBroker.getInstance();
-        mGitHubBroker.addSubscriber(new IGitHubBrokerListener() {
+        try {
+            mGitHubBroker.addSubscriber(new IGitHubBrokerListener() {
 
-            @Override
-            public void onConnected() {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        showProgress(false);
-                        Toast.makeText(mContext, "Connected",
-                                Toast.LENGTH_SHORT).show();
-                        finishLogin();
-                    }
-                });
-            }
-            @Override
-            public void onConnectionRefused(String reason) {
+                @Override
+                public void onConnected() {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            showProgress(false);
+                            Toast.makeText(mContext, "Connected",
+                                    Toast.LENGTH_SHORT).show();
+                            finishLogin();
+                        }
+                    });
+                }
+                @Override
+                public void onConnectionRefused(String reason) {
 
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        showProgress(false);
-                        Toast.makeText(mContext, "Connection refused",
-                                Toast.LENGTH_SHORT).show();
-                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-                        mPasswordView.requestFocus();
-                    }
-                });
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            showProgress(false);
+                            Toast.makeText(mContext, "Connection refused",
+                                    Toast.LENGTH_SHORT).show();
+                            mPasswordView.setError(getString(R.string.error_incorrect_password));
+                            mPasswordView.requestFocus();
+                        }
+                    });
 
-            }
+                }
 
-            @Override
-            public void onDisconnected() {
+                @Override
+                public void onDisconnected() {
 
-            }
+                }
 
-            @Override
-            public void onAllIssuesRetrieved(boolean success, Collection<GHIssue> issues) {
+                @Override
+                public void onAllIssuesRetrieved(boolean success, Collection<GHIssue> issues) {
 
-            }
+                }
 
-            @Override
-            public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
+                @Override
+                public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
 
-            }
+                }
 
-            @Override
-            public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
+                @Override
+                public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
 
-            }
+                }
 
-            @Override
-            public void onRepoSelected(boolean result) {
+                @Override
+                public void onRepoSelected(boolean result) {
 
-            }
-
-
-        });
+                }
+            });
+        } catch (GitHubBroker.NullArgumentException e) {
+            e.printStackTrace();
+        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+            e.printStackTrace();
+        }
 
         try {
             mGitHubBroker.connect(mUsername, mPassword, this);
