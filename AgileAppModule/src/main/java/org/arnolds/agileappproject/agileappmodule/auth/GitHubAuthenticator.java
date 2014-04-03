@@ -18,6 +18,9 @@ import org.arnolds.agileappproject.agileappmodule.LoginActivity;
 public class GitHubAuthenticator extends AbstractAccountAuthenticator {
 
     private Context mContext;
+    public static final String USERNAME = "GITHUB_USERNAME";
+    public static final String PASSWORD = "GITHUB_PASSWORD";
+
 
     public GitHubAuthenticator(Context context) {
         super(context);
@@ -97,4 +100,29 @@ public class GitHubAuthenticator extends AbstractAccountAuthenticator {
     public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account, String[] features) throws NetworkErrorException {
         return null;
     }
+
+    /**
+     * Returns a bundle with GitHub credentials if such credentials exist in the AccountManager. Otherwise returns null.
+     * Should then proceed to LoginActivity to login to GitHub.
+     * TODO: Use tokens instead. This is a temporary solution for testing. Passwords are given in plaintext.
+     * @return Bundle with GitHub credentials.
+     */
+    public Bundle getCredentials() {
+
+        final AccountManager am = AccountManager.get(mContext);
+
+        Account[] accounts = am.getAccountsByType(LoginActivity.ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            Account acc = accounts[0];
+            String username = acc.name;
+            String password = am.getPassword(acc);
+            Bundle bundle = new Bundle();
+            bundle.putString(USERNAME, username);
+            bundle.putString(PASSWORD, password);
+            return bundle;
+        }
+
+        return null;
+    }
+
 }

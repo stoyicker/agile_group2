@@ -1,13 +1,14 @@
 package org.arnolds.agileappproject.agileappmodule;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import org.arnolds.agileappproject.agileappmodule.auth.GitHubAuthenticator;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 
@@ -21,15 +22,20 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
+        GitHubAuthenticator gAuth = new GitHubAuthenticator(this);
 
-        AccountManager mAccountManager = AccountManager.get(getBaseContext());
-
-        Account[] accounts = mAccountManager.getAccountsByType(LoginActivity.ACCOUNT_TYPE);
-
-        for (Account acc : accounts ) {
-            Log.d("TestActivity",  acc.name);
-            Log.d("TestActivity",  acc.type);
+        TextView tv = (TextView) findViewById(R.id.textview1);
+        Bundle creds = gAuth.getCredentials();
+        if (creds != null) {
+            tv.setText(creds.getString(GitHubAuthenticator.USERNAME) +" "+ creds.getString(GitHubAuthenticator.PASSWORD));
         }
+        else {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+
+
+
     }
 
 
