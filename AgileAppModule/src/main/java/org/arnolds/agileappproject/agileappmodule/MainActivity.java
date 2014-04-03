@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -118,11 +117,16 @@ public class MainActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        //int id = item.getItemId();
-        //if (id == R.id.action_settings) {
-        //    return true;
-        //}
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                //Do something
+                return true;
+            case R.id.action_choose_project:
+                //Do something
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /* Called whenever we call invalidateOptionsMenu() */

@@ -1,12 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.arnolds.agileappproject.agileappmodule.MainActivity" >
-
-
-
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Choose Project, should always be in the overflow -->
-    <item android:id="@+id/action_settings"
+    <item android:id="@+id/action_choose_project"
         android:title="@string/action_choose_project"
         android:showAsAction="never" />
 
