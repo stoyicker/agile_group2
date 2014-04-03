@@ -43,7 +43,7 @@ public class DrawerItemAdapter extends BaseAdapter {
         if(view == null) {
             LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            view = mLayoutInflater.inflate(R.layout.drawer_item, null);
+            view = mLayoutInflater.inflate(R.layout.drawer_item, parent, false);
         }
 
         //Get View-elements to update.

@@ -11,4 +11,6 @@
         <item>@drawable/ic_arnold</item>
         <item>@drawable/ic_arnold</item>
     </array>
+
+    <string name="navigation_drawer_icon_content_description">List Icon</string>
 </resources>
