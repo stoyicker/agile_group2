@@ -9,25 +9,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.kohsuke.github.GHBranch;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class RetrieveBranchesActivity extends Activity{
+public class RetrieveBranchesActivity extends Activity {
 
     private static final long BRANCHES_POLL_INTERVAL_MILLIS = 30000;
     private BranchesListAdapter listAdapter;
@@ -41,7 +37,8 @@ public class RetrieveBranchesActivity extends Activity{
         return ret;
     }
 
-    private void onBranchesReceived(Collection<GHBranch> branches){
+    private void onBranchesReceived(Collection<GHBranch> branches) {
+
         listAdapter.getBranchCollection().clear();
         listAdapter.getBranchCollection().addAll(branches);
         this.runOnUiThread(new Runnable() {
@@ -53,16 +50,19 @@ public class RetrieveBranchesActivity extends Activity{
         updateShownBranches();
     }
 
-    private final class BranchesListener extends GitHubBrokerListener{
+    private final class BranchesListener extends GitHubBrokerListener {
         @Override
         public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
-            if (success){
+            if (success) {
                 onBranchesReceived(branches);
-            } else {
+            }
+            else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(),getResources().getString(R.string.error_retri_branches),Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(),
+                                getResources().getString(R.string.error_retri_branches),
+                                Toast.LENGTH_LONG);
                     }
                 });
             }
@@ -80,41 +80,48 @@ public class RetrieveBranchesActivity extends Activity{
 
         try {
             GitHubBroker.getInstance().addSubscriber(branchesListener);
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+        }
+        catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
 
         try {
             GitHubBroker.getInstance().getAllBranches();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
 
     }
 
-    private void updateShownBranches(){
+    private void updateShownBranches() {
         try {
             Thread.sleep(BRANCHES_POLL_INTERVAL_MILLIS);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
         try {
             GitHubBroker.getInstance().getAllBranches();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
-            if(GitHubBroker.getInstance().isConnected()){
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            if (GitHubBroker.getInstance().isConnected()) {
                 updateShownBranches();
             }
         }
     }
 
-    public final class BranchesListAdapter extends BaseAdapter{
 
+    public final class BranchesListAdapter extends BaseAdapter {
         private final List<GHBranch> branchCollection = new LinkedList<GHBranch>();
 
         public List<GHBranch> getBranchCollection() {
@@ -139,8 +146,10 @@ public class RetrieveBranchesActivity extends Activity{
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
-            if (convertView == null){
-                convertView = ((LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_branch,null);
+            if (convertView == null) {
+                convertView = ((LayoutInflater) getApplicationContext()
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                        .inflate(R.layout.list_item_branch, null);
                 viewHolder = new ViewHolder();
                 viewHolder.setNameView((TextView) convertView.findViewById(R.id.name_branch));
                 viewHolder.setShaView((TextView) convertView.findViewById(R.id.sha_branch));

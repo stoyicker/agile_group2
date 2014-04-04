@@ -41,7 +41,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         try {
             GitHubBroker.getInstance().addSubscriber(listener);
         }
@@ -51,14 +50,12 @@ public class MainActivity extends Activity {
         catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
-
         try {
             GitHubBroker.getInstance().getAllRepos();
         }
         catch (GitHubBroker.AlreadyNotConnectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
-
         mTitle = mDrawerTitle = getTitle();
 
         //Get Drawer Resources
@@ -196,8 +193,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
                 return;
             case 4:
-                Intent intent2 = new Intent(this,
-                        org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity.class);
+                Intent intent2 = new Intent(this, RetrieveIssuesActivity.class);
                 startActivity(intent2);
                 return;
             default:
@@ -233,19 +229,19 @@ public class MainActivity extends Activity {
                 for (GHRepository x : repos)
                     if (target == null) {
                         target = x;
+                        try {
+                            GitHubBroker.getInstance().selectRepo(target);
+                        }
+                        catch (GitHubBroker.AlreadyNotConnectedException e) {
+                            Log.wtf("debug", e.getClass().getName(), e);
+                        }
+                        catch (GitHubBroker.NullArgumentException e) {
+                            Log.wtf("debug", e.getClass().getName(), e);
+                        }
                     }
                     else {
                         break;
                     }
-            }
-            try {
-                GitHubBroker.getInstance().selectRepo(target);
-            }
-            catch (GitHubBroker.AlreadyNotConnectedException e) {
-                Log.wtf("debug", e.getClass().getName(), e);
-            }
-            catch (GitHubBroker.NullArgumentException e) {
-                Log.wtf("debug", e.getClass().getName(), e);
             }
         }
     }

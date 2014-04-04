@@ -1,78 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.arnolds.agileappproject.agileappmodule" >
+          package="org.arnolds.agileappproject.agileappmodule">
 
-    <application
-        android:allowBackup="true"
-        android:icon="@drawable/ic_arnold"
-        android:label="@string/app_name" 
-        android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
+	<application
+		android:allowBackup="true"
+		android:icon="@drawable/ic_arnold"
+		android:label="@string/app_name"
+		android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
 
-        <activity android:name=".InitialActivity"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+		<activity android:name=".InitialActivity"
+		          android:launchMode="singleTop"
+		          android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
 
-        <activity
-            android:name="org.arnolds.agileappproject.agileappmodule.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
+		<activity
+			android:name="org.arnolds.agileappproject.agileappmodule.LoginActivity"
+			android:label="@string/title_activity_login"
+			android:windowSoftInputMode="adjustResize|stateVisible">
+		</activity>
 
-        <service
-            android:name="org.arnolds.agileappproject.agileappmodule.auth.GitHubAuthenticatorService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
+		<service
+			android:name="org.arnolds.agileappproject.agileappmodule.auth.GitHubAuthenticatorService"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.accounts.AccountAuthenticator"/>
+			</intent-filter>
 
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
+			<meta-data
+				android:name="android.accounts.AccountAuthenticator"
+				android:resource="@xml/authenticator"/>
+		</service>
 
-        <activity
-            android:name="org.arnolds.agileappproject.agileappmodule.TestActivity"
-            android:label="@string/title_activity_test" >
-        </activity>
+		<activity
+			android:name="org.arnolds.agileappproject.agileappmodule.TestActivity"
+			android:label="@string/title_activity_test">
+		</activity>
 
-        <activity
-            android:name="org.arnolds.agileappproject.agileappmodule.MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
-	    <activity android:name=".RetrieveBranchesActivity"
-	              android:label="@string/ret_branches"
-	              android:launchMode="singleTop">
+		<activity
+			android:name="org.arnolds.agileappproject.agileappmodule.MainActivity"
+			android:label="@string/title_activity_main">
+		</activity>
 
-		    <intent-filter>
-			    <action android:name="android.intent.action.VIEW"/>
-			    <category android:name="android.intent.category.DEFAULT"/>
-		    </intent-filter>
-	    </activity>
-	    <activity android:name=".RetrieveIssuesActivity"
-	              android:label="@string/ret_branches"
-	              android:launchMode="singleTop">
+		<activity
+			android:name=".RetrieveBranchesActivity"
+			android:label="@string/title_activity_main">
+		</activity>
 
-		    <intent-filter>
-			    <action android:name="android.intent.action.VIEW"/>
-			    <category android:name="android.intent.category.DEFAULT"/>
-		    </intent-filter>
-	    </activity>
 
-    </application>
+		<activity
+			android:name=".RetrieveIssuesActivity"
+			android:label="@string/title_activity_main">
+		</activity>
+	</application>
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
+	<!-- To auto-complete the email text field in the login form with the user's emails -->
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+	<uses-permission android:name="android.permission.READ_PROFILE"/>
+	<uses-permission android:name="android.permission.READ_CONTACTS"/>
+	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
 </manifest>
 
