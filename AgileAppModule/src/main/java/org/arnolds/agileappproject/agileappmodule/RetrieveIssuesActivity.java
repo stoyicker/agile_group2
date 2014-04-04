@@ -6,16 +6,16 @@ import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.kohsuke.github.GHIssue;
 
@@ -70,7 +70,33 @@ public class RetrieveIssuesActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrieve_issues);
+
+
+
+        ListView listView = (ListView) findViewById(R.id.issues_list);
+        listAdapter = new IssuesListAdapter();
+        listView.setAdapter(listAdapter);
+
+        try {
+            GitHubBroker.getInstance().addSubscriber(issuesListener);
+        } catch (GitHubBroker.NullArgumentException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        }
+
+        try {
+            GitHubBroker.getInstance().getAllIssues();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        }
     }
+
+
+
+
 
     private void updateShownIssues(){
         try {
@@ -117,7 +143,7 @@ public class RetrieveIssuesActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null){
-                convertView = ((LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_branch,null);
+                convertView = ((LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_issue,null);
                 viewHolder = new ViewHolder();
                 viewHolder.setNameView((TextView) convertView.findViewById(R.id.title_issue));
                 convertView.setTag(viewHolder);
@@ -125,7 +151,9 @@ public class RetrieveIssuesActivity extends Activity {
             else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+
             GHIssue issue = getItem(position);
+            Log.wtf("Issues", issue.toString());
             viewHolder.getNameView().setText(issue.getTitle());
             return convertView;
         }
