@@ -10,4 +10,6 @@
 
     <color name="it_section_colour">#09cdda</color>
     <color name="socialist_red">#ff2400</color>
+    <color name="theme_white">#FFFFFF</color>
+    <color name="theme_dark_blue">#FF0000</color>
 </resources>

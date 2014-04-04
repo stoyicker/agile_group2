@@ -15,5 +15,12 @@
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="ret_branches">Retrieve Branches</string>
+    <string name="error_retri_branches">Error while retrieving branches</string>
+    <string name="connected">Connected</string>
+    <string name="connection_error">Error while connected</string>
+    <string name="repo_retr_error">Error retrieving repos</string>
+    <string name="no_repos">No repos found</string>
+    <string name="repo_sel_error">Error selecting repo</string>
 
 </resources>
