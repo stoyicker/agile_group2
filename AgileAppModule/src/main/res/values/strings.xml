@@ -22,5 +22,6 @@
     <string name="repo_retr_error">Error retrieving repos</string>
     <string name="no_repos">No repos found</string>
     <string name="repo_sel_error">Error selecting repo</string>
+    <string name="title_activity_retrieve_issues">RetrieveIssuesActivity</string>
 
 </resources>
