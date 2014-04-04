@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="navigation_drawer_items_titles">
-        <item>GitHub View</item>
-        <item>Pivotal Tracker View</item>
-        <item>Planning Poker</item>
-        <item>Temp Test Activity</item>
-    </string-array>
+	<string-array name="navigation_drawer_items_titles">
+		<item>GitHub View</item>
+		<item>Pivotal Tracker View</item>
+		<item>Planning Poker</item>
+		<item>Branches</item>
+		<item>Issues</item>
+	</string-array>
 
-    <array name="nav_drawer_icons">
-        <item>@drawable/ic_arnold</item>
-        <item>@drawable/ic_arnold</item>
-        <item>@drawable/ic_arnold</item>
-        <item>@drawable/ic_arnold</item>
-    </array>
+	<array name="nav_drawer_icons">
+		<item>@drawable/ic_arnold</item>
+		<item>@drawable/ic_arnold</item>
+		<item>@drawable/ic_arnold</item>
+		<item>@drawable/ic_arnold</item>
+		<item>@drawable/ic_arnold</item>
+	</array>
 
-    <string name="navigation_drawer_icon_content_description">List Icon</string>
+	<string name="navigation_drawer_icon_content_description">List Icon</string>
 </resources>

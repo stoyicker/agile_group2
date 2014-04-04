@@ -7,6 +7,17 @@
         android:icon="@drawable/ic_arnold"
         android:label="@string/app_name" 
         android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
+
+        <activity android:name=".InitialActivity"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name="org.arnolds.agileappproject.agileappmodule.LoginActivity"
             android:label="@string/title_activity_login"
@@ -33,20 +44,25 @@
         <activity
             android:name="org.arnolds.agileappproject.agileappmodule.MainActivity"
             android:label="@string/title_activity_main" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-        <activity android:name=".RetrieveBranchesActivity"
-            android:label="@string/ret_branches"
-            android:launchMode="singleTop">
+	    <activity android:name=".RetrieveBranchesActivity"
+	              android:label="@string/ret_branches"
+	              android:launchMode="singleTop">
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
+		    <intent-filter>
+			    <action android:name="android.intent.action.VIEW"/>
+			    <category android:name="android.intent.category.DEFAULT"/>
+		    </intent-filter>
+	    </activity>
+	    <activity android:name=".RetrieveIssuesActivity"
+	              android:label="@string/ret_branches"
+	              android:launchMode="singleTop">
+
+		    <intent-filter>
+			    <action android:name="android.intent.action.VIEW"/>
+			    <category android:name="android.intent.category.DEFAULT"/>
+		    </intent-filter>
+	    </activity>
 
     </application>
 

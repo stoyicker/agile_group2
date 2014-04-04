@@ -9,13 +9,19 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
+import org.kohsuke.github.GHRepository;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -29,11 +35,29 @@ public class MainActivity extends Activity {
     private TypedArray mDrawerIcons;
     private CharSequence mTitle;
     private CharSequence mDrawerTitle;
+    private InnerListener listener = new InnerListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try {
+            GitHubBroker.getInstance().addSubscriber(listener);
+        }
+        catch (GitHubBroker.NullArgumentException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        }
+        catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        }
+
+        try {
+            GitHubBroker.getInstance().getAllRepos();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            Log.wtf("debug", e.getClass().getName(), e);
+        }
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -47,8 +71,9 @@ public class MainActivity extends Activity {
 
         //Populate ArrayList with DrawerItems
         List<DrawerItem> drawerItemList = new ArrayList<DrawerItem>();
-        for(int i=0; i < mDrawerTitles.length; i++) {
-            DrawerItem item = new DrawerItem(mDrawerTitles[i], mDrawerIcons.getResourceId(i, DEFAULT_ICON_ID));
+        for (int i = 0; i < mDrawerTitles.length; i++) {
+            DrawerItem item = new DrawerItem(mDrawerTitles[i],
+                    mDrawerIcons.getResourceId(i, DEFAULT_ICON_ID));
             drawerItemList.add(item);
         }
 
@@ -101,7 +126,7 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_activity_actions_logged_in, menu);
         return super.onCreateOptionsMenu(menu);
@@ -155,7 +180,8 @@ public class MainActivity extends Activity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    private class DrawerItemClickListener implements android.widget.AdapterView.OnItemClickListener {
+    private class DrawerItemClickListener
+            implements android.widget.AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
@@ -164,16 +190,21 @@ public class MainActivity extends Activity {
 
     private void selectItem(int position) {
         Fragment fragment;
-        switch(position) {
+        switch (position) {
             case 3:
-                Intent intent = new Intent(this, TestActivity.class);
+                Intent intent = new Intent(this, RetrieveBranchesActivity.class);
                 startActivity(intent);
+                return;
+            case 4:
+                Intent intent2 = new Intent(this,
+                        org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity.class);
+                startActivity(intent2);
                 return;
             default:
                 fragment = null;
         }
 
-        if(fragment != null) {
+        if (fragment != null) {
             // Insert the fragment by replacing any existing fragment
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
@@ -186,5 +217,36 @@ public class MainActivity extends Activity {
         }
 
         mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    private class InnerListener extends GitHubBrokerListener {
+        /**
+         * Callback for getAllRepos.
+         *
+         * @param success {@link String} The success of the operation.
+         * @param repos   {@link java.util.Collection.<org.kohsuke.github.GHRepository></org.kohsuke.github.GHRepository>} The collection of repositories.
+         */
+        @Override
+        public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
+            GHRepository target = null;
+            if (!repos.isEmpty()) {
+                for (GHRepository x : repos)
+                    if (target == null) {
+                        target = x;
+                    }
+                    else {
+                        break;
+                    }
+            }
+            try {
+                GitHubBroker.getInstance().selectRepo(target);
+            }
+            catch (GitHubBroker.AlreadyNotConnectedException e) {
+                Log.wtf("debug", e.getClass().getName(), e);
+            }
+            catch (GitHubBroker.NullArgumentException e) {
+                Log.wtf("debug", e.getClass().getName(), e);
+            }
+        }
     }
 }

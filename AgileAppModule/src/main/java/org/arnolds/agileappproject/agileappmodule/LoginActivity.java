@@ -30,6 +30,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.arnolds.agileappproject.agileappmodule.auth.GitHubAuthenticator;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
@@ -69,6 +70,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
     public static final String TOKEN_TYPE = "GITHUB";
     public static final String ACCOUNT_TYPE = "org.arnolds.agileappproject.agileappmodule.account";
 
+    public static final int MAIN_ACTIVITY = 0;
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -87,15 +90,26 @@ public class LoginActivity extends AccountAuthenticatorActivity {
     private String mPassword;
 
     private Context mContext;
+    private Bundle credentials;
+    private int mNextActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        GitHubAuthenticator mGitHubAuthenticator = new GitHubAuthenticator(this);
+        credentials = mGitHubAuthenticator.getCredentials();
+
+
+
+
         setContentView(R.layout.activity_login);
 
         mContext = getBaseContext();
 
         mAccountManager = AccountManager.get(getBaseContext());
+
+        mNextActivity = getIntent().getIntExtra(InitialActivity.LAUNCH_ACTIVITY, -1);
 
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -123,6 +137,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        // != null => there is a stored account.
+        if(credentials != null) {
+            mUsername = credentials.getString(GitHubAuthenticator.USERNAME);
+            mPassword = credentials.getString(GitHubAuthenticator.PASSWORD);
+            showProgress(true);
+            submit();
+
+        }
     }
 
     /**
@@ -221,11 +244,26 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
                 @Override
                 public void onConnected() {
+                    Log.d("DEBUG","onConnected");
                     runOnUiThread(new Runnable() {
                         public void run() {
                             showProgress(false);
                             Toast.makeText(mContext, "Connected",
                                     Toast.LENGTH_SHORT).show();
+
+                            switch (mNextActivity){
+                                //TODO remove magic strings
+                                case MAIN_ACTIVITY:
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    break;
+                                default:
+                            }
+
+
+                            //if an account already exists skip finishLogin()
+                            if (credentials != null){
+                                finish();
+                            }
                             finishLogin();
                         }
                     });
