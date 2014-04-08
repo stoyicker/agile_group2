@@ -20,12 +20,6 @@ public interface IGitHubBrokerListener {
     public void onConnectionRefused(String reason);
 
     /**
-     * Callback for when {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} is disconnected.
-     */
-    //TODO Poll continously for connection status
-    public void onDisconnected();
-
-    /**
      * Callback for getAllIssues.
      *
      * @param success {@link String} The success of the operation.
