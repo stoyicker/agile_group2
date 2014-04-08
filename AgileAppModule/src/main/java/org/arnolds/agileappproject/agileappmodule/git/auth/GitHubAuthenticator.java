@@ -30,11 +30,10 @@ public class GitHubAuthenticator extends AbstractAccountAuthenticator {
     }
 
     @Override
-    public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
+    public Bundle addAccount(AccountAuthenticatorResponse response, String accountType,
+                             String authTokenType, String[] requiredFeatures, Bundle options)
+            throws NetworkErrorException {
         final Intent intent = new Intent(mContext, LoginActivity.class);
-        intent.putExtra(LoginActivity.ARG_ACCOUNT_TYPE, accountType);
-        intent.putExtra(LoginActivity.ARG_AUTH_TYPE, authTokenType);
-        intent.putExtra(LoginActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -42,12 +41,14 @@ public class GitHubAuthenticator extends AbstractAccountAuthenticator {
     }
 
     @Override
-    public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account, Bundle options) throws NetworkErrorException {
+    public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
+                                     Bundle options) throws NetworkErrorException {
         return null;
     }
 
     @Override
-    public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+    public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
+                               String authTokenType, Bundle options) throws NetworkErrorException {
         // Extract the username and password from the Account Manager, and ask
         // the server for an appropriate AuthToken.
         final AccountManager am = AccountManager.get(mContext);
@@ -89,12 +90,15 @@ public class GitHubAuthenticator extends AbstractAccountAuthenticator {
     }
 
     @Override
-    public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+    public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account,
+                                    String authTokenType, Bundle options)
+            throws NetworkErrorException {
         return null;
     }
 
     @Override
-    public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account, String[] features) throws NetworkErrorException {
+    public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account,
+                              String[] features) throws NetworkErrorException {
         return null;
     }
 
@@ -102,6 +106,7 @@ public class GitHubAuthenticator extends AbstractAccountAuthenticator {
      * Returns a bundle with GitHub credentials if such credentials exist in the AccountManager. Otherwise returns null.
      * Should then proceed to LoginActivity to login to GitHub.
      * TODO: Use tokens instead. This is a temporary solution for testing. Passwords are given in plaintext.
+     *
      * @return Bundle with GitHub credentials.
      */
     public Bundle getCredentials() {

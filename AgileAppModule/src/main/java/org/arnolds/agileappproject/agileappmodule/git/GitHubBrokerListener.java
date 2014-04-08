@@ -25,15 +25,6 @@ public abstract class GitHubBrokerListener implements IGitHubBrokerListener {
      */
     @Override
     public void onConnectionRefused(String reason) {
-
-    }
-
-    /**
-     * Callback for when {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} is disconnected.
-     */
-    @Override
-    public void onDisconnected() {
-
     }
 
     /**

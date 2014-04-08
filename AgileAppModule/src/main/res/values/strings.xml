@@ -12,7 +12,8 @@
 	<string name="ret_branches">Retrieve Branches</string>
 	<string name="error_retri_branches">Error while retrieving branches</string>
 	<string name="connected">Connected</string>
-	<string name="connection_error">Error while connected</string>
+	<string name="connection_error">Error while connecting</string>
+	<string name="connection_success">Connected</string>
 	<string name="repo_retr_error">Error retrieving repositories</string>
 	<string name="no_repos">No repos found</string>
 	<string name="repo_sel_error">Error selecting repo</string>

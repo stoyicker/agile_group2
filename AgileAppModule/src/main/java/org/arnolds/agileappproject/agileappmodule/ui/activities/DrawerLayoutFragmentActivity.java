@@ -1,11 +1,11 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
@@ -119,7 +119,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             navigatedItemsStack.add(0);
         }
 
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         NavigationDrawerListFragment mNavigationDrawerListFragment = (NavigationDrawerListFragment)
                 fragmentManager.findFragmentById(R.id.navigation_drawer);

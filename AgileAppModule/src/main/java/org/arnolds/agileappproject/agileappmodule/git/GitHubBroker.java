@@ -1,6 +1,5 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -15,9 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 
 public class GitHubBroker implements IGitHubBroker {
 
@@ -104,11 +101,12 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... params) {
-                IGitHubBrokerListener callback = ((IGitHubBrokerListener)params[3]);
+                IGitHubBrokerListener callback = ((IGitHubBrokerListener) params[2]);
                 GitHub tempSession;
 
                 try {
-                    tempSession = GitHub.connectUsingPassword(params[0].toString(), params[1].toString());
+                    tempSession =
+                            GitHub.connectUsingPassword(params[0].toString(), params[1].toString());
                     if (tempSession.isCredentialValid()) {
                         session = tempSession;
                         user = session.getMyself();
@@ -157,8 +155,8 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... params) {
-                GHRepository repo = (GHRepository)params[0];
-                IGitHubBrokerListener callback = (IGitHubBrokerListener)params[1];
+                GHRepository repo = (GHRepository) params[0];
+                IGitHubBrokerListener callback = (IGitHubBrokerListener) params[1];
                 try {
                     Map<String, GHRepository> repositories = user.getRepositories();
                     boolean success = repositories.values().contains(repo);
@@ -167,7 +165,7 @@ public class GitHubBroker implements IGitHubBroker {
                         repository = repo;
                     }
                     synchronized (asyncLock) {
-                        if(callback != null) {
+                        if (callback != null) {
                             callback.onRepoSelected(success);
                         }
                     }
@@ -181,7 +179,8 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllBranches(IGitHubBrokerListener callback) throws RepositoryNotSelectedException,
+    public void getAllBranches(IGitHubBrokerListener callback)
+            throws RepositoryNotSelectedException,
             AlreadyNotConnectedException {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
@@ -201,8 +200,9 @@ public class GitHubBroker implements IGitHubBroker {
                 }
                 boolean success = branches != null;
                 synchronized (asyncLock) {
-                    if(params[0] != null) {
-                        params[0].onAllBranchesRetrieved(success, success ? branches.values() : null);
+                    if (params[0] != null) {
+                        params[0].onAllBranchesRetrieved(success,
+                                success ? branches.values() : null);
                     }
                 }
                 return null;
@@ -227,7 +227,7 @@ public class GitHubBroker implements IGitHubBroker {
                 }
                 boolean success = repos != null;
                 synchronized (asyncLock) {
-                    if(params[0] != null){
+                    if (params[0] != null) {
                         params[0].onAllReposRetrieved(success, success ? repos.values() : null);
                     }
                     return null;
@@ -237,7 +237,8 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllIssues(IGitHubBrokerListener callback) throws RepositoryNotSelectedException, AlreadyNotConnectedException {
+    public void getAllIssues(IGitHubBrokerListener callback)
+            throws RepositoryNotSelectedException, AlreadyNotConnectedException {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
         }
@@ -259,7 +260,7 @@ public class GitHubBroker implements IGitHubBroker {
                 }
 
                 synchronized (asyncLock) {
-                    if(params[0] != null){
+                    if (params[0] != null) {
                         params[0].onAllIssuesRetrieved(success, success ? issues : null);
                     }
                     return null;

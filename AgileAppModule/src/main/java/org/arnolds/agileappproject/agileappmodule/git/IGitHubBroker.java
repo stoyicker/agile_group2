@@ -32,7 +32,7 @@ public interface IGitHubBroker {
     /**
      * Asynchronously selects a repo to work with, giving response on the provided callback.
      *
-     * @param repo {@link org.kohsuke.github.GHRepository} The repository to select.
+     * @param repo     {@link org.kohsuke.github.GHRepository} The repository to select.
      * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.NullArgumentException} If repo is null.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
@@ -42,11 +42,13 @@ public interface IGitHubBroker {
 
     /**
      * Asynchronously return all branches of the working repository, giving response on the provided callback.
+     *
      * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
-    public void getAllBranches(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
+    public void getAllBranches(IGitHubBrokerListener callback)
+            throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
 
     /**
@@ -55,7 +57,8 @@ public interface IGitHubBroker {
      * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
-    public void getAllRepos(IGitHubBrokerListener callback) throws GitHubBroker.AlreadyNotConnectedException;
+    public void getAllRepos(IGitHubBrokerListener callback)
+            throws GitHubBroker.AlreadyNotConnectedException;
 
     /**
      * Asynchronously return all issues of the working repository, giving response on the provided callback.
@@ -64,6 +67,7 @@ public interface IGitHubBroker {
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
-    public void getAllIssues(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
+    public void getAllIssues(IGitHubBrokerListener callback)
+            throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
 }

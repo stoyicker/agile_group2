@@ -79,17 +79,7 @@ public class RetrieveBranchesActivity extends Activity {
         listView.setAdapter(listAdapter);
 
         try {
-            GitHubBroker.getInstance().addSubscriber(branchesListener);
-        }
-        catch (GitHubBroker.NullArgumentException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
-        catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
-
-        try {
-            GitHubBroker.getInstance().getAllBranches();
+            GitHubBroker.getInstance().getAllBranches(branchesListener);
         }
         catch (GitHubBroker.RepositoryNotSelectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
@@ -108,7 +98,7 @@ public class RetrieveBranchesActivity extends Activity {
             Log.wtf("debug", e.getClass().getName(), e);
         }
         try {
-            GitHubBroker.getInstance().getAllBranches();
+            GitHubBroker.getInstance().getAllBranches(branchesListener);
         }
         catch (GitHubBroker.RepositoryNotSelectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
@@ -119,8 +109,7 @@ public class RetrieveBranchesActivity extends Activity {
             }
         }
     }
-
-
+    
     public final class BranchesListAdapter extends BaseAdapter {
         private final List<GHBranch> branchCollection = new LinkedList<GHBranch>();
 

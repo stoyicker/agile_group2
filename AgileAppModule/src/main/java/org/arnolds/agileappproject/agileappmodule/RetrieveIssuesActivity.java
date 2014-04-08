@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
-import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.kohsuke.github.GHIssue;
 
@@ -32,12 +31,10 @@ public class RetrieveIssuesActivity extends Activity {
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         View ret = super.onCreateView(parent, name, context, attrs);
-
-
         return ret;
     }
 
-    private void onIssuesReceived(Collection<GHIssue> issues){
+    private void onIssuesReceived(Collection<GHIssue> issues) {
         listAdapter.getIssueCollection().clear();
         listAdapter.getIssueCollection().addAll(issues);
         this.runOnUiThread(new Runnable() {
@@ -49,16 +46,19 @@ public class RetrieveIssuesActivity extends Activity {
         updateShownIssues();
     }
 
-    private final class IssuesListener extends GitHubBrokerListener{
+    private final class IssuesListener extends GitHubBrokerListener {
         @Override
         public void onAllIssuesRetrieved(boolean success, Collection<GHIssue> issues) {
-            if (success){
+            if (success) {
                 onIssuesReceived(issues);
-            } else {
+            }
+            else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_retri_branches), Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(),
+                                getResources().getString(R.string.error_retri_branches),
+                                Toast.LENGTH_LONG);
                     }
                 });
             }
@@ -71,45 +71,36 @@ public class RetrieveIssuesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrieve_issues);
 
-
-
         ListView listView = (ListView) findViewById(R.id.issues_list);
         listAdapter = new IssuesListAdapter();
         listView.setAdapter(listAdapter);
 
         try {
-            GitHubBroker.getInstance().addSubscriber(issuesListener);
-        } catch (GitHubBroker.NullArgumentException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+            GitHubBroker.getInstance().getAllIssues(issuesListener);
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
-
-        try {
-            GitHubBroker.getInstance().getAllIssues();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
     }
 
-
-
-
-
-    private void updateShownIssues(){
+    private void updateShownIssues() {
         try {
             Thread.sleep(ISSUES_POLL_INTERVAL_MILLIS);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
         try {
-            GitHubBroker.getInstance().getAllIssues();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            GitHubBroker.getInstance().getAllIssues(issuesListener);
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
-            if(GitHubBroker.getInstance().isConnected()){
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            if (GitHubBroker.getInstance().isConnected()) {
                 updateShownIssues();
             }
         }
@@ -142,8 +133,10 @@ public class RetrieveIssuesActivity extends Activity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
-            if (convertView == null){
-                convertView = ((LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.list_item_issue,null);
+            if (convertView == null) {
+                convertView = ((LayoutInflater) getApplicationContext()
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                        .inflate(R.layout.list_item_issue, null);
                 viewHolder = new ViewHolder();
                 viewHolder.setNameView((TextView) convertView.findViewById(R.id.title_issue));
                 convertView.setTag(viewHolder);
