@@ -22,7 +22,8 @@ import java.util.List;
  * Created by thrawn on 08/04/14.
  */
 public class GitHubNotificationServiceTests extends InstrumentationTestCase {
-
+    public static final long SECOND = 1000;
+    public static final long SLEEP_TIME = 10;
     private GitHubNotificationService service;
     private GHRepository repo = Mockito.mock(GHRepository.class);
     private GitHubBroker broker = Mockito.mock(GitHubBroker.class);
@@ -70,26 +71,37 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
 
         Mockito.when(repo.listCommits().asList()).thenReturn(dummyCommits);
 
-
-
-        while (!listener.receivedEvent) {
-
+        //Wait for event in SLEEP_TIME seconds
+        for (int i = 0; !listener.isEventReceived() || i < SLEEP_TIME; i++) {
+            try {
+                Thread.sleep(SECOND);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
+        assertTrue(listener.isEventReceived());
+
+        List<GHCommit> commits = listener.getCommits();
+        assertTrue(commits.containsAll(dummyCommits));
     }
 
 
     private class myListener implements PropertyChangeListener {
 
         private List<GHCommit> commits;
-        public boolean receivedEvent = false;
+        private boolean eventReceived = false;
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             commits = (List<GHCommit>) event.getNewValue();
-            receivedEvent = true;
+            eventReceived = true;
 
 
+        }
+
+        public boolean isEventReceived() {
+            return  eventReceived;
         }
 
         public List<GHCommit> getCommits() {
