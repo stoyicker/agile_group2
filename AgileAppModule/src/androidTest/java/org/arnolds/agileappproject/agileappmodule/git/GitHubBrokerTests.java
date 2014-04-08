@@ -91,6 +91,15 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
                 repositories.values());
     }
 
+    public void test_getRepositories_connected_nullCallback() {
+        try {
+            broker.getAllRepos(null);
+        }
+        catch (Exception e) {
+            fail();
+        }
+    }
+
     public void test_getRepositories_not_connected() {
         try {
             broker.disconnect();
@@ -146,6 +155,22 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
                 .onAllIssuesRetrieved(true, expectedIssues);
     }
 
+    public void test_getIssues_connected_selected_nullCallback() {
+        try {
+            broker.selectRepo(repo, listener);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        try {
+            broker.getAllIssues(null);
+        }
+        catch (Exception e) {
+            fail();
+        }
+    }
+
     public void test_getIssues_connected_not_selected() {
         try {
             broker.getAllIssues(listener);
@@ -192,6 +217,22 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
         }
         Mockito.verify(listener, timeout(TIMEOUT_MILLIS))
                 .onAllBranchesRetrieved(true, branches.values());
+    }
+
+    public void test_getBranches_connected_selected_nullCallback() {
+        try {
+            broker.selectRepo(repo, listener);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        try {
+            broker.getAllBranches(null);
+        }
+        catch (Exception e) {
+            fail();
+        }
     }
 
     public void test_getBranches_connected_not_selected() {
@@ -254,6 +295,15 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             fail();
         }
         Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+    }
+
+    public void test_select_repo_valid_nullCallback() {
+        try {
+            broker.selectRepo(repo, listener);
+        }
+        catch (Exception e) {
+            fail();
+        }
     }
 
     public void test_disconnect_when_not_connected() {
