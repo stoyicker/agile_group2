@@ -32,10 +32,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
 
     public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
     public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
-    //    public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
     public static final String ACCOUNT_TYPE = "org.arnolds.agileappproject.agileappmodule.account";
-    public static final String LAUNCH_HOME_ACTIVTY = "launch_home_activity";
-    public Boolean launchHome = false;
+    public static final String LAUNCH_HOME_ACTIVITY = "LAUNCH_HOME";
+    private static final int MINIMUM_PASSWORD_LENGTH = 7;
+    private Boolean launchHome = false;
 
     // UI references.
     private EditText mUsernameView;
@@ -73,7 +73,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
             getFragmentManager().popBackStack();
             runOnUiThread(new Runnable() {
                 public void run() {
-                    Toast.makeText(getApplicationContext(), AgileAppModuleUtils
+                    Toast.makeText(LoginActivity.this.getApplicationContext(), AgileAppModuleUtils
                                     .getString(getApplicationContext(), "connection_error",
                                             null),
                             Toast.LENGTH_SHORT
@@ -91,11 +91,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        launchHome = getIntent().getBooleanExtra(LAUNCH_HOME_ACTIVTY, false);
-
         listener = new InnerListener();
 
-        launchHome = getIntent().getBooleanExtra(LAUNCH_HOME_ACTIVTY, false);
+        launchHome = getIntent().getBooleanExtra(LAUNCH_HOME_ACTIVITY, false);
 
         setContentView(R.layout.activity_login);
 
@@ -118,8 +116,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
                 return false;
             }
         });
-
-//        mProgressView = findViewById(R.id.login_progress);
     }
 
     /**
@@ -128,8 +124,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-
-
         // Reset errors.
         mUsernameView.setError(null);
         mPasswordView.setError(null);
@@ -141,14 +135,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
         boolean cancel = false;
         View focusView = null;
 
-
-        // Check for a valid password
-        if (TextUtils.isEmpty(mPassword) || !isPasswordValid(mPassword)) {
+        if (TextUtils.isEmpty(mPassword) || !isGitHubPasswordValid(mPassword)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
-
 
         if (TextUtils.isEmpty(mUsername)) {
             mUsernameView.setError(getString(R.string.error_field_required));
@@ -168,48 +159,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
         }
     }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+    private boolean isGitHubPasswordValid(String password) {
+        //Implemented real GitHub credentials validation
+        return password.length() >= MINIMUM_PASSWORD_LENGTH && password.matches(".*\\d.*") &&
+                password.matches(".*[a-z].*");
     }
-
-//    /**
-//     * Shows the progress UI and hides the login form.
-//     */
-//    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-//    public void showProgress(final boolean show) {
-//        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-//        // for very easy animations. If available, use these APIs to fade-in
-//        // the progress spinner.
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-//            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-//
-//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-//                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//                }
-//            });
-//
-//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//            mProgressView.animate().setDuration(shortAnimTime).alpha(
-//                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//                }
-//            });
-//        }
-//        else {
-//            // The ViewPropertyAnimator APIs are not available, so simply show
-//            // and hide the relevant UI components.
-//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//        }
-//    }
-
 
     public void submit() {
         getFragmentManager().beginTransaction()
@@ -241,10 +195,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
 
-        Log.d("LoginActivity", "finished login");
-        //Log.d("LoginActivity", "token for: "+mUsername+"="+token);
         if (launchHome) {
-            Log.d("debug", "I'M IN");
             startActivity(new Intent(getApplicationContext(), HomeActivity.class));
         }
         finish();
