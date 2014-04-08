@@ -121,9 +121,11 @@ public class GitHubBroker implements IGitHubBroker {
                     for (IGitHubBrokerListener listener : listeners)
                         listener.onConnectionRefused(e.getMessage());
                 }
-                if (isConnected()) {
-                    for (IGitHubBrokerListener listener : listeners)
-                        listener.onConnected();
+                synchronized (GitHubBroker.this) {
+                    if (isConnected()) {
+                        for (IGitHubBrokerListener listener : listeners)
+                            listener.onConnected();
+                    }
                 }
                 return null;
             }
@@ -138,8 +140,10 @@ public class GitHubBroker implements IGitHubBroker {
         session = null;
         user = null;
         repository = null;
-        for (IGitHubBrokerListener listener : listeners)
-            listener.onDisconnected();
+        synchronized (GitHubBroker.this) {
+            for (IGitHubBrokerListener listener : listeners)
+                listener.onDisconnected();
+        }
     }
 
     @Override
@@ -148,10 +152,12 @@ public class GitHubBroker implements IGitHubBroker {
         if (listener == null) {
             throw new NullArgumentException();
         }
-        if (listeners.contains(listener)) {
-            throw new ListenerAlreadyRegisteredException();
+        synchronized (GitHubBroker.this) {
+            if (listeners.contains(listener)) {
+                throw new ListenerAlreadyRegisteredException();
+            }
+            listeners.add(listener);
         }
-        listeners.add(listener);
     }
 
 
@@ -161,10 +167,12 @@ public class GitHubBroker implements IGitHubBroker {
         if (listener == null) {
             throw new NullArgumentException();
         }
-        if (!listeners.contains(listener)) {
-            throw new ListenerNotRegisteredException();
+        synchronized (GitHubBroker.this) {
+            if (!listeners.contains(listener)) {
+                throw new ListenerNotRegisteredException();
+            }
+            listeners.remove(listener);
         }
-        listeners.remove(listener);
     }
 
     @Override
@@ -186,8 +194,10 @@ public class GitHubBroker implements IGitHubBroker {
                         Log.d("debug", "repository set to: " + params[0].toString());
                         repository = params[0];
                     }
-                    for (IGitHubBrokerListener listener : listeners)
-                        listener.onRepoSelected(success);
+                    synchronized (GitHubBroker.this) {
+                        for (IGitHubBrokerListener listener : listeners)
+                            listener.onRepoSelected(success);
+                    }
                 }
                 catch (IOException e) {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
@@ -217,9 +227,11 @@ public class GitHubBroker implements IGitHubBroker {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 boolean success = branches != null;
-                for (IGitHubBrokerListener listener : listeners)
-                    listener.onAllBranchesRetrieved(success,
-                            success ? branches.values() : null);
+                synchronized (GitHubBroker.this) {
+                    for (IGitHubBrokerListener listener : listeners)
+                        listener.onAllBranchesRetrieved(success,
+                                success ? branches.values() : null);
+                }
                 return null;
             }
         }.execute();
@@ -241,10 +253,12 @@ public class GitHubBroker implements IGitHubBroker {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 boolean success = repos != null;
-                for (IGitHubBrokerListener listener : listeners)
-                    listener.onAllReposRetrieved(success,
-                            success ? repos.values() : null);
-                return null;
+                synchronized (GitHubBroker.this) {
+                    for (IGitHubBrokerListener listener : listeners)
+                        listener.onAllReposRetrieved(success,
+                                success ? repos.values() : null);
+                    return null;
+                }
             }
         }.execute();
     }
@@ -269,10 +283,12 @@ public class GitHubBroker implements IGitHubBroker {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
                 boolean success = openIssues != null;
-                for (IGitHubBrokerListener listener : listeners)
-                    listener.onAllIssuesRetrieved(success,
-                            success ? openIssues : null);
-                return null;
+                synchronized (GitHubBroker.this) {
+                    for (IGitHubBrokerListener listener : listeners)
+                        listener.onAllIssuesRetrieved(success,
+                                success ? openIssues : null);
+                    return null;
+                }
             }
         }.execute();
     }
