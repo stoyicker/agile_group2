@@ -101,7 +101,7 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... params) {
-                IGitHubBrokerListener callback = ((IGitHubBrokerListener) params[2]);
+                IGitHubBrokerListener callback = ((IGitHubBrokerListener)params[2]);
                 GitHub tempSession;
 
                 try {
@@ -225,9 +225,10 @@ public class GitHubBroker implements IGitHubBroker {
                 catch (IOException e) {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
+
                 boolean success = repos != null;
                 synchronized (asyncLock) {
-                    if (params[0] != null) {
+                    if(params[0] != null){
                         params[0].onAllReposRetrieved(success, success ? repos.values() : null);
                     }
                     return null;
