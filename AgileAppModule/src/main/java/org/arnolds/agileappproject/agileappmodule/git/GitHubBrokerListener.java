@@ -24,41 +24,34 @@ public abstract class GitHubBrokerListener implements IGitHubBrokerListener {
      * @param reason {@link String} Reason of the failure.
      */
     @Override
-    public void onConnectionRefused(String reason) {
-    }
+    public void onConnectionRefused(String reason) {}
 
     /**
      * Callback for getAllIssues.
      *
      * @param success {@link String} The success of the operation.
-     * @param issues  {@link java.util.Collection.<org.kohsuke.github.GHIssue></org.kohsuke.github.GHIssue>} The collection of issues
+     * @param issues  {@link java.util.Collection<org.kohsuke.github.GHIssue></org.kohsuke.github.GHIssue>} The collection of issues
      */
     @Override
-    public void onAllIssuesRetrieved(boolean success, Collection<GHIssue> issues) {
-
-    }
+    public void onAllIssuesRetrieved(boolean success, Collection<GHIssue> issues) {}
 
     /**
      * Callback for getAllBranches.
      *
      * @param success  {@link String} The success of the operation.
-     * @param branches {@link java.util.Collection.<org.kohsuke.github.GHBranch></org.kohsuke.github.GHBranch>} The collection of branches.
+     * @param branches {@link java.util.Collection<org.kohsuke.github.GHBranch></org.kohsuke.github.GHBranch>} The collection of branches.
      */
     @Override
-    public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
-
-    }
+    public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {}
 
     /**
      * Callback for getAllRepos.
      *
      * @param success {@link String} The success of the operation.
-     * @param repos   {@link java.util.Collection.<org.kohsuke.github.GHRepository></org.kohsuke.github.GHRepository>} The collection of repositories.
+     * @param repos   {@link java.util.Collection<org.kohsuke.github.GHRepository></org.kohsuke.github.GHRepository>} The collection of repositories.
      */
     @Override
-    public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
-
-    }
+    public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {}
 
     /**
      * Callback for selectRepo.
@@ -66,7 +59,5 @@ public abstract class GitHubBrokerListener implements IGitHubBrokerListener {
      * @param result {@link Boolean} The success of the operation.
      */
     @Override
-    public void onRepoSelected(boolean result) {
-
-    }
+    public void onRepoSelected(boolean result) {}
 }
