@@ -1,23 +1,30 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
-
-
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
-import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.kohsuke.github.GHRepository;
+import org.mockito.Mockito;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 
 /**
  * Created by thrawn on 08/04/14.
  */
-class GitHubNotificationService extends GitHubBrokerListener {
-
-    private static GitHubNotificationService instance;
+public class GitHubNotificationService {
 
     private GHRepository repo;
+    private GitHubBroker broker;
+
+    private static GitHubNotificationService instance;
+    private PropertyChangeSupport propertyChangeSupport;
+
 
 
     private GitHubNotificationService() {
+        propertyChangeSupport = new PropertyChangeSupport(this);
 
 
     }
@@ -30,8 +37,16 @@ class GitHubNotificationService extends GitHubBrokerListener {
     }
 
 
-    @Override
-    public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
-        repo = repos.
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
+
+
+    private class myGitHubBrokerListener extends GitHubBrokerListener {
+
+    }
+
+
+
 }
