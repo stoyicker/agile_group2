@@ -11,7 +11,8 @@
 		android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
 		<activity android:name=".InitialActivity"
 		          android:launchMode="singleTop"
-		          android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+		          android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+		          android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
@@ -27,7 +28,11 @@
 		<activity
 			android:name="org.arnolds.agileappproject.agileappmodule.LoginActivity"
 			android:label="@string/title_activity_login"
-			android:windowSoftInputMode="adjustResize|stateVisible">
+			android:windowSoftInputMode="adjustResize">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
 		</activity>
 		<service
 			android:name=".git.auth.GitHubAuthenticatorService"
@@ -45,11 +50,19 @@
 			android:name=".RetrieveBranchesActivity"
 			android:label="@string/title_activity_main"
 			android:launchMode="singleTop">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
 		</activity>
 		<activity
 			android:name=".RetrieveIssuesActivity"
 			android:label="@string/title_activity_main"
 			android:launchMode="singleTop">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
 		</activity>
 	</application>
 </manifest>

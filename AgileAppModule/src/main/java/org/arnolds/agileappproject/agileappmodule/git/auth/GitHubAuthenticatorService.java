@@ -8,8 +8,7 @@ public class GitHubAuthenticatorService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-
         GitHubAuthenticator mGitHubAuthenticator = new GitHubAuthenticator(this);
-        return  mGitHubAuthenticator.getIBinder();
+        return mGitHubAuthenticator.getIBinder();
     }
 }

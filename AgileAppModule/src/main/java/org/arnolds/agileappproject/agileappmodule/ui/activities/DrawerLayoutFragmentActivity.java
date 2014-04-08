@@ -78,9 +78,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         Class target = null;
         switch (position) {
             case 0:
+                //TODO: Decide on a 'Home' content
+                return;
+            case 1:
                 target = RetrieveBranchesActivity.class;
                 break;
-            case 5:
+            case 2:
                 target = RetrieveIssuesActivity.class;
                 break;
             default:
@@ -122,7 +125,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         NavigationDrawerListFragment mNavigationDrawerListFragment = (NavigationDrawerListFragment)
-                fragmentManager.findFragmentById(R.id.navigation_drawer);
+                fragmentManager.findFragmentById(R.id.navigation_drawer_list);
 
         mNavigationDrawerListFragment.setHasOptionsMenu(Boolean.TRUE);
 
@@ -130,7 +133,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         // Set up the drawer.
         mNavigationDrawerListFragment.setUp(
-                R.id.navigation_drawer,
+                R.id.navigation_drawer_list,
                 drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 

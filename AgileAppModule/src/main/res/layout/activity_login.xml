@@ -24,10 +24,12 @@
 
 			<EditText
 				android:id="@+id/username"
+				android:layout_marginTop="@dimen/login_top_to_username_margin"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:hint="@string/prompt_username"
 				android:inputType="text"
+				android:imeOptions="actionNext"
 				android:maxLines="1"
 				android:text="agilearnold"
 				android:singleLine="true"/>
@@ -38,15 +40,16 @@
 				android:layout_height="wrap_content"
 				android:hint="@string/prompt_password"
 				android:imeActionId="@+id/login"
-				android:imeActionLabel="@string/action_sign_in_short"
-				android:imeOptions="actionUnspecified"
+				android:imeOptions="actionDone"
 				android:inputType="textPassword"
 				android:maxLines="1"
 				android:text="beback2"
 				android:singleLine="true"/>
 
-			<fragment
-				android:id="@+id/log_in_button_fragment"
+			<LinearLayout
+				android:id="@+id/fragment_container"
+				android:orientation="horizontal"
+				android:layout_marginTop="@dimen/login_password_to_fragment_container_margin"
 				android:name="org.arnolds.agileappproject.agileappmodule.ui.frags.LogInButtonFragment"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"

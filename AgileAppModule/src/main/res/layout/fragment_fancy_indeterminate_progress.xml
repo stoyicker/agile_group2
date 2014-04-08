@@ -8,10 +8,16 @@
               android:paddingRight="@dimen/splash_progress_bar_horizontal_margin"
               android:paddingTop="@dimen/splash_progress_bar_vertical_margin"
               tools:context="org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment">
-	<fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-		android:id="@+id/fragment_splash_progress_bar_view"
-		style="@style/SmoothProgressBar"
+	<TextView
+		android:id="@+id/fancy_progress_text_view"
+		style="@style/LoadingTextStyle"
+		android:text="@string/loading"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"/>
+	<fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+		android:id="@+id/fancy_progress_bar_view"
+		style="@style/IndeterminateFancyProgressBarStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
 		android:indeterminate="true"/>
 </LinearLayout>

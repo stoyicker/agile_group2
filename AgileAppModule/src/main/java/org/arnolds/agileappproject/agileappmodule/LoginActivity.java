@@ -6,11 +6,14 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +51,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
 
     @Override
     public void onClick() {
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
         attemptLogin();
     }
 
@@ -71,6 +79,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
         @Override
         public void onConnectionRefused(String reason) {
             getFragmentManager().popBackStack();
+            getFragmentManager().executePendingTransactions();
             runOnUiThread(new Runnable() {
                 public void run() {
                     Toast.makeText(LoginActivity.this.getApplicationContext(), AgileAppModuleUtils
@@ -83,7 +92,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
                     mPasswordView.requestFocus();
                 }
             });
-
         }
     }
 
@@ -92,6 +100,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
         super.onCreate(savedInstanceState);
 
         listener = new InnerListener();
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new LogInButtonFragment()).commit();
+        getFragmentManager().executePendingTransactions();
 
         launchHome = getIntent().getBooleanExtra(LAUNCH_HOME_ACTIVITY, false);
 
@@ -166,9 +178,26 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
     }
 
     public void submit() {
+        mUsernameView.setFilters(new InputFilter[]{
+                new InputFilter() {
+                    public CharSequence filter(CharSequence src, int start,
+                                               int end, Spanned dst, int dstart, int dend) {
+                        return src.length() < 1 ? dst.subSequence(dstart, dend) : "";
+                    }
+                }
+        });
+        mPasswordView.setFilters(new InputFilter[]{
+                new InputFilter() {
+                    public CharSequence filter(CharSequence src, int start,
+                                               int end, Spanned dst, int dstart, int dend) {
+                        return src.length() < 1 ? dst.subSequence(dstart, dend) : "";
+                    }
+                }
+        });
         getFragmentManager().beginTransaction()
-                .replace(R.id.log_in_button_fragment, new IndefiniteFancyProgressFragment())
+                .replace(R.id.fragment_container, new IndefiniteFancyProgressFragment())
                 .addToBackStack("").commit();
+        getFragmentManager().executePendingTransactions();
         final IGitHubBroker mGitHubBroker = GitHubBroker.getInstance();
         try {
             mGitHubBroker.connect(mUsername, mPassword, listener);

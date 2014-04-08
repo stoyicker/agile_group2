@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-	<ImageView android:layout_width="match_parent"
-	           android:layout_height="wrap_content"
-	           android:src="@drawable/ic_arnold"
-	           android:contentDescription="@string/app_name"
-	           android:layout_gravity="center_vertical"/>
+              android:layout_height="match_parent"
+              android:layout_margin="@dimen/splash_global_margin"
+              tools:context="org.arnolds.agileappproject.agileappmodule.InitialActivity">
+	<org.arnolds.agileappproject.agileappmodule.utils.Banner android:layout_width="match_parent"
+	                                                         android:layout_height="wrap_content"
+	                                                         android:contentDescription="@string/app_name"
+	                                                         android:scaleType="matrix"
+	                                                         android:layout_marginTop="@dimen/splash_margin_top_to_logo"
+	                                                         android:layout_marginBottom="@dimen/splash_margin_logo_to_progress_bar"/>
+	<fragment
+		android:id="@+id/splash_progress_bar"
+		android:name="org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout="@layout/fragment_fancy_indeterminate_progress"
+		tools:layout="@layout/fragment_fancy_indeterminate_progress"/>
 </LinearLayout>

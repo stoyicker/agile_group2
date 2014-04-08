@@ -18,7 +18,7 @@ public abstract class AgileAppModuleUtils {
             ret = context.getString(resourceId);
         }
         catch (NoSuchFieldException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
+//            Log.wtf("debug", e.getClass().getName(), e);
         }
         catch (IllegalAccessException e) {
             Log.wtf("debug", e.getClass().getName(), e);

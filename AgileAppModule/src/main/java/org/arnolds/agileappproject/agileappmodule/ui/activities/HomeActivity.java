@@ -13,6 +13,5 @@ public class HomeActivity extends DrawerLayoutFragmentActivity {
         }
         savedInstanceState.putInt("layout", R.layout.activity_home);
         super.onCreate(savedInstanceState);
-
     }
 }

@@ -8,4 +8,5 @@
 	<color name="socialist_red">#FF2400</color>
 	<color name="theme_white">#FFFFFF</color>
 	<color name="theme_dark_blue">#0000FF</color>
+	<color name="theme_black">#000000</color>
 </resources>

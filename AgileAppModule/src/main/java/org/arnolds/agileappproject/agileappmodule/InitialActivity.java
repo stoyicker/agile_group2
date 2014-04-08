@@ -23,7 +23,7 @@ public class InitialActivity extends Activity {
         public void onConnected() {
             Intent home = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(home);
-            finish();
+            InitialActivity.this.finish();
         }
 
         @Override
@@ -32,25 +32,20 @@ public class InitialActivity extends Activity {
             InitialActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), AgileAppModuleUtils
+                    Toast.makeText(InitialActivity.this.getApplicationContext(), AgileAppModuleUtils
                                     .getString(getApplicationContext(), "connection_error", null),
                             Toast.LENGTH_SHORT
                     )
                             .show();
                 }
             });
+            InitialActivity.this.finish();
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_initial);
-//        Intent intent = new Intent(this, LoginActivity.class);
-//        intent.putExtra(LAUNCH_ACTIVITY, LoginActivity.MAIN_ACTIVITY);
-//        startActivity(intent);
-
-//        startActivity(new Intent(this, HomeActivity.class));
 
         GitHubAuthenticator mGitHubAuthenticator = new GitHubAuthenticator(this);
         Bundle credentials = mGitHubAuthenticator.getCredentials();
@@ -59,6 +54,7 @@ public class InitialActivity extends Activity {
 
         // != null => there is a stored account.
         if (credentials != null) {
+            setContentView(R.layout.activity_initial);
             getFragmentManager().beginTransaction()
                     .add(new IndefiniteFancyProgressFragment(), "progress").commit();
 
@@ -73,23 +69,9 @@ public class InitialActivity extends Activity {
         }
         else {
             Intent login = new Intent(getApplicationContext(), LoginActivity.class);
-            login.putExtra(LoginActivity.LAUNCH_HOME_ACTIVTY, true);
+            login.putExtra(LoginActivity.LAUNCH_HOME_ACTIVITY, true);
             startActivity(login);
             finish();
         }
-
-        /**
-         *TODO
-         *  Intent firstActivity;
-         *  if(!authenticated){
-         *  firstActivity = new Intent(this,LoginActivity.class);
-         * } else{
-         *  connect();
-         *  ...onConnnected(){
-         *  firstActivity = new Intent(this,LoadingActivity.class);
-         *  }
-         *  }
-         *  startActivity(firstActivity);
-         */
     }
 }

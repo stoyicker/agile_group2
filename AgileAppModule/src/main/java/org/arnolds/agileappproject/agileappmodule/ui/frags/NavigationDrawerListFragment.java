@@ -215,8 +215,12 @@ public class NavigationDrawerListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return getActivity().getApplicationContext().getResources()
-                    .getStringArray(R.array.navigation_drawer_items).length;
+            Context context = getActivity().getApplicationContext();
+            for (int i = 1; ; i++) {
+                if (AgileAppModuleUtils.getString(context, "title_section" + i, null) == null) {
+                    return i - 1;
+                }
+            }
         }
 
         @Override
@@ -233,51 +237,24 @@ public class NavigationDrawerListFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                convertView =
-                        ((LayoutInflater) getActivity().getApplicationContext().getSystemService(
-                                Context.LAYOUT_INFLATER_SERVICE)).inflate(mResource, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.setTextView((TextView) convertView.findViewById(R.id.drawer_item_title));
-                viewHolder
-                        .setImageView((ImageView) convertView.findViewById(R.id.drawer_item_icon));
-            }
-            else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
+            LayoutInflater inflater =
+                    (LayoutInflater) getActivity().getApplicationContext().getSystemService(
+                            Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(mResource, parent, false);
+
 
             int temp = position + 1;
 
-            viewHolder.getTextView().setText(
-                    AgileAppModuleUtils.getString(getActivity().getApplicationContext(),
-                            "title_section" + +temp, "")
-            );
-            viewHolder.getImageView().setImageResource(
+            TextView textView =
+                    (TextView) convertView.findViewById(R.id.navigation_drawer_item_title);
+            ImageView imageView =
+                    (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
+
+            textView.setText(AgileAppModuleUtils
+                    .getString(getActivity().getApplicationContext(), "title_section" + +temp, ""));
+            imageView.setImageResource(
                     AgileAppModuleUtils.getDrawableAsId("icon_section" + temp, -1));
-
             return convertView;
-        }
-
-        private class ViewHolder {
-            private TextView textView;
-            private ImageView imageView;
-
-            public TextView getTextView() {
-                return textView;
-            }
-
-            public void setTextView(TextView textView) {
-                this.textView = textView;
-            }
-
-            public ImageView getImageView() {
-                return imageView;
-            }
-
-            public void setImageView(ImageView imageView) {
-                this.imageView = imageView;
-            }
         }
     }
 }
