@@ -7,4 +7,9 @@
 	<dimen name="padding_branch">2dp</dimen>
 	<dimen name="repo_name_textsize">20dp</dimen>
 	<dimen name="repo_sha_textsize">10dp</dimen>
+	<dimen name="navigation_drawer_item_left_padding">3dp</dimen>
+	<dimen name="navigation_drawer_item_text_size">24dp</dimen>
+	<dimen name="navigation_drawer_item_end_padding">10dp</dimen>
+	<dimen name="navigation_drawer_item_vertical_padding">10dp</dimen>
+	<dimen name="navigation_drawer_list_spinner_separator">30dp</dimen>
 </resources>

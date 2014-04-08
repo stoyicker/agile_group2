@@ -1,4 +1,4 @@
-package org.arnolds.agileappproject.agileappmodule.auth;
+package org.arnolds.agileappproject.agileappmodule.git.auth;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;

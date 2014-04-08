@@ -30,6 +30,7 @@ dependencies {
     compile 'org.kohsuke:github-api:+'
     compile 'com.android.support:support-v4:+'
     compile 'org.mockito:mockito-all:+'
+    compile 'com.github.castorflex.smoothprogressbar:library:+'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

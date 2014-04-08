@@ -1,4 +1,4 @@
-package org.arnolds.agileappproject.agileappmodule.auth;
+package org.arnolds.agileappproject.agileappmodule.git.auth;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -12,9 +12,6 @@ import android.text.TextUtils;
 
 import org.arnolds.agileappproject.agileappmodule.LoginActivity;
 
-/**
- * Created by Magnus on 2014-04-01.
- */
 public class GitHubAuthenticator extends AbstractAccountAuthenticator {
 
     private Context mContext;
