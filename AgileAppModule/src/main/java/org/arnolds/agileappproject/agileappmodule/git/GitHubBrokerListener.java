@@ -29,14 +29,6 @@ public abstract class GitHubBrokerListener implements IGitHubBrokerListener {
     }
 
     /**
-     * Callback for when {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} is disconnected.
-     */
-    @Override
-    public void onDisconnected() {
-
-    }
-
-    /**
      * Callback for getAllIssues.
      *
      * @param success {@link String} The success of the operation.
