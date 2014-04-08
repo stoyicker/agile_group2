@@ -16,7 +16,7 @@ import java.util.Collection;
 public class GitHubNotificationService {
 
     private GHRepository repo;
-    private GitHubBroker broker;
+
 
     private static GitHubNotificationService instance;
     private PropertyChangeSupport propertyChangeSupport;
