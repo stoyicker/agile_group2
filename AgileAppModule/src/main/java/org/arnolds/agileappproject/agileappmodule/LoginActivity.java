@@ -6,89 +6,52 @@ import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.arnolds.agileappproject.agileappmodule.auth.GitHubAuthenticator;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
+import org.arnolds.agileappproject.agileappmodule.git.auth.GitHubAuthenticator;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.HomeActivity;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 
 /**
  * A login screen that offers login via email/password.
-
  */
 public class LoginActivity extends AccountAuthenticatorActivity {
 
-    private static final String TAG = "LoginActivity";
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
     public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
-    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
     public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
-
-    public static final String KEY_ERROR_MESSAGE = "ERR_MSG";
-
-    public final static String PARAM_USER_PASS = "USER_PASS";
-
-    public static final String TOKEN_TYPE = "GITHUB";
     public static final String ACCOUNT_TYPE = "org.arnolds.agileappproject.agileappmodule.account";
-
     public static final int MAIN_ACTIVITY = 0;
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-
 
     // UI references.
     private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
     private AccountManager mAccountManager;
-
-
     private String mUsername;
     private String mPassword;
-
     private Context mContext;
     private Bundle credentials;
     private int mNextActivity;
@@ -99,8 +62,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
         GitHubAuthenticator mGitHubAuthenticator = new GitHubAuthenticator(this);
         credentials = mGitHubAuthenticator.getCredentials();
-
-
 
 
         setContentView(R.layout.activity_login);
@@ -137,15 +98,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-        // != null => there is a stored account.
-        if(credentials != null) {
-            mUsername = credentials.getString(GitHubAuthenticator.USERNAME);
-            mPassword = credentials.getString(GitHubAuthenticator.PASSWORD);
-            showProgress(true);
-            submit();
-
-        }
     }
 
     /**
@@ -186,7 +138,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
-        } else {
+        }
+        else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
@@ -227,7 +180,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                     mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
-        } else {
+        }
+        else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -244,30 +198,32 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
                 @Override
                 public void onConnected() {
-                    Log.d("DEBUG","onConnected");
+                    Log.d("DEBUG", "onConnected");
                     runOnUiThread(new Runnable() {
                         public void run() {
                             showProgress(false);
                             Toast.makeText(mContext, "Connected",
                                     Toast.LENGTH_SHORT).show();
 
-                            switch (mNextActivity){
+                            switch (mNextActivity) {
                                 //TODO remove magic strings
                                 case MAIN_ACTIVITY:
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    startActivity(
+                                            new Intent(LoginActivity.this, HomeActivity.class));
                                     break;
                                 default:
                             }
 
 
                             //if an account already exists skip finishLogin()
-                            if (credentials != null){
+                            if (credentials != null) {
                                 finish();
                             }
                             finishLogin();
                         }
                     });
                 }
+
                 @Override
                 public void onConnectionRefused(String reason) {
 
@@ -308,15 +264,18 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
                 }
             });
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             e.printStackTrace();
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+        }
+        catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
             e.printStackTrace();
         }
 
         try {
             mGitHubBroker.connect(mUsername, mPassword, this);
-        } catch (GitHubBroker.AlreadyConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyConnectedException e) {
             e.printStackTrace();
         }
 
