@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.timeout;
 public class GitHubBrokerTests extends InstrumentationTestCase {
 
     private static final int TIMEOUT_MILLIS = 1000;
+    private static final int POLLING_INTERVAL = 35000;
     private IGitHubBroker broker;
     private IGitHubBrokerListener listener;
     private static GHRepository repo;
@@ -323,5 +325,151 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
         Mockito.verify(listener, only()).onDisconnected();
     }
 
+    public void test_branches_one_branch(){
+        try {
+            broker.selectRepo(repo);
+        } catch (Exception e) {
+            fail();
+        }
 
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+
+        Map<String, GHBranch> returnedBranches = new HashMap<String, GHBranch>();
+        returnedBranches.put("BranchNumeroUna", Mockito.mock(GHBranch.class));
+
+        try {
+            Mockito.when(repo.getBranches()).thenReturn(returnedBranches);
+        } catch (IOException e) {
+            fail();
+        }
+
+        try {
+            broker.getAllBranches();
+        } catch (Exception e) {
+            fail();
+        }
+
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onAllBranchesRetrieved(true, returnedBranches.values());
+    }
+
+    public void test_branches_polling_when_disconnected(){
+        test_getBranches_connected_selected();
+        try {
+            broker.disconnect();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        try {
+            broker.getAllBranches();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+    }
+
+    public void test_branches_no_branches(){
+        try {
+            broker.selectRepo(repo);
+        } catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        Map<String, GHBranch> returnedBranches = new HashMap<String, GHBranch>();
+
+        try {
+            Mockito.when(repo.getBranches()).thenReturn(returnedBranches);
+        } catch (IOException e) {
+            fail();
+        }
+        try {
+            broker.getAllBranches();
+        } catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onAllBranchesRetrieved(true, returnedBranches.values());
+    }
+
+    //TODO move polling tests to polling class Now RetrieveBranches.java
+    public void test_branches_polling_when_no_changes(){
+        try {
+            broker.selectRepo(repo);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        branches = new HashMap<String, GHBranch>();
+        branches.put("hola1",Mockito.mock(GHBranch.class));
+        branches.put("hola2", Mockito.mock(GHBranch.class));
+        try {
+            Mockito.when(repo.getBranches()).thenReturn(branches);
+        } catch (IOException e) {
+            fail();
+        }
+        try {
+            broker.getAllBranches();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS+POLLING_INTERVAL)).onAllBranchesRetrieved(true, branches.values());
+    }
+
+    public void test_branches_polling_when_removed(){
+        try {
+            broker.selectRepo(repo);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        branches = new HashMap<String, GHBranch>();
+        branches.put("hola1",Mockito.mock(GHBranch.class));
+        branches.put("hola2", Mockito.mock(GHBranch.class));
+        try {
+            Mockito.when(repo.getBranches()).thenReturn(branches);
+        } catch (IOException e) {
+            fail();
+        }
+        try {
+            broker.getAllBranches();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        branches.remove("hola1");
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS+POLLING_INTERVAL)).onAllBranchesRetrieved(true, branches.values());
+    }
+
+    public void test_branches_polling_when_added(){
+        try {
+            broker.selectRepo(repo);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        branches = new HashMap<String, GHBranch>();
+        branches.put("hola1",Mockito.mock(GHBranch.class));
+        branches.put("hola2", Mockito.mock(GHBranch.class));
+        try {
+            Mockito.when(repo.getBranches()).thenReturn(branches);
+        } catch (IOException e) {
+            fail();
+        }
+        try {
+            broker.getAllBranches();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        branches.put("kaufmann", Mockito.mock(GHBranch.class));
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS+POLLING_INTERVAL)).onAllBranchesRetrieved(true, branches.values());
+    }
 }
