@@ -1,6 +1,4 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
-import org.arnolds.agileappproject.agileappmodule.Data.DataModel;
-import org.arnolds.agileappproject.agileappmodule.Data.IDataModel;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
@@ -10,6 +8,7 @@ import org.kohsuke.github.GHRepository;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +29,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
 
+        commitList = new ArrayList<GHCommit>();
         brokerListener = new MyGitHubBrokerListener();
         broker = GitHubBroker.getInstance();
         try {
@@ -43,6 +43,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         //Start the poller
         Thread thread = new Thread(new PollerThread());
         thread.start();
+
     }
 
     public static GitHubNotificationService getInstance() {
@@ -85,8 +86,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
         @Override
         public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
-            GHRepository[] ghRepos = (GHRepository[]) repos.toArray();
-            repo = ghRepos[0];
+            Object[] ghRepos = repos.toArray();
+            repo = (GHRepository) ghRepos[0];
             List<GHCommit> remoteCommitList = repo.listCommits().asList();
 
             //If change
