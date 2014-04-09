@@ -79,17 +79,20 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
         @Override
         public void onConnectionRefused(String reason) {
             getFragmentManager().popBackStack();
-            getFragmentManager().executePendingTransactions();
             runOnUiThread(new Runnable() {
                 public void run() {
+                    getFragmentManager().executePendingTransactions();
                     Toast.makeText(LoginActivity.this.getApplicationContext(), AgileAppModuleUtils
                                     .getString(getApplicationContext(), "connection_error",
                                             null),
                             Toast.LENGTH_SHORT
                     )
                             .show();
+                    mUsernameView.setEnabled(Boolean.TRUE);
+                    mPasswordView.setEnabled(Boolean.TRUE);
+                    mUsernameView.clearFocus();
+                    mPasswordView.clearFocus();
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mPasswordView.requestFocus();
                 }
             });
         }
@@ -178,6 +181,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
     }
 
     public void submit() {
+        mUsernameView.setEnabled(Boolean.FALSE);
+        mPasswordView.setEnabled(Boolean.FALSE);
         mUsernameView.setFilters(new InputFilter[]{
                 new InputFilter() {
                     public CharSequence filter(CharSequence src, int start,
