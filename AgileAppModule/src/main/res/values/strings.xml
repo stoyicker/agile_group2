@@ -31,4 +31,7 @@
 	<string name="loading">Loading…</string>
 	<string name="error_get_repos">Error retrieving repos</string>
 	<string name="repo_spin_title">Select a repo</string>
+    <string name="error_no_title">There is no title.</string>
+    <string name="prompt_optional">Optional</string>
+    <string name="prompt_title">Title</string>
 </resources>

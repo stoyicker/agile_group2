@@ -1,0 +1,50 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context="org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment">
+
+    <ScrollView
+        android:id="@+id/login_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:id="@+id/create_issue_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/create_issue_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_title"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"/>
+            <EditText
+                android:id="@+id/create_issue_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_optional"
+                android:inputType="textMultiLine"
+                android:gravity="left|top"
+                android:singleLine="false"
+                android:lines="5" />
+
+            <Button
+                android:id="@+id/create_issue_button"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/action_sign_in"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>
