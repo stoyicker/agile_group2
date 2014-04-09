@@ -5,6 +5,7 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,16 +38,20 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_commit_log, container, false);
+
         context = getActivity().getApplicationContext();
-        ListView listView = (ListView) getView().findViewById(R.id.branch_list);
+        ListView listView = (ListView) view.findViewById(R.id.branch_list);
         commitAdapter = new CommitAdapter();
         listView.setAdapter(commitAdapter);
 
         GitHubNotificationService service = GitHubNotificationService.getInstance();
         service.addCommitListener(this);
 
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_commit_log, container, false);
+        Log.d("Commit fragment", "on create");
+
+        return view;
 
 
     }

@@ -86,7 +86,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             navigatedItemsStack.add(0, position);
         }
 
-<<<<<<< HEAD
+
         lastSelectedFragmentIndex = position;
         Fragment target = fragments[position];
 
