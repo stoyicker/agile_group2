@@ -61,16 +61,9 @@ public class MainRepoActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            GitHubBroker.getInstance().connect("agilearnold", "beback2", getApplicationContext());
-        } catch (GitHubBroker.AlreadyConnectedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
+            GitHubBroker.getInstance().connect("agilearnold", "beback2", connectListener);
         }
-
-        try {
-            GitHubBroker.getInstance().addSubscriber(connectListener);
-        } catch (GitHubBroker.NullArgumentException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
+        catch (GitHubBroker.AlreadyConnectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
 
@@ -92,7 +85,8 @@ public class MainRepoActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.connection_error), Toast.LENGTH_LONG);
+                    Toast.makeText(getApplicationContext(),
+                            getResources().getString(R.string.connection_error), Toast.LENGTH_LONG);
                 }
             });
         }

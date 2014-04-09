@@ -28,4 +28,6 @@
 	<string name="error_field_required">Required field</string>
 	<string name="error_incorrect_password">Incorrect password</string>
 	<string name="loading">Loading…</string>
+	<string name="error_get_repos">Error retrieving repos</string>
+	<string name="repo_spin_title">Select a repo</string>
 </resources>

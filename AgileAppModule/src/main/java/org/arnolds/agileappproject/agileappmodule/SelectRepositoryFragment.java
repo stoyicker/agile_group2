@@ -112,15 +112,9 @@ public class SelectRepositoryFragment extends FragmentActivity {
         });
 
         try {
-            GitHubBroker.getInstance().addSubscriber(repoListener);
-        } catch (GitHubBroker.NullArgumentException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
+            GitHubBroker.getInstance().getAllRepos(repoListener);
         }
-        try {
-            GitHubBroker.getInstance().getAllRepos();
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
     }
@@ -128,10 +122,12 @@ public class SelectRepositoryFragment extends FragmentActivity {
     private void onSelectRepo(int position) {
         GHRepository repoToSelect = repoAdapter.getItem(position);
         try {
-            GitHubBroker.getInstance().selectRepo(repoToSelect);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            GitHubBroker.getInstance().selectRepo(repoToSelect, repoListener);
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             Log.wtf("debug", e.getClass().getName(), e);
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             Log.wtf("debug", e.getClass().getName(), e);
         }
     }
@@ -274,7 +270,8 @@ public class SelectRepositoryFragment extends FragmentActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.setNameView((TextView) convertView.findViewById(R.id.name_repo));
                 convertView.setTag(viewHolder);
-            } else {
+            }
+            else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             GHRepository repository = getItem(position);
@@ -304,7 +301,8 @@ public class SelectRepositoryFragment extends FragmentActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.setNameView((TextView) convertView.findViewById(R.id.name_repo));
                 convertView.setTag(viewHolder);
-            } else {
+            }
+            else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             GHRepository repository = getItem(position);
@@ -354,7 +352,8 @@ public class SelectRepositoryFragment extends FragmentActivity {
                         Toast.makeText(getApplicationContext(), "repo selected", Toast.LENGTH_LONG);
                     }
                 });
-            } else {
+            }
+            else {
 
             }
         }
@@ -363,11 +362,13 @@ public class SelectRepositoryFragment extends FragmentActivity {
         public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
             if (success) {
                 onReposRetrieved(repos);
-            } else {
+            }
+            else {
                 runOnUiThread(new Runnable() {
                                   @Override
                                   public void run() {
-                                      Toast.makeText(getApplicationContext(), R.string.error_get_repos, Toast.LENGTH_LONG);
+                                      Toast.makeText(getApplicationContext(),
+                                              R.string.error_get_repos, Toast.LENGTH_LONG);
                                   }
                               }
                 );

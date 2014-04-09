@@ -24,19 +24,20 @@ public class RetrieveBranchesTests extends InstrumentationTestCase {
     private static Map<String, GHRepository> repositories = new HashMap<String, GHRepository>();
     private Map<String, GHBranch> innerBranches;
     private IGitHubBrokerListener listener;
-        private static GHRepository repo;
+    private static GHRepository repo;
 
-    private void init(){
+    private void init() {
         System.setProperty("dexmaker.dexcache",
                 getInstrumentation().getTargetContext().getCacheDir().getAbsolutePath());
         repo = Mockito.mock(GHRepository.class);
         repositories.put("customRepo", repo);
     }
 
-    public void setUp() throws IllegalAccessException, NoSuchFieldException, IOException, GitHubBroker.ListenerAlreadyRegisteredException, GitHubBroker.NullArgumentException {
-        if(firstRun){
+    public void setUp() throws IllegalAccessException, NoSuchFieldException, IOException,
+            GitHubBroker.ListenerAlreadyRegisteredException, GitHubBroker.NullArgumentException {
+        if (firstRun) {
             init();
-        firstRun = Boolean.FALSE;
+            firstRun = Boolean.FALSE;
         }
 
         Field brokerField = GitHubBroker.class.getDeclaredField("instance");
@@ -62,45 +63,53 @@ public class RetrieveBranchesTests extends InstrumentationTestCase {
         userField.setAccessible(false);
 
         listener = Mockito.mock(IGitHubBrokerListener.class);
-        broker.addSubscriber(listener);
         branches = new HashSet<GHBranch>();
     }
 
-    public void test_branches_polling_when_removed(){
+    public void test_branches_polling_when_removed() {
         try {
-            broker.selectRepo(repo);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            broker.selectRepo(repo, listener);
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
         }
         Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
         branches = new HashSet<GHBranch>();
         branches.add(Mockito.mock(GHBranch.class));
         branches.add(Mockito.mock(GHBranch.class));
-        for(GHBranch branch : branches)
+        for (GHBranch branch : branches)
             innerBranches.put(branch.getName(), branch);
         try {
             Mockito.when(repo.getBranches()).thenReturn(innerBranches);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             fail();
         }
         try {
-            broker.getAllBranches();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
-            fail();
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            broker.getAllBranches(listener);
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
         }
-        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onAllBranchesRetrieved(true,branches);
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS))
+                .onAllBranchesRetrieved(true, branches);
         branches.remove("branch2");
         try {
-            broker.getAllBranches();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
-            fail();
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            broker.getAllBranches(listener);
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
         }
-        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onAllBranchesRetrieved(true,branches);
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS))
+                .onAllBranchesRetrieved(true, branches);
     }
 }
