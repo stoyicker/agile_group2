@@ -4,11 +4,13 @@
     android:layout_height="match_parent"
     tools:context="org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+
     <ListView
         android:id="@+id/commit_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
      </ListView>
 
 </FrameLayout>

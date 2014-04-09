@@ -21,6 +21,8 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragm
 import org.arnolds.agileappproject.agileappmodule.RetrieveBranchesActivity;
 import org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerListFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
