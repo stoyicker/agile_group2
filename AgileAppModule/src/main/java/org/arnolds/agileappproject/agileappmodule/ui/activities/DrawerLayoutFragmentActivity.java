@@ -1,7 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
-
 import android.support.v4.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -87,13 +86,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             navigatedItemsStack.add(0, position);
         }
 
+<<<<<<< HEAD
         lastSelectedFragmentIndex = position;
         Fragment target = fragments[position];
 
         if (target == null) {
             switch (position) {
                 case 0:
-                    //NOTIFICATIONCOMMITFRAGMENT
+                    fragment = new CommitLogFragment();
                     break;
                 case 1:
                     target = new ListBranchesFragment();
