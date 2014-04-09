@@ -6,13 +6,10 @@ import android.test.InstrumentationTestCase;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.PagedIterable;
-import org.kohsuke.github.PagedIterator;
 import org.mockito.Mockito;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +60,7 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
         service = GitHubNotificationService.getInstance();
 
         myListener listener = new myListener();
-        service.addPropertyChangeListener(listener);
+        service.addCommitListener(listener);
 
         Field serviceField = GitHubNotificationService.class.getDeclaredField("repo");
         serviceField.setAccessible(true);
@@ -72,10 +69,10 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
 
         assertNotNull(dummyCommits);
 
-        //Mockito.when(repo.listCommits().asList()).thenReturn(dummyCommits);
+        Mockito.when(repo.listCommits().asList()).thenReturn(dummyCommits);
 
         //Wait for event in SLEEP_TIME seconds
-        for (int i = 0; i < SLEEP_TIME; i++) {
+        for (int i = 0; !listener.isEventReceived() && i < SLEEP_TIME; i++) {
             try {
                 Thread.sleep(SECOND);
             } catch (InterruptedException e) {
