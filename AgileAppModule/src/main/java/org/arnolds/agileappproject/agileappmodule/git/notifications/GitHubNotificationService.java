@@ -1,4 +1,5 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
+
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
@@ -32,13 +33,6 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         commitList = new ArrayList<GHCommit>();
         brokerListener = new MyGitHubBrokerListener();
         broker = GitHubBroker.getInstance();
-        try {
-            broker.addSubscriber(brokerListener);
-        } catch (GitHubBroker.NullArgumentException e) {
-            e.printStackTrace();
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
-            e.printStackTrace();
-        }
 
         //Start the poller
         Thread thread = new Thread(new PollerThread());
@@ -67,16 +61,18 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private class PollerThread implements Runnable {
         @Override
         public void run() {
-            while(true) {
+            while (true) {
                 try {
-                    broker.getAllRepos();
-                } catch (GitHubBroker.AlreadyNotConnectedException e) {
+                    broker.getAllRepos(brokerListener);
+                }
+                catch (GitHubBroker.AlreadyNotConnectedException e) {
                     e.printStackTrace();
                 }
 
                 try {
                     TimeUnit.SECONDS.sleep(POLL_TIMEOUT_SECONDS);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -91,9 +87,10 @@ public class GitHubNotificationService implements IGitHubNotificationService {
             List<GHCommit> remoteCommitList = repo.listCommits().asList();
 
             //If change
-            if(remoteCommitList.size() != commitList.size()) {
+            if (remoteCommitList.size() != commitList.size()) {
                 commitList = remoteCommitList;
-                commitChangeSupport.firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
+                commitChangeSupport
+                        .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
             }
         }
     }

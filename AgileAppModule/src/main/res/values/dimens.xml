@@ -17,8 +17,10 @@
 	<dimen name="splash_global_margin">17dp</dimen>
 	<dimen name="splash_margin_top_to_logo">10dp</dimen>
 	<dimen name="splash_margin_logo_to_progress_bar">60dp</dimen>
-	<dimen name="navigation_drawer_list_height">400dp</dimen>
+	<dimen name="navigation_drawer_height">400dp</dimen>
 	<dimen name="login_password_to_fragment_container_margin">40dp</dimen>
 	<dimen name="login_arnold_to_username_margin">40dp</dimen>
 	<dimen name="login_arnold_height">250dp</dimen>
+	<dimen name="repo_selector_spinner_to_bottom_margin">30dp</dimen>
+	<dimen name="repo_name_separator">10dp</dimen>
 </resources>

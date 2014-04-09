@@ -14,13 +14,13 @@ import android.view.MenuItem;
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.RetrieveBranchesActivity;
 import org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity;
-import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerListFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
-        NavigationDrawerListFragment.NavigationDrawerCallbacks {
+        NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private static final ArrayList<Integer> navigatedItemsStack =
             new ArrayList<Integer>();
@@ -79,6 +79,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         switch (position) {
             case 0:
                 //TODO: Decide on a 'Home' content
+                target = HomeActivity.class;
                 return;
             case 1:
                 target = RetrieveBranchesActivity.class;
@@ -124,19 +125,20 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        NavigationDrawerListFragment mNavigationDrawerListFragment = (NavigationDrawerListFragment)
-                fragmentManager.findFragmentById(R.id.navigation_drawer_list);
+        NavigationDrawerFragment mNavigationDrawerFragment = (NavigationDrawerFragment)
+                fragmentManager.findFragmentById(R.id.navigation_drawer_fragment);
 
-        mNavigationDrawerListFragment.setHasOptionsMenu(Boolean.TRUE);
+        mNavigationDrawerFragment.setHasOptionsMenu(Boolean.TRUE);
 
         mTitle = getTitle();
 
         // Set up the drawer.
-        mNavigationDrawerListFragment.setUp(
-                R.id.navigation_drawer_list,
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer_fragment,
                 drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
+    //TODO Call onSectionAttached on an activity when a Fragment is added to it.
     public void onSectionAttached(int number) {
         int shiftedPos = number + 1;
         mTitle = AgileAppModuleUtils.getString(this, "title_section" + shiftedPos, "");

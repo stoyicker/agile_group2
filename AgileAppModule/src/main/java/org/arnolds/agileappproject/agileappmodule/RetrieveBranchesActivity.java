@@ -138,7 +138,7 @@ public class RetrieveBranchesActivity extends Activity {
             if (convertView == null) {
                 convertView = ((LayoutInflater) getApplicationContext()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                        .inflate(R.layout.list_item_navigation_drawer, null);
+                        .inflate(R.layout.list_item_navigation_drawer_list, null);
                 viewHolder = new ViewHolder();
                 viewHolder.setNameView((TextView) convertView.findViewById(R.id.name_branch));
                 viewHolder.setShaView((TextView) convertView.findViewById(R.id.sha_branch));

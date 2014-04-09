@@ -16,12 +16,6 @@
 		<item name="android:shadowDy">1</item>
 		<item name="android:shadowRadius">1</item>
 	</style>
-	<style name="NavigationDrawerStyle">
-		<!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
- https://developer.android.com/design/patterns/navigation-drawer.html -->
-		<item name="android:width">@dimen/navigation_drawer_width</item>
-		<item name="android:background">@color/navigation_drawer_background</item>
-	</style>
 	<style name="NavigationDrawerItemStyle">
 		<item name="android:textSize">@dimen/navigation_drawer_item_text_size</item>
 		<item name="android:gravity">start</item>
@@ -34,6 +28,20 @@
 		<item name="android:shadowDx">1</item>
 		<item name="android:shadowDy">1</item>
 		<item name="android:shadowRadius">1</item>
+		<item name="android:gravity">center</item>
+	</style>
+	<style name="RepoSelectorSpinnerDropdownTextStyle">
+		<item name="android:textColor">@color/theme_black</item>
+		<item name="android:textSize">@dimen/repo_name_textsize</item>
+		<item name="android:gravity">center</item>
+	</style>
+	<style name="RepoSelectorSpinnerSelectedItemTextStyle">
+		<item name="android:textColor">@color/theme_black</item>
+		<item name="android:textSize">@dimen/repo_name_textsize</item>
+		<item name="android:shadowColor">@color/navigation_drawer_background</item>
+		<item name="android:shadowDx">2</item>
+		<item name="android:shadowDy">2</item>
+		<item name="android:shadowRadius">2</item>
 		<item name="android:gravity">center</item>
 	</style>
 	<style name="IndeterminateFancyProgressBarStyle" parent="SmoothProgressBar">

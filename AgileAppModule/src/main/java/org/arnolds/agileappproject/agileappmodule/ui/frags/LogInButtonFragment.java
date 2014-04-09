@@ -1,7 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,25 +10,7 @@ import android.widget.Button;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 
-/**
- * This file is part of LoLin1.
- * <p/>
- * LoLin1 is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p/>
- * LoLin1 is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * <p/>
- * You should have received a copy of the GNU General Public License
- * along with LoLin1. If not, see <http://www.gnu.org/licenses/>.
- * <p/>
- * Created by JorgeAntonio on 08/04/2014.
- */
-public class LogInButtonFragment extends Fragment {
+public class LogInButtonFragment extends android.app.Fragment {
 
     private Button mButton;
     private LogInButtonFragmentCallbacks mCallback;

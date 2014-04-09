@@ -9,6 +9,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,17 +17,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
+import org.kohsuke.github.GHRepository;
 
-public class NavigationDrawerListFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+public class NavigationDrawerFragment extends Fragment {
+
+    private static final long REPOS_POLL_RATE_SECONDS = 120;
     private NavigationDrawerCallbacks mCallbacks;
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -34,6 +48,9 @@ public class NavigationDrawerListFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
+
+    private Spinner mRepoSelectionSpinner;
+    private String latestSelectedRepoName = "";
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -45,8 +62,28 @@ public class NavigationDrawerListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(R.layout.navigation_drawer_list, container,
-                false);
+        View ret = inflater.inflate(
+                R.layout.fragment_navigation_drawer_layout, container, false);
+        mDrawerListView = (ListView) ret.findViewById(R.id.navigation_drawer_list_view);
+
+        mRepoSelectionSpinner = (Spinner) ret.findViewById(R.id.repo_selector_view);
+
+        mRepoSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String repoName = mRepoSelectionSpinner.getItemAtPosition(position).toString();
+                if (!repoName.isEmpty() && !repoName.contentEquals(latestSelectedRepoName)) {
+                    latestSelectedRepoName = repoName;
+                    mCallbacks.onNewRepoSelected(repoName);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        mRepoSelectionSpinner.setBackgroundResource(R.color.theme_white);
 
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -57,7 +94,59 @@ public class NavigationDrawerListFragment extends Fragment {
         mDrawerListView
                 .setAdapter(new NavigationDrawerArrayAdapter());
 
-        return mDrawerListView;
+        initializeAutoUpdaterRepoSelector(mRepoSelectionSpinner);
+
+        return ret;
+    }
+
+    private final void initializeAutoUpdaterRepoSelector(final Spinner selectionSpinner) {
+        final ScheduledExecutorService reposFetchService = Executors
+                .newScheduledThreadPool(1);
+
+        reposFetchService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                if (isDrawerOpen()) {
+                    return;
+                }
+                try {
+                    GitHubBroker.getInstance().getAllRepos(new GitHubBrokerListener() {
+                        @Override
+                        public void onAllReposRetrieved(boolean success,
+                                                        Collection<GHRepository> repositories) {
+                            if (success) {
+                                final List<String> allRepositories = new ArrayList<String>();
+                                for (GHRepository repository : repositories)
+                                    allRepositories.add(repository.getName());
+                                final ArrayAdapter<String> adapter =
+                                        new ArrayAdapter<String>(
+                                                getActivity().getApplicationContext(),
+                                                R.layout.repo_selector_spinner_selected_item,
+                                                allRepositories);
+                                adapter.setDropDownViewResource(
+                                        R.layout.repo_selector_dropdown_item);
+                                final String newSelectedRepoName =
+                                        selectionSpinner.getSelectedItem() == null ? "" :
+                                                selectionSpinner.getSelectedItem().toString();
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        selectionSpinner.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
+                                        if (newSelectedRepoName.isEmpty()) {
+                                            selectionSpinner.setSelection(0);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+                catch (GitHubBroker.AlreadyNotConnectedException e) {
+                    Log.wtf("debug", e.getClass().getName(), e);
+                }
+            }
+        }, 0, REPOS_POLL_RATE_SECONDS, TimeUnit.SECONDS);
     }
 
     public boolean isDrawerOpen() {
@@ -207,11 +296,13 @@ public class NavigationDrawerListFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+
+        void onNewRepoSelected(String repoName);
     }
 
     private class NavigationDrawerArrayAdapter extends BaseAdapter {
 
-        private final int mResource = R.layout.list_item_navigation_drawer;
+        private final int mResource = R.layout.list_item_navigation_drawer_list;
 
         @Override
         public int getCount() {

@@ -13,7 +13,6 @@ import org.arnolds.agileappproject.agileappmodule.ui.activities.HomeActivity;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
-
 public class InitialActivity extends Activity {
     private final GitHubBrokerListener listener = new InitialActivityListener();
 
