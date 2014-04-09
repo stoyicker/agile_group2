@@ -2,6 +2,8 @@ package org.arnolds.agileappproject.agileappmodule.git;
 
 import org.kohsuke.github.GHRepository;
 
+import java.nio.channels.NotYetConnectedException;
+
 public interface IGitHubBroker {
 
     /**
@@ -28,6 +30,23 @@ public interface IGitHubBroker {
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
     public void disconnect() throws GitHubBroker.AlreadyNotConnectedException;
+
+    /**
+     * Creates an issue in the currently selected repository.
+     *
+     * @param title {@link String} Title of the issue.
+     * @param body {@link String} The body of the issue. If null, it is ignored.
+     * @param assignee {@link String} The assignee of the issue. If null, it is ignored.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     *
+     * @throws org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException Thrown when not connected to github.
+     * @throws org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException Thrown when no repository connected.
+     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.NullArgumentException} Thrown if title is null.
+     * @throws {@link IllegalArgumentException} Thrown if title.length() == 0.
+     */
+    public void createIssue(String title, String body, String assignee, IGitHubBrokerListener callback) throws
+            GitHubBroker.AlreadyNotConnectedException, GitHubBroker.RepositoryNotSelectedException,
+            GitHubBroker.NullArgumentException, IllegalArgumentException;
 
     /**
      * Asynchronously selects a repo to work with, giving response on the provided callback.

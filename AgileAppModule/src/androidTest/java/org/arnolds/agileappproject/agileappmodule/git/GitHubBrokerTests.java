@@ -4,6 +4,7 @@ import android.test.InstrumentationTestCase;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GHIssueBuilder;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
@@ -32,6 +33,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             new LinkedList<GHIssue>();
     private static Map<String, GHRepository> repositories = new HashMap<String, GHRepository>();
     private static boolean firstRun = true;
+    private static GHIssue createdIssue = Mockito.mock(GHIssue.class);
 
     public void init() {
         System.setProperty("dexmaker.dexcache",
@@ -74,6 +76,11 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
         Mockito.when(repo.getBranches()).thenReturn(branches);
         Mockito.when(repo.getIssues(GHIssueState.OPEN)).thenReturn(openIssues);
         Mockito.when(repo.getIssues(GHIssueState.CLOSED)).thenReturn(closedIssues);
+
+        GHIssueBuilder ib = Mockito.mock(GHIssueBuilder.class);
+        Mockito.when(ib.create()).thenReturn(createdIssue);
+        Mockito.when(repo.createIssue(Mockito.anyString())).thenReturn(ib);
+
         userField.set(broker, user);
         userField.setAccessible(false);
 
@@ -135,13 +142,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getIssues_connected_selected() {
-        try {
-            broker.selectRepo(repo, listener);
-        }
-        catch (Exception e) {
-            fail();
-        }
-        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        selectRepo(true);
         try {
             broker.getAllIssues(listener);
         }
@@ -156,13 +157,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getIssues_connected_selected_nullCallback() {
-        try {
-            broker.selectRepo(repo, listener);
-        }
-        catch (Exception e) {
-            fail();
-        }
-        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        selectRepo(true);
         try {
             broker.getAllIssues(null);
         }
@@ -202,13 +197,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getBranches_connected_selected() {
-        try {
-            broker.selectRepo(repo, listener);
-        }
-        catch (Exception e) {
-            fail();
-        }
-        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        selectRepo(true);
         try {
             broker.getAllBranches(listener);
         }
@@ -220,13 +209,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
     public void test_getBranches_connected_selected_nullCallback() {
-        try {
-            broker.selectRepo(repo, listener);
-        }
-        catch (Exception e) {
-            fail();
-        }
-        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(true);
+        selectRepo(true);
         try {
             broker.getAllBranches(null);
         }
@@ -328,5 +311,154 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
         catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
         }
+    }
+
+
+    public  void test_createIssue_when_notConnected() {
+        selectRepo(true);
+
+        try {
+            broker.disconnect();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+
+        try {
+            broker.createIssue("a", "b", "c", listener);
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+    }
+
+    public  void test_createIssue_when_connected_noRepository() {
+        try {
+            broker.createIssue("a", "b", "c", listener);
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+    }
+
+    public  void test_createIssue_valid_callbackNull() {
+        selectRepo(true);
+
+        try {
+            broker.createIssue("a", "b", "c", null);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+    }
+
+    public void test_createIssue_valid() {
+        selectRepo(true);
+
+        try {
+            broker.createIssue("a", "b", "c", listener);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).
+                onIssueCreation(true, createdIssue);
+    }
+
+    public void test_createIssue_valid_nullBody() {
+        selectRepo(true);
+
+        try {
+            broker.createIssue("a", null, "c", listener);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).
+                onIssueCreation(true, createdIssue);
+    }
+
+    public void test_createIssue_valid_nullAssignee() {
+        selectRepo(true);
+
+        try {
+            broker.createIssue("a", "b", null, listener);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onIssueCreation(true, createdIssue);
+    }
+
+    public void test_createIssue_nullTitle() {
+        selectRepo(true);
+
+        try {
+            broker.createIssue(null, "b", "c", listener);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+    }
+
+    public void test_createIssue_titleZeroLength() {
+        selectRepo(true);
+
+        boolean pass = false;
+        try {
+            broker.createIssue("","b","c", listener);
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        } catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
+    }
+
+    private void selectRepo(boolean wantSuccess){
+        try {
+            broker.selectRepo(repo, listener);
+        }
+        catch (Exception e) {
+            fail();
+        }
+        Mockito.verify(listener, timeout(TIMEOUT_MILLIS).only()).onRepoSelected(wantSuccess);
     }
 }
