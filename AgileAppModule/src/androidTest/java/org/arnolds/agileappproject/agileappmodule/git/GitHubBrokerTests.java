@@ -299,7 +299,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_select_repo_valid_nullCallback() {
         try {
-            broker.selectRepo(repo, listener);
+            broker.selectRepo(repo, null);
         }
         catch (Exception e) {
             fail();
