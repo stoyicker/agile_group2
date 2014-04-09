@@ -32,13 +32,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         commitList = new ArrayList<GHCommit>();
         brokerListener = new MyGitHubBrokerListener();
         broker = GitHubBroker.getInstance();
-        try {
-            broker.addSubscriber(brokerListener);
-        } catch (GitHubBroker.NullArgumentException e) {
-            e.printStackTrace();
-        } catch (GitHubBroker.ListenerAlreadyRegisteredException e) {
-            e.printStackTrace();
-        }
+
 
         //Start the poller
         Thread thread = new Thread(new PollerThread());
@@ -69,7 +63,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         public void run() {
             while(true) {
                 try {
-                    broker.getAllRepos();
+                    broker.getAllRepos(brokerListener);
                 } catch (GitHubBroker.AlreadyNotConnectedException e) {
                     e.printStackTrace();
                 }
