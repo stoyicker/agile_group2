@@ -13,6 +13,7 @@ public class HomeActivity extends DrawerLayoutFragmentActivity {
             savedInstanceState = new Bundle();
         }
         savedInstanceState.putInt("layout", R.layout.activity_home);
+        savedInstanceState.putInt("main_fragment_container", R.id.main_fragment_container);
         super.onCreate(savedInstanceState);
     }
 

@@ -1,19 +1,18 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 
 import org.arnolds.agileappproject.agileappmodule.R;
-import org.arnolds.agileappproject.agileappmodule.RetrieveBranchesActivity;
-import org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
@@ -24,8 +23,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     private static final ArrayList<Integer> navigatedItemsStack =
             new ArrayList<Integer>();
+    private static int MAIN_FRAGMENT_CONTAINER;
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
+    private ArnoldSupportFragment[] fragments;
 
     public static int getLastSelectedNavDavIndex() {
         return navigatedItemsStack.get(0);
@@ -75,22 +76,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             navigatedItemsStack.add(0, position);
         }
 
-        Class target = null;
-        switch (position) {
-            case 0:
-                //TODO: Decide on a 'Home' content
-                target = HomeActivity.class;
-                return;
-            case 1:
-                target = RetrieveBranchesActivity.class;
-                break;
-            case 2:
-                target = RetrieveIssuesActivity.class;
-                break;
-            default:
-                Log.wtf("debug", "Should never happen - Selected index - " + position);
-        }
-        startActivity(new Intent(getApplicationContext(), target));
+        Fragment target = fragments[position];
+
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(FragmentTransaction.TRANSIT_FRAGMENT_OPEN,
+                        FragmentTransaction.TRANSIT_NONE).replace(MAIN_FRAGMENT_CONTAINER, target)
+                .addToBackStack(
+                        "").commit();
+        getSupportFragmentManager().executePendingTransactions();
     }
 
     @Override
@@ -119,6 +112,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         super.onCreate(savedInstanceState);
         setContentView(savedInstanceState.getInt("layout"));
 
+        MAIN_FRAGMENT_CONTAINER = savedInstanceState.getInt("main_fragment_container");
+
+        int amountOfSections;
+
+        for (int i = 1; ; i++) {
+            String thisTitle = AgileAppModuleUtils
+                    .getString(getApplicationContext(), "title_section" + i, null);
+            if (thisTitle == null) {
+                amountOfSections = i - 1;
+                break;
+            }
+        }
+
+        fragments = new ArnoldSupportFragment[amountOfSections];
+
         if (navigatedItemsStack.isEmpty()) {
             navigatedItemsStack.add(0);
         }
@@ -138,8 +146,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
-    //TODO Call onSectionAttached on an activity when a Fragment is added to it.
-    public void onSectionAttached(int number) {
+    public void onSectionAttached(int number, ArnoldSupportFragment fragment) {
+        fragments[number] = fragment;
         int shiftedPos = number + 1;
         mTitle = AgileAppModuleUtils.getString(this, "title_section" + shiftedPos, "");
         if (mTitle.toString().isEmpty()) {
