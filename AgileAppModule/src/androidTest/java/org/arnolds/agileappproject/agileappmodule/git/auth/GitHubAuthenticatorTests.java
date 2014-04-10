@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.test.InstrumentationTestCase;
 
-import org.arnolds.agileappproject.agileappmodule.LoginActivity;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.LoginActivity;
 import org.mockito.Mockito;
 
 /**

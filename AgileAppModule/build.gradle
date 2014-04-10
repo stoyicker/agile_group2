@@ -27,6 +27,7 @@ android {
 }
 
 dependencies {
+    compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:+'
     compile 'org.kohsuke:github-api:+'
     compile 'com.android.support:support-v4:+'
     compile 'org.mockito:mockito-all:+'

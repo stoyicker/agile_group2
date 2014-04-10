@@ -102,7 +102,7 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... params) {
-                IGitHubBrokerListener callback = ((IGitHubBrokerListener)params[2]);
+                IGitHubBrokerListener callback = ((IGitHubBrokerListener) params[2]);
                 GitHub tempSession;
 
                 try {
@@ -145,22 +145,28 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void selectRepo(GHRepository repo, IGitHubBrokerListener callback)
+    public void selectRepo(String repoName, IGitHubBrokerListener callback)
             throws NullArgumentException, AlreadyNotConnectedException {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
         }
-        if (repo == null) {
+        if (repoName == null) {
             throw new NullArgumentException();
         }
         new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... params) {
-                GHRepository repo = (GHRepository) params[0];
+                String repositoryName = (String) params[0];
                 IGitHubBrokerListener callback = (IGitHubBrokerListener) params[1];
                 try {
                     Map<String, GHRepository> repositories = user.getRepositories();
-                    boolean success = repositories.values().contains(repo);
+                    GHRepository repo = null;
+                    for (GHRepository x : repositories.values())
+                        if (x.getName().contentEquals(repositoryName)) {
+                            repo = x;
+                            break;
+                        }
+                    boolean success = repo != null;
                     if (success) {
                         Log.d("debug", "repository set to: " + repo.toString());
                         repository = repo;
@@ -176,7 +182,7 @@ public class GitHubBroker implements IGitHubBroker {
                 }
                 return null;
             }
-        }.execute(repo, callback);
+        }.execute(repoName, callback);
     }
 
     @Override
@@ -229,7 +235,7 @@ public class GitHubBroker implements IGitHubBroker {
 
                 boolean success = repos != null;
                 synchronized (asyncLock) {
-                    if(params[0] != null){
+                    if (params[0] != null) {
                         params[0].onAllReposRetrieved(success, success ? repos.values() : null);
                     }
                     return null;
@@ -273,8 +279,10 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void createIssue(String title, String body, String assignee, IGitHubBrokerListener callback)
-            throws AlreadyNotConnectedException, RepositoryNotSelectedException, NullArgumentException,
+    public void createIssue(String title, String body, String assignee,
+                            IGitHubBrokerListener callback)
+            throws AlreadyNotConnectedException, RepositoryNotSelectedException,
+            NullArgumentException,
             IllegalArgumentException {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
@@ -285,28 +293,29 @@ public class GitHubBroker implements IGitHubBroker {
         if (title == null) {
             throw new NullArgumentException();
         }
-        if(title.length() == 0){
+        if (title.length() == 0) {
             throw new IllegalArgumentException("Length of title must be > 0");
         }
 
         GHIssueBuilder ib = repository.createIssue(title);
-        if(body != null) {
+        if (body != null) {
             ib.body(body);
         }
-        if(assignee != null) {
+        if (assignee != null) {
             ib.assignee(assignee);
         }
 
         new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... params) {
-                final GHIssueBuilder ib = (GHIssueBuilder)params[0];
-                final IGitHubBrokerListener callback = (IGitHubBrokerListener)params[1];
+                final GHIssueBuilder ib = (GHIssueBuilder) params[0];
+                final IGitHubBrokerListener callback = (IGitHubBrokerListener) params[1];
 
                 GHIssue issue = null;
                 try {
                     issue = ib.create();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
                 }
 

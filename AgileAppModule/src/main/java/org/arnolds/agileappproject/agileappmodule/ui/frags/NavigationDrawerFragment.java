@@ -40,7 +40,8 @@ import java.util.concurrent.TimeUnit;
 
 public class NavigationDrawerFragment extends Fragment {
 
-    private static final long REPOS_POLL_RATE_SECONDS = 120;
+    private static final long REPOS_POLL_RATE_SECONDS = 300;
+    private static int LAST_SELECTED_ITEM_INDEX = 0;
     private NavigationDrawerCallbacks mCallbacks;
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -51,12 +52,25 @@ public class NavigationDrawerFragment extends Fragment {
 
     private Spinner mRepoSelectionSpinner;
     private String latestSelectedRepoName = "";
+    private final SelectionListener selectionListener = new SelectionListener();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(Boolean.TRUE);
+    }
+
+    private class SelectionListener extends GitHubBrokerListener {
+        @Override
+        public void onRepoSelected(boolean result) {
+            Log.d("debug", "On repo selected. Repo selected: " + latestSelectedRepoName);
+            try {
+                mCallbacks.onNewRepoSelected(latestSelectedRepoName);
+            }
+            catch (NullPointerException ex) {
+            }
+        }
     }
 
     @Override
@@ -71,10 +85,21 @@ public class NavigationDrawerFragment extends Fragment {
         mRepoSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                LAST_SELECTED_ITEM_INDEX = position;
+                Log.d("debug", "onItemSelected");
                 String repoName = mRepoSelectionSpinner.getItemAtPosition(position).toString();
                 if (!repoName.isEmpty() && !repoName.contentEquals(latestSelectedRepoName)) {
-                    latestSelectedRepoName = repoName;
-                    mCallbacks.onNewRepoSelected(repoName);
+                    NavigationDrawerFragment.this.latestSelectedRepoName = repoName;
+                    Log.d("debug", "Inside the if");
+                    try {
+                        GitHubBroker.getInstance().selectRepo(repoName, selectionListener);
+                    }
+                    catch (GitHubBroker.AlreadyNotConnectedException e) {
+                        Log.wtf("debug", e.getClass().getName(), e);
+                    }
+                    catch (GitHubBroker.NullArgumentException e) {
+                        Log.wtf("debug", e.getClass().getName(), e);
+                    }
                 }
             }
 
@@ -118,26 +143,31 @@ public class NavigationDrawerFragment extends Fragment {
                                 final List<String> allRepositories = new ArrayList<String>();
                                 for (GHRepository repository : repositories)
                                     allRepositories.add(repository.getName());
-                                final ArrayAdapter<String> adapter =
-                                        new ArrayAdapter<String>(
-                                                getActivity().getApplicationContext(),
-                                                R.layout.repo_selector_spinner_selected_item,
-                                                allRepositories);
-                                adapter.setDropDownViewResource(
-                                        R.layout.repo_selector_dropdown_item);
-                                final String newSelectedRepoName =
-                                        selectionSpinner.getSelectedItem() == null ? "" :
-                                                selectionSpinner.getSelectedItem().toString();
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        selectionSpinner.setAdapter(adapter);
-                                        adapter.notifyDataSetChanged();
-                                        if (newSelectedRepoName.isEmpty()) {
-                                            selectionSpinner.setSelection(0);
+                                try {
+                                    final ArrayAdapter<String> adapter =
+                                            new ArrayAdapter<String>(
+                                                    getActivity().getApplicationContext(),
+                                                    R.layout.repo_selector_spinner_selected_item,
+                                                    allRepositories);
+                                    adapter.setDropDownViewResource(
+                                            R.layout.repo_selector_dropdown_item);
+                                    final String newSelectedRepoName =
+                                            selectionSpinner.getSelectedItem() == null ? "" :
+                                                    selectionSpinner.getSelectedItem().toString();
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            selectionSpinner.setAdapter(adapter);
+                                            adapter.notifyDataSetChanged();
+                                            if (newSelectedRepoName.isEmpty()) {
+                                                selectionSpinner
+                                                        .setSelection(LAST_SELECTED_ITEM_INDEX);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
+                                catch (NullPointerException ex) {
+                                }
                             }
                         }
                     });

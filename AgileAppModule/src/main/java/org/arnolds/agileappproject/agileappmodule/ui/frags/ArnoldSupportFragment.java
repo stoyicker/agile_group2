@@ -17,6 +17,6 @@ public abstract class ArnoldSupportFragment extends Fragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        ((DrawerLayoutFragmentActivity) activity).onSectionAttached(menuIndex, this);
+        ((DrawerLayoutFragmentActivity) activity).onSectionAttached(menuIndex);
     }
 }

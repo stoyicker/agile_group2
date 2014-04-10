@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="RepoNameStyle">
-		<item name="android:textColor">@color/theme_white</item>
+	<style name="BranchNameStyle">
+		<item name="android:textColor">@color/theme_black</item>
 		<item name="android:textSize">@dimen/repo_name_textsize</item>
-		<item name="android:shadowColor">@color/theme_dark_blue</item>
-		<item name="android:shadowDx">1</item>
-		<item name="android:shadowDy">1</item>
-		<item name="android:shadowRadius">1</item>
+		<item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
+		<item name="android:shadowDx">2</item>
+		<item name="android:shadowDy">2</item>
+		<item name="android:shadowRadius">2</item>
 	</style>
-	<style name="RepoSHAStyle">
-		<item name="android:textColor">@color/theme_white</item>
+	<style name="BranchSHAStyle">
+		<item name="android:textColor">@color/theme_black</item>
 		<item name="android:textSize">@dimen/repo_sha_textsize</item>
-		<item name="android:shadowColor">@color/theme_dark_blue</item>
-		<item name="android:shadowDx">1</item>
-		<item name="android:shadowDy">1</item>
-		<item name="android:shadowRadius">1</item>
+		<item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
+		<item name="android:shadowDx">2</item>
+		<item name="android:shadowDy">2</item>
+		<item name="android:shadowRadius">2</item>
 	</style>
 	<style name="NavigationDrawerItemStyle">
 		<item name="android:textSize">@dimen/navigation_drawer_item_text_size</item>
@@ -38,7 +38,7 @@
 	<style name="RepoSelectorSpinnerSelectedItemTextStyle">
 		<item name="android:textColor">@color/theme_black</item>
 		<item name="android:textSize">@dimen/repo_name_textsize</item>
-		<item name="android:shadowColor">@color/navigation_drawer_background</item>
+		<item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
 		<item name="android:shadowDx">2</item>
 		<item name="android:shadowDy">2</item>
 		<item name="android:shadowRadius">2</item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-	<color name="navigation_drawer_background">#444</color>
+	<color name="theme_navigation_drawer_background">#444</color>
 	<color name="navigation_drawer_item_text">#EEEEEE</color>
 	<color name="drawer_list_divider">#333333</color>
 	<color name="it_section_colour">#09CDDA</color>

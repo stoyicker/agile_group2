@@ -6,13 +6,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
@@ -77,13 +78,27 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
 
         Fragment target = fragments[position];
+        if (target == null) {
+            switch (position) {
+                case 0:
+                    //NOTIFICATIONCOMMITFRAGMENT
+                    break;
+                case 1:
+                    target = new ListBranchesFragment();
+                    break;
+                case 2:
+                    //ISSUES
+                    break;
+                default:
+                    Log.wtf("debug", "Should never happen - position is " + position);
+                    break;
+            }
+        }
 
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(FragmentTransaction.TRANSIT_FRAGMENT_OPEN,
-                        FragmentTransaction.TRANSIT_NONE).replace(MAIN_FRAGMENT_CONTAINER, target)
-                .addToBackStack(
-                        "").commit();
+        getSupportFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER, target)
+                .addToBackStack("").commit();
         getSupportFragmentManager().executePendingTransactions();
+        findViewById(R.id.activity_home).invalidate();
     }
 
     @Override
@@ -143,15 +158,25 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer_fragment,
-                drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout));
+                drawerLayout = (DrawerLayout) findViewById(R.id.activity_home));
     }
 
-    public void onSectionAttached(int number, ArnoldSupportFragment fragment) {
-        fragments[number] = fragment;
+    public void onSectionAttached(int number) {
         int shiftedPos = number + 1;
         mTitle = AgileAppModuleUtils.getString(this, "title_section" + shiftedPos, "");
         if (mTitle.toString().isEmpty()) {
             mTitle = getString(R.string.title_section1);
+        }
+    }
+
+    @Override
+    public void onNewRepoSelected(String repoName) {
+        try {
+            for (ArnoldSupportFragment x : fragments)
+                x.onNewRepositorySelected();
+        }
+        catch (NullPointerException ex) {
+//            Log.wtf("debug", ex.getClass().getName(), ex);
         }
     }
 }

@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import org.arnolds.agileappproject.agileappmodule.LoginActivity;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.LoginActivity;
 
 public class GitHubAuthenticator extends AbstractAccountAuthenticator {
 

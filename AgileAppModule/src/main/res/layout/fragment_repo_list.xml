@@ -9,7 +9,7 @@
 		android:id="@+id/title_repo_list"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		style="@style/RepoNameStyle"/>
+		style="@style/BranchNameStyle"/>
 	<Spinner
 		android:id="@+id/repo_spinner"
 		android:prompt="@string/repo_spin_title"

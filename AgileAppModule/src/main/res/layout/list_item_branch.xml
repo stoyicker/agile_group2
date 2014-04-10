@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical" android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
               android:padding="@dimen/padding_branch">
 
 	<TextView
 		android:id="@+id/name_branch"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		style="@style/RepoNameStyle"/>
+		style="@style/BranchNameStyle"/>
 	<TextView
 		android:id="@+id/sha_branch"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		style="@style/RepoSHAStyle"/>
+		style="@style/BranchSHAStyle"/>
 
 </LinearLayout>

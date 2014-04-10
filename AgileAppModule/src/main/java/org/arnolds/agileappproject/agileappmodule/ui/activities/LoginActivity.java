@@ -1,4 +1,4 @@
-package org.arnolds.agileappproject.agileappmodule;
+package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -18,10 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
-import org.arnolds.agileappproject.agileappmodule.ui.activities.HomeActivity;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.LogInButtonFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
