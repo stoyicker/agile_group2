@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GHIssueBuilder;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
@@ -237,6 +238,7 @@ public class GitHubBroker implements IGitHubBroker {
         }.execute(callback);
     }
 
+
     @Override
     public void getAllIssues(IGitHubBrokerListener callback)
             throws RepositoryNotSelectedException, AlreadyNotConnectedException {
@@ -268,5 +270,54 @@ public class GitHubBroker implements IGitHubBroker {
                 }
             }
         }.execute(callback);
+    }
+
+    @Override
+    public void createIssue(String title, String body, String assignee, IGitHubBrokerListener callback)
+            throws AlreadyNotConnectedException, RepositoryNotSelectedException, NullArgumentException,
+            IllegalArgumentException {
+        if (!isConnected()) {
+            throw new AlreadyNotConnectedException();
+        }
+        if (repository == null) {
+            throw new RepositoryNotSelectedException();
+        }
+        if (title == null) {
+            throw new NullArgumentException();
+        }
+        if(title.length() == 0){
+            throw new IllegalArgumentException("Length of title must be > 0");
+        }
+
+        GHIssueBuilder ib = repository.createIssue(title);
+        if(body != null) {
+            ib.body(body);
+        }
+        if(assignee != null) {
+            ib.assignee(assignee);
+        }
+
+        new AsyncTask<Object, Void, Void>() {
+            @Override
+            protected Void doInBackground(Object... params) {
+                final GHIssueBuilder ib = (GHIssueBuilder)params[0];
+                final IGitHubBrokerListener callback = (IGitHubBrokerListener)params[1];
+
+                GHIssue issue = null;
+                try {
+                    issue = ib.create();
+                } catch (IOException e) {
+                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
+                }
+
+                final boolean success = issue != null;
+                synchronized (asyncLock) {
+                    if (callback != null) {
+                        callback.onIssueCreation(success, success ? issue : null);
+                    }
+                    return null;
+                }
+            }
+        }.execute(ib, callback);
     }
 }
