@@ -168,7 +168,6 @@ public class GitHubBroker implements IGitHubBroker {
                         }
                     boolean success = repo != null;
                     if (success) {
-                        Log.d("debug", "repository set to: " + repo.toString());
                         repository = repo;
                     }
                     synchronized (asyncLock) {

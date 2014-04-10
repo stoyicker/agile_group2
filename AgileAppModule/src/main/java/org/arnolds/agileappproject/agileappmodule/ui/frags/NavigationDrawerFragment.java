@@ -64,7 +64,6 @@ public class NavigationDrawerFragment extends Fragment {
     private class SelectionListener extends GitHubBrokerListener {
         @Override
         public void onRepoSelected(boolean result) {
-            Log.d("debug", "On repo selected. Repo selected: " + latestSelectedRepoName);
             try {
                 mCallbacks.onNewRepoSelected(latestSelectedRepoName);
             }
@@ -86,11 +85,9 @@ public class NavigationDrawerFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 LAST_SELECTED_ITEM_INDEX = position;
-                Log.d("debug", "onItemSelected");
                 String repoName = mRepoSelectionSpinner.getItemAtPosition(position).toString();
                 if (!repoName.isEmpty() && !repoName.contentEquals(latestSelectedRepoName)) {
                     NavigationDrawerFragment.this.latestSelectedRepoName = repoName;
-                    Log.d("debug", "Inside the if");
                     try {
                         GitHubBroker.getInstance().selectRepo(repoName, selectionListener);
                     }

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
@@ -28,6 +29,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
+    private int lastSelectedFragmentIndex = 0;
 
     public static int getLastSelectedNavDavIndex() {
         return navigatedItemsStack.get(0);
@@ -65,6 +67,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         super.onConfigurationChanged(newConfig);
         navigatedItemsStack.add(0, navigatedItemsStack.get(0));
         recreate();
+        onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
     }
 
     @Override
@@ -77,7 +80,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             navigatedItemsStack.add(0, position);
         }
 
+        lastSelectedFragmentIndex = position;
         Fragment target = fragments[position];
+
         if (target == null) {
             switch (position) {
                 case 0:
@@ -87,7 +92,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     target = new ListBranchesFragment();
                     break;
                 case 2:
-                    //ISSUES
+                    target = new ListIssuesFragment();
                     break;
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
@@ -100,6 +105,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getSupportFragmentManager().executePendingTransactions();
         findViewById(R.id.activity_home).invalidate();
     }
+
 
     @Override
     protected void onResume() {
@@ -163,6 +169,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     public void onSectionAttached(int number) {
         int shiftedPos = number + 1;
+        Log.d("tagThis", "shiftedPost" + shiftedPos);
         mTitle = AgileAppModuleUtils.getString(this, "title_section" + shiftedPos, "");
         if (mTitle.toString().isEmpty()) {
             mTitle = getString(R.string.title_section1);

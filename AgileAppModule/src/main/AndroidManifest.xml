@@ -18,7 +18,8 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".ui.activities.HomeActivity"
-		          android:launchMode="singleTop">
+		          android:launchMode="singleTop"
+		          android:configChanges="screenSize|orientation">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
 				<category android:name="android.intent.category.DEFAULT"/>

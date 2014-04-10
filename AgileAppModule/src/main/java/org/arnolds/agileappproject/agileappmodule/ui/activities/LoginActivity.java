@@ -63,7 +63,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
 
         @Override
         public void onConnected() {
-            Log.d("debug", "onConnected");
             runOnUiThread(new Runnable() {
                 public void run() {
                     Toast.makeText(mContext, AgileAppModuleUtils

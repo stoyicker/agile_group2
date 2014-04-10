@@ -12,6 +12,7 @@
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 	<string name="ret_branches">Retrieve Branches</string>
 	<string name="error_retri_branches">Error while retrieving branches</string>
+	<string name="error_retri_issues">Error while retrieving issues</string>
 	<string name="connected">Connected</string>
 	<string name="connection_error">Error while connecting</string>
 	<string name="connection_success">Connected</string>
