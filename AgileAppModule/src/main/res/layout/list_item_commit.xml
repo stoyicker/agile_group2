@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/padding_branch">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="3dp"
+    android:background="#eee">
 
     <TextView
         android:id="@+id/commit_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/RepoNameStyle"/>
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:text="Example commit message"
+        android:textSize="16sp"
+        />
     <TextView
-        android:id="@+id/comitter"
-        android:layout_width="match_parent"
+        android:id="@+id/committer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/RepoSHAStyle"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:textStyle="italic"
+        android:text="AgileArnold"
+        android:layout_centerVertical="true"
+        android:textSize="12sp"
+        android:background="@drawable/committer_tag"
+        android:textColor="#000"
+        />
 
-</LinearLayout>
+</RelativeLayout>

@@ -82,7 +82,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                         .inflate(R.layout.list_item_commit, null);
                 viewHolder = new ViewHolder();
                 viewHolder.setCommentView((TextView) convertView.findViewById(R.id.commit_message));
-                viewHolder.setCommitterView((TextView) convertView.findViewById(R.id.comitter));
+                viewHolder.setCommitterView((TextView) convertView.findViewById(R.id.committer));
                 convertView.setTag(viewHolder);
             }
             else {
