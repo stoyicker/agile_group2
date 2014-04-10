@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -64,6 +65,13 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        GitHubNotificationService service = GitHubNotificationService.getInstance();
+        service.removeCommitListener(this);
+    }
+
     public final class CommitAdapter extends BaseAdapter {
         private final List<GHCommit> commitCollection = new LinkedList<GHCommit>();
 
@@ -94,6 +102,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                         .inflate(R.layout.list_item_commit, null);
                 viewHolder = new ViewHolder();
+                viewHolder.setExpandIconImageView((ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 viewHolder.setCommentView((TextView) convertView.findViewById(R.id.commit_message));
                 viewHolder.setCommitterView((TextView) convertView.findViewById(R.id.committer));
                 convertView.setTag(viewHolder);
@@ -109,15 +118,16 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                 convertView.findViewById(R.id.commit_fragment).setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
-
             GHCommit commit = getItem(position);
             viewHolder.getCommentView().setText(commit.getCommitShortInfo().getMessage());
             viewHolder.getCommitterView().setText(commit.getCommitShortInfo().getCommitter().getName());
+
             return convertView;
         }
 
         private final class ViewHolder {
             private TextView commentView, committerView;
+            private ImageView expandIconImageView;
 
             private boolean expanded = true;
 
@@ -129,9 +139,19 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                 expanded = value;
                 if(expanded){
                     commentView.setMaxLines(Integer.MAX_VALUE);
+                    expandIconImageView.setImageResource(R.drawable.expander_ic_maximized);
                 } else {
                     commentView.setMaxLines(1);
+                    expandIconImageView.setImageResource(R.drawable.expander_ic_minimized);
                 }
+            }
+
+            public void setExpandIconImageView(ImageView expandIconImageView) {
+                this.expandIconImageView = expandIconImageView;
+            }
+
+            public ImageView getExpandIconImageView(ImageView expandIconImageView) {
+                return expandIconImageView;
             }
 
             public TextView getCommentView() {

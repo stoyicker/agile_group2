@@ -7,12 +7,22 @@
     android:padding="10dp"
     android:id="@+id/commit_fragment">
 
-    <TextView
-        android:id="@+id/commit_message"
+    <ImageView
+        android:id="@+id/commit_expander_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/expander_ic_minimized"
+        android:layout_marginRight="10dp"/>
+
+    <TextView
+        android:id="@+id/commit_message"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Example commit message that is quite long."
+        android:layout_toRightOf="@id/commit_expander_icon"
         android:textSize="16sp"
         android:textColor="#000"
         />
@@ -28,7 +38,7 @@
         android:textSize="12sp"
         android:background="@drawable/committer_tag"
         android:padding="3sp"
-        android:layout_marginTop="10sp"
+        android:layout_marginTop="10dp"
         android:textColor="#000"
         />
 
