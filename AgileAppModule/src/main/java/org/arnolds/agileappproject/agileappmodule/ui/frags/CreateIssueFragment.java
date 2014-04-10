@@ -1,7 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +16,6 @@ import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 
 public class CreateIssueFragment extends Fragment {
 
-    public static CreateIssueFragment newInstance(String param1, String param2) {
-        CreateIssueFragment fragment = new CreateIssueFragment();
-        return fragment;
-    }
     public CreateIssueFragment() {
         // Required empty public constructor
     }
