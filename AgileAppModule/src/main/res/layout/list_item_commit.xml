@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="3dp"
-    android:background="#eee">
+    android:padding="10dp"
+    android:id="@+id/commit_fragment">
 
     <TextView
         android:id="@+id/commit_message"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:text="Example commit message"
+        android:text="Example commit message that is quite long."
         android:textSize="16sp"
+        android:textColor="#000"
         />
+
     <TextView
         android:id="@+id/committer"
+        android:layout_below="@+id/commit_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="20dp"
-        android:textStyle="italic"
         android:text="AgileArnold"
-        android:layout_centerVertical="true"
         android:textSize="12sp"
-        android:background="@drawable/committer_tag"
+        android:background="#FF9D2D"
+        android:padding="3sp"
+        android:layout_marginTop="10sp"
         android:textColor="#000"
         />
 

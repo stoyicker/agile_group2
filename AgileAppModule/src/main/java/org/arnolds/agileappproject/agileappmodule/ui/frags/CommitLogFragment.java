@@ -2,6 +2,8 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 
 
+import android.app.LauncherActivity;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,13 +25,21 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CommitLogFragment extends Fragment implements PropertyChangeListener {
+public class CommitLogFragment extends Fragment implements PropertyChangeListener, AdapterView.OnItemClickListener {
     private List<GHCommit> mCommitList;
     private Context mContext;
     CommitAdapter commitAdapter;
 
     public CommitLogFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        ListView listView = (ListView) view.findViewById(R.id.commit_list_view);
+        commitAdapter.getItem(i);
+        CommitAdapter.ViewHolder vh = (CommitAdapter.ViewHolder) view.getTag();
+        vh.toggleExpanded();
     }
 
     @Override
@@ -47,6 +58,8 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         service.addCommitListener(this);
 
         Log.d("Commit fragment", "on create");
+
+        listView.setOnItemClickListener(this);
 
         return view;
     }
@@ -84,10 +97,19 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                 viewHolder.setCommentView((TextView) convertView.findViewById(R.id.commit_message));
                 viewHolder.setCommitterView((TextView) convertView.findViewById(R.id.committer));
                 convertView.setTag(viewHolder);
+                viewHolder.setExpanded(false);
             }
             else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+
+            if(position % 2 == 0) {
+                convertView.findViewById(R.id.commit_fragment).setBackgroundColor(getResources().getColor(R.color.list_row_background1));
+            } else {
+                convertView.findViewById(R.id.commit_fragment).setBackgroundColor(getResources().getColor(R.color.list_row_background2));
+            }
+
+
             GHCommit commit = getItem(position);
             viewHolder.getCommentView().setText(commit.getCommitShortInfo().getMessage());
             viewHolder.getCommitterView().setText(commit.getCommitShortInfo().getCommitter().getName());
@@ -96,6 +118,21 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
 
         private final class ViewHolder {
             private TextView commentView, committerView;
+
+            private boolean expanded = true;
+
+            public void toggleExpanded(){
+                setExpanded(!expanded);
+            }
+
+            public void setExpanded(boolean value){
+                expanded = value;
+                if(expanded){
+                    commentView.setMaxLines(Integer.MAX_VALUE);
+                } else {
+                    commentView.setMaxLines(1);
+                }
+            }
 
             public TextView getCommentView() {
                 return commentView;
@@ -126,7 +163,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                 CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
             }
         });
-
-
     }
+
+
 }
