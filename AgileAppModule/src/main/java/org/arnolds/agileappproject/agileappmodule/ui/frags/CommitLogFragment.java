@@ -14,7 +14,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
-import org.arnolds.agileappproject.agileappmodule.RetrieveBranchesActivity;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.kohsuke.github.GHCommit;
 
@@ -25,14 +24,12 @@ import java.util.List;
 
 public class CommitLogFragment extends Fragment implements PropertyChangeListener {
     private List<GHCommit> mCommitList;
-
-    private Context context;
+    private Context mContext;
     CommitAdapter commitAdapter;
 
     public CommitLogFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,8 +38,8 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_commit_log, container, false);
 
-        context = getActivity().getApplicationContext();
-        ListView listView = (ListView) view.findViewById(R.id.branch_list);
+        mContext = getActivity().getApplicationContext();
+        ListView listView = (ListView) view.findViewById(R.id.commit_list_view);
         commitAdapter = new CommitAdapter();
         listView.setAdapter(commitAdapter);
 
@@ -52,8 +49,6 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         Log.d("Commit fragment", "on create");
 
         return view;
-
-
     }
 
     public final class CommitAdapter extends BaseAdapter {
@@ -82,7 +77,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
-                convertView = ((LayoutInflater) context
+                convertView = ((LayoutInflater) mContext
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                         .inflate(R.layout.list_item_commit, null);
                 viewHolder = new ViewHolder();
@@ -118,10 +113,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
                 this.committerView = committerView;
             }
         }
-
     }
-
-
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {

@@ -5,7 +5,7 @@
     tools:context="org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="Test"
         />
 
@@ -13,8 +13,6 @@
         android:id="@+id/commit_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
      </ListView>
 
 </FrameLayout>
