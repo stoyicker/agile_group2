@@ -23,14 +23,15 @@ import java.util.Collection;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 
-public class CreateIssueFragment extends Fragment {
+public class CreateIssueFragment extends ArnoldSupportFragment {
 
     private View view;
     private EditText editTextTitle;
     private EditText editTextComment;
 
     public CreateIssueFragment() {
-        // Required empty public constructor
+        //TODO change item number
+        super(1);
     }
 
     @Override
@@ -75,8 +76,6 @@ public class CreateIssueFragment extends Fragment {
         //Checks that the title is not all spaces or empty.
         if (!title.trim().isEmpty()){
 
-
-
             final GitHubBrokerListener listener = new GitHubBrokerListener() {
                 @Override
                 public void onIssueCreation(boolean result, GHIssue issue) {
@@ -89,41 +88,18 @@ public class CreateIssueFragment extends Fragment {
                     });
 
                 }
-
-                @Override
-                public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
-                    super.onAllReposRetrieved(success, repos);
-                    try {
-                        GitHubBroker.getInstance().selectRepo(repos.iterator().next(), this);
-                    } catch (GitHubBroker.AlreadyNotConnectedException e) {
-                        e.printStackTrace();
-                    } catch (GitHubBroker.NullArgumentException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onRepoSelected(boolean result) {
-                    super.onRepoSelected(result);
-                    try {
-                        GitHubBroker.getInstance().createIssue(title, comment, null, this);
-                    } catch (GitHubBroker.AlreadyNotConnectedException e) {
-                        e.printStackTrace();
-                    } catch (GitHubBroker.RepositoryNotSelectedException e) {
-                        e.printStackTrace();
-                    } catch (GitHubBroker.NullArgumentException e) {
-                        e.printStackTrace();
-                    }
-                }
             };
 
             IGitHubBroker gitHubBroker = GitHubBroker.getInstance();
             try {
-                gitHubBroker.getAllRepos(listener);
+                gitHubBroker.createIssue(title, comment, null, listener);
             } catch (GitHubBroker.AlreadyNotConnectedException e) {
                 e.printStackTrace();
+            } catch (GitHubBroker.RepositoryNotSelectedException e) {
+                e.printStackTrace();
+            } catch (GitHubBroker.NullArgumentException e) {
+                e.printStackTrace();
             }
-
 
 
         }
@@ -166,4 +142,8 @@ public class CreateIssueFragment extends Fragment {
     }
 
 
+    @Override
+    public void onNewRepositorySelected() {
+
+    }
 }
