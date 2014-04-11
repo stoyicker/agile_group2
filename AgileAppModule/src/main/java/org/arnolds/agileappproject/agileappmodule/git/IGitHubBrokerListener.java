@@ -1,10 +1,12 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface for listeners to git-hub-broker callbacks.
@@ -55,8 +57,15 @@ public interface IGitHubBrokerListener {
 
     /**
      * Callback for creating issues.
-     * @param result {@link java.lang.Boolean} True if issue was created; otherwise false.
-     * @param issue {@link org.kohsuke.github.GHIssue} The created issue.
+     * @param result {@link boolean} True if issue was created; otherwise false.
+     * @param issue {@link org.kohsuke.github.GHIssue} The created issue, null if no issue was created.
      */
     public void onIssueCreation(boolean result, GHIssue issue);
+
+    /**
+     * Callback for getting all commits.
+     * @param result {@link boolean} True if commits could be retrieved; otherwise false.
+     * @param commits {@link List<org.kohsuke.github.GHCommit>} All commits, null if commits could not be retrieved.
+     */
+    public void onAllCommitsRetrieved(boolean result, List<GHCommit> commits);
 }

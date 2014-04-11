@@ -14,7 +14,7 @@ public interface IGitHubBroker {
      *
      * @param username {@link String} GitHub username.
      * @param password {@link String} GitHub password.
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyConnectedException} If already connected.
      */
     public void connect(String username, String password, IGitHubBrokerListener callback)
@@ -33,7 +33,7 @@ public interface IGitHubBroker {
      * @param title    {@link String} Title of the issue.
      * @param body     {@link String} The body of the issue. If null, it is ignored.
      * @param assignee {@link String} The assignee of the issue. If null, it is ignored.
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException   Thrown when not connected to github.
      * @throws org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException Thrown when no repository connected.
      * @throws {@link                                                                                     org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.NullArgumentException} Thrown if title is null.
@@ -48,7 +48,7 @@ public interface IGitHubBroker {
      * Asynchronously selects a repo to work with, giving response on the provided callback.
      *
      * @param repoName {@link String} The name of the repository to select.
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.NullArgumentException} If repo is null.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
@@ -58,7 +58,7 @@ public interface IGitHubBroker {
     /**
      * Asynchronously return all branches of the working repository, giving response on the provided callback.
      *
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
@@ -69,20 +69,31 @@ public interface IGitHubBroker {
     /**
      * Asynchronously return all repos of the currently logged in user, giving response on the provided callback.
      *
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
     public void getAllRepos(IGitHubBrokerListener callback)
             throws GitHubBroker.AlreadyNotConnectedException;
 
     /**
-     * Asynchronously return all issues of the working repository, giving response on the provided callback.
+     * Asynchronously returns all issues of the working repository, giving response on the provided callback.
      *
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker} Callback receiver, if null no callback will be made.
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
      */
     public void getAllIssues(IGitHubBrokerListener callback)
             throws GitHubBroker.RepositoryNotSelectedException,
+            GitHubBroker.AlreadyNotConnectedException;
+
+
+    /**
+     * Asynchronously returns all commits in the working repository, giving response on the provided callback.
+     *
+     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
+     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
+     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If not connected.
+     */
+    public void getAllCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
 }

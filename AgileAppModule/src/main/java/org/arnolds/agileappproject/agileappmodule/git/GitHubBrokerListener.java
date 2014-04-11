@@ -1,10 +1,12 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Basic implementation of the {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} interface.
@@ -27,6 +29,11 @@ public abstract class GitHubBrokerListener implements IGitHubBrokerListener {
 
     @Override
     public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
+
+    }
+
+    @Override
+    public void onAllCommitsRetrieved(boolean result, List<GHCommit> commits) {
 
     }
 
