@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -17,11 +16,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
-import org.arnolds.agileappproject.agileappmodule.RetrieveBranchesActivity;
-import org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity;
-import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
-import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerListFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
@@ -92,7 +87,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         if (target == null) {
             switch (position) {
                 case 0:
-                    fragment = new CommitLogFragment();
+                    target = new CommitLogFragment();
                     break;
                 case 1:
                     target = new ListBranchesFragment();
@@ -172,7 +167,11 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 drawerLayout = (DrawerLayout) findViewById(R.id.activity_home));
 
         //Setup default home fragment
-        onNavigationDrawerItemSelected.onNavigationDrawerItemSelected(0);
+        fragments[CommitLogFragment.DRAWER_POSITION] = new CommitLogFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container,
+                fragments[CommitLogFragment.DRAWER_POSITION])
+                .commit();
+        getSupportFragmentManager().executePendingTransactions();
     }
 
     public void onSectionAttached(int number) {

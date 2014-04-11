@@ -22,13 +22,15 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CommitLogFragment extends Fragment implements PropertyChangeListener, AdapterView.OnItemClickListener {
+public class CommitLogFragment extends ArnoldSupportFragment implements PropertyChangeListener, AdapterView.OnItemClickListener {
     private List<GHCommit> mCommitList;
     private Context mContext;
     CommitAdapter commitAdapter;
 
+    public final static int DRAWER_POSITION = 0;
+
     public CommitLogFragment() {
-        // Required empty public constructor
+        super(DRAWER_POSITION);
     }
 
     @Override
@@ -78,6 +80,11 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         super.onStop();
         GitHubNotificationService service = GitHubNotificationService.getInstance();
         service.removeCommitListener(this);
+    }
+
+    @Override
+    public void onNewRepositorySelected() {
+
     }
 
     public final class CommitAdapter extends BaseAdapter {
