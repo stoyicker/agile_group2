@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.timeout;
 
 public class GitHubBrokerTests extends InstrumentationTestCase {
@@ -232,7 +231,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_select_repo_not_found() {
         try {
-            broker.selectRepo(Mockito.mock(GHRepository.class), listener);
+            broker.selectRepo(Mockito.mock(GHRepository.class).getName(), listener);
         }
         catch (Exception e) {
             fail();
@@ -260,7 +259,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             fail();
         }
         try {
-            broker.selectRepo(Mockito.mock(GHRepository.class), listener);
+            broker.selectRepo(Mockito.mock(GHRepository.class).getName(), listener);
             fail();
         }
         catch (GitHubBroker.NullArgumentException e) {
@@ -272,7 +271,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_select_repo_valid() {
         try {
-            broker.selectRepo(repo, listener);
+            broker.selectRepo(repo.getName(), listener);
         }
         catch (Exception e) {
             fail();
@@ -282,7 +281,7 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
     public void test_select_repo_valid_nullCallback() {
         try {
-            broker.selectRepo(repo, null);
+            broker.selectRepo(repo.getName(), null);
         }
         catch (Exception e) {
             fail();
@@ -314,54 +313,67 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
     }
 
 
-    public  void test_createIssue_when_notConnected() {
+    public void test_createIssue_when_notConnected() {
         selectRepo(true);
 
         try {
             broker.disconnect();
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
         }
 
         try {
             broker.createIssue("a", "b", "c", listener);
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             fail();
         }
     }
 
-    public  void test_createIssue_when_connected_noRepository() {
+    public void test_createIssue_when_connected_noRepository() {
         try {
             broker.createIssue("a", "b", "c", listener);
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             fail();
         }
     }
 
-    public  void test_createIssue_valid_callbackNull() {
+    public void test_createIssue_valid_callbackNull() {
         selectRepo(true);
 
         try {
             broker.createIssue("a", "b", "c", null);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             fail();
         }
     }
@@ -371,13 +383,17 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
         try {
             broker.createIssue("a", "b", "c", listener);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             fail();
         }
         Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).
@@ -389,13 +405,17 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
         try {
             broker.createIssue("a", null, "c", listener);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             fail();
         }
         Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).
@@ -407,16 +427,21 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
         try {
             broker.createIssue("a", "b", null, listener);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
-            fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
-            fail();
-        } catch (GitHubBroker.NullArgumentException e) {
-            fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
         }
-        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onIssueCreation(true, createdIssue);
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        }
+        catch (GitHubBroker.NullArgumentException e) {
+            fail();
+        }
+        catch (IllegalArgumentException e) {
+            fail();
+        }
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS))
+                .onIssueCreation(true, createdIssue);
     }
 
     public void test_createIssue_nullTitle() {
@@ -424,12 +449,16 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
         try {
             broker.createIssue(null, "b", "c", listener);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
-        } catch (IllegalArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             fail();
         }
     }
@@ -439,22 +468,26 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
 
         boolean pass = false;
         try {
-            broker.createIssue("","b","c", listener);
-        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            broker.createIssue("", "b", "c", listener);
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();
-        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        }
+        catch (GitHubBroker.RepositoryNotSelectedException e) {
             fail();
-        } catch (GitHubBroker.NullArgumentException e) {
+        }
+        catch (GitHubBroker.NullArgumentException e) {
             fail();
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             pass = true;
         }
         assertTrue(pass);
     }
 
-    private void selectRepo(boolean wantSuccess){
+    private void selectRepo(boolean wantSuccess) {
         try {
-            broker.selectRepo(repo, listener);
+            broker.selectRepo(repo.getName(), listener);
         }
         catch (Exception e) {
             fail();

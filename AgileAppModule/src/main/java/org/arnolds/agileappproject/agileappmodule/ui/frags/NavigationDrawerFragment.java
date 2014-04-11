@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NavigationDrawerFragment extends Fragment {
 
-    private static final long REPOS_POLL_RATE_SECONDS = 300;
+    private static final long REPOS_POLL_RATE_SECONDS = Long.MAX_VALUE;
     private static int LAST_SELECTED_ITEM_INDEX = 0;
     private NavigationDrawerCallbacks mCallbacks;
 
@@ -286,7 +286,6 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.standard, menu);
         if (mDrawerLayout != null) {
             if (isDrawerOpen()) {
                 showGlobalContextActionBar();

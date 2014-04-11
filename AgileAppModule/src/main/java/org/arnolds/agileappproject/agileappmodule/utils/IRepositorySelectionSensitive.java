@@ -1,4 +1,4 @@
-package org.arnolds.agileappproject.agileappmodule.ui.frags;
+package org.arnolds.agileappproject.agileappmodule.utils;
 
 public interface IRepositorySelectionSensitive {
 

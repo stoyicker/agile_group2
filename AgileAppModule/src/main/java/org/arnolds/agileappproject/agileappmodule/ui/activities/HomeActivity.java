@@ -15,4 +15,9 @@ public class HomeActivity extends DrawerLayoutFragmentActivity {
         savedInstanceState.putInt("main_fragment_container", R.id.main_fragment_container);
         super.onCreate(savedInstanceState);
     }
+
+    @Override
+    public void onIssueCreated() {
+        super.notifyIssueCreated();
+    }
 }

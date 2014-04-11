@@ -14,16 +14,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * Created by thrawn on 08/04/14.
- */
 public class GitHubNotificationServiceTests extends InstrumentationTestCase {
     public static final long SECOND = 1000;
     public static final long SLEEP_TIME = 4;
     private GitHubNotificationService service;
     private GHRepository repo;
-    private IGitHubBroker broker;
     private List<GHCommit> dummyCommits;
 
     public void init() {
@@ -34,13 +29,6 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
 
         GHCommit commit1 = new GHCommit();
         GHCommit commit2 = new GHCommit();
-
-        /*try {
-            //commit2.createComment("hej hej");
-            //commit1.createComment("LALALA");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
         dummyCommits = new ArrayList<GHCommit>();
         dummyCommits.add(commit1);
@@ -75,7 +63,8 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
         for (int i = 0; !listener.isEventReceived() && i < SLEEP_TIME; i++) {
             try {
                 Thread.sleep(SECOND);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -101,7 +90,7 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
         }
 
         public boolean isEventReceived() {
-            return  eventReceived;
+            return eventReceived;
         }
 
         public List<GHCommit> getCommits() {
@@ -109,15 +98,7 @@ public class GitHubNotificationServiceTests extends InstrumentationTestCase {
         }
 
 
-
     }
-
-
-
-
-
-
-
 
 
 }

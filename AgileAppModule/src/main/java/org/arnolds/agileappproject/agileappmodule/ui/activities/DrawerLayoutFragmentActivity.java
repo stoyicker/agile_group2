@@ -1,7 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -9,10 +8,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
@@ -22,7 +23,8 @@ import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 import java.util.ArrayList;
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
-        NavigationDrawerFragment.NavigationDrawerCallbacks {
+        NavigationDrawerFragment.NavigationDrawerCallbacks,
+        CreateIssueFragment.IssueCreationCallbacks {
 
     private static final ArrayList<Integer> navigatedItemsStack =
             new ArrayList<Integer>();
@@ -37,6 +39,25 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem newIssueItem = menu.findItem(R.id.action_create);
+        switch (lastSelectedFragmentIndex) {
+            case 2:
+                if (newIssueItem != null) {
+                    newIssueItem.setVisible(Boolean.TRUE);
+                }
+                break;
+            default:
+                if (newIssueItem != null) {
+                    newIssueItem.setVisible(Boolean.FALSE);
+                }
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -48,6 +69,20 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         switch (item.getItemId()) {
             case R.id.action_settings:
 //  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
+                break;
+            case R.id.action_create:
+                switch (lastSelectedFragmentIndex) {
+                    case 2:
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_fragment_container, new CreateIssueFragment())
+                                .commit();
+                        getSupportFragmentManager().executePendingTransactions();
+                        break;
+                    default:
+                        Log.wtf("debug",
+                                "Should never happen - Index: " + lastSelectedFragmentIndex);
+                        break;
+                }
                 break;
             default: //Up button
                 ret = super.onOptionsItemSelected(item);
@@ -82,7 +117,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
 
         lastSelectedFragmentIndex = position;
-        Fragment target = fragments[position];
+        ArnoldSupportFragment target = fragments[position];
 
         if (target == null) {
             switch (position) {
@@ -99,6 +134,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     Log.wtf("debug", "Should never happen - position is " + position);
                     break;
             }
+            fragments[position] = target;
         }
 
         getSupportFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER, target)
@@ -191,6 +227,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
         catch (NullPointerException ex) {
 //            Log.wtf("debug", ex.getClass().getName(), ex);
+        }
+    }
+
+    public void notifyIssueCreated() {
+        Log.d("debug", "ey");
+        final FragmentManager supportFragmentManager = getSupportFragmentManager();
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container, fragments[2]).commit();
+        if (supportFragmentManager != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    supportFragmentManager.executePendingTransactions();
+                }
+            });
         }
     }
 }
