@@ -75,7 +75,6 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
         Mockito.when(repo.getBranches()).thenReturn(branches);
         Mockito.when(repo.getIssues(GHIssueState.OPEN)).thenReturn(openIssues);
         Mockito.when(repo.getIssues(GHIssueState.CLOSED)).thenReturn(closedIssues);
-
         GHIssueBuilder ib = Mockito.mock(GHIssueBuilder.class);
         Mockito.when(ib.create()).thenReturn(createdIssue);
         Mockito.when(repo.createIssue(Mockito.anyString())).thenReturn(ib);
@@ -483,6 +482,56 @@ public class GitHubBrokerTests extends InstrumentationTestCase {
             pass = true;
         }
         assertTrue(pass);
+    }
+
+    public void test_getAllCommits_valid() {
+        selectRepo(true);
+        try {
+            broker.getAllCommits(listener);
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+
+        Mockito.verify(listener, Mockito.timeout(TIMEOUT_MILLIS)).onAllReposRetrieved(true, Mockito.anyCollection());
+    }
+
+    public void test_getAllCommits_valid_nullCallback() {
+        selectRepo(true);
+        try {
+            broker.getAllCommits(null);
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+    }
+
+    public void test_getAllCommits_noRepoSelected() {
+        try {
+            broker.getAllCommits(listener);
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+    }
+
+    public void test_getAllCommits_notConnected() {
+        try {
+            broker.disconnect();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            fail();
+        }
+        try {
+            broker.getAllCommits(listener);
+            fail();
+        } catch (GitHubBroker.RepositoryNotSelectedException e) {
+            fail();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void selectRepo(boolean wantSuccess) {
