@@ -1,6 +1,5 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,8 +21,8 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CommitLogFragment extends ArnoldSupportFragment implements PropertyChangeListener, AdapterView.OnItemClickListener {
-    private List<GHCommit> mCommitList;
+public class CommitLogFragment extends ArnoldSupportFragment
+        implements PropertyChangeListener, AdapterView.OnItemClickListener {
     private Context mContext;
     CommitAdapter commitAdapter;
 
@@ -35,7 +34,6 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        ListView listView = (ListView) view.findViewById(R.id.commit_list_view);
         commitAdapter.getItem(i);
         CommitAdapter.ViewHolder vh = (CommitAdapter.ViewHolder) view.getTag();
         vh.toggleExpanded();
@@ -47,6 +45,10 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_commit_log, container, false);
+
+        if (!GitHubNotificationService.getInstance().isEmpty()) {
+            view.findViewById(R.id.commit_list_empty).setVisibility(View.INVISIBLE);
+        }
 
         mContext = getActivity().getApplicationContext();
         ListView listView = (ListView) view.findViewById(R.id.commit_list_view);
@@ -76,15 +78,7 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        GitHubNotificationService service = GitHubNotificationService.getInstance();
-        service.removeCommitListener(this);
-    }
-
-    @Override
     public void onNewRepositorySelected() {
-
     }
 
     public final class CommitAdapter extends BaseAdapter {
@@ -117,7 +111,8 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                         .inflate(R.layout.list_item_commit, null);
                 viewHolder = new ViewHolder();
-                viewHolder.setExpandIconImageView((ImageView) convertView.findViewById(R.id.commit_expander_icon));
+                viewHolder.setExpandIconImageView(
+                        (ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 viewHolder.setCommentView((TextView) convertView.findViewById(R.id.commit_message));
                 viewHolder.setCommitterView((TextView) convertView.findViewById(R.id.committer));
                 convertView.setTag(viewHolder);
@@ -127,15 +122,19 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            if(position % 2 == 0) {
-                convertView.findViewById(R.id.commit_fragment).setBackgroundColor(getResources().getColor(R.color.list_row_background1));
-            } else {
-                convertView.findViewById(R.id.commit_fragment).setBackgroundColor(getResources().getColor(R.color.list_row_background2));
+            if (position % 2 == 0) {
+                convertView.findViewById(R.id.commit_fragment)
+                        .setBackgroundColor(getResources().getColor(R.color.list_row_background1));
+            }
+            else {
+                convertView.findViewById(R.id.commit_fragment)
+                        .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
             GHCommit commit = getItem(position);
             viewHolder.getCommentView().setText(commit.getCommitShortInfo().getMessage());
-            viewHolder.getCommitterView().setText(commit.getCommitShortInfo().getCommitter().getName());
+            viewHolder.getCommitterView()
+                    .setText(commit.getCommitShortInfo().getCommitter().getName());
 
             return convertView;
         }
@@ -146,16 +145,17 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
 
             private boolean expanded = true;
 
-            public void toggleExpanded(){
+            public void toggleExpanded() {
                 setExpanded(!expanded);
             }
 
-            public void setExpanded(boolean value){
+            public void setExpanded(boolean value) {
                 expanded = value;
-                if(expanded){
+                if (expanded) {
                     commentView.setMaxLines(Integer.MAX_VALUE);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_maximized);
-                } else {
+                }
+                else {
                     commentView.setMaxLines(1);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_minimized);
                 }
@@ -163,10 +163,6 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
 
             public void setExpandIconImageView(ImageView expandIconImageView) {
                 this.expandIconImageView = expandIconImageView;
-            }
-
-            public ImageView getExpandIconImageView(ImageView expandIconImageView) {
-                return expandIconImageView;
             }
 
             public TextView getCommentView() {
@@ -189,7 +185,15 @@ public class CommitLogFragment extends ArnoldSupportFragment implements Property
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        populateList((List<GHCommit>) event.getNewValue());;
+        if (getView() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getView().findViewById(R.id.commit_list_empty).setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+        populateList((List<GHCommit>) event.getNewValue());
     }
 
 }

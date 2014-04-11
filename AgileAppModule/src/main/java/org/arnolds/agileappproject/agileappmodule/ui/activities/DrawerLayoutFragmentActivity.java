@@ -10,14 +10,15 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
-import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
@@ -107,8 +108,11 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         super.onConfigurationChanged(newConfig);
         navigatedItemsStack.add(0, navigatedItemsStack.get(0));
         recreate();
-        Log.d("debug", "lastSelectedFragmentIndex" + lastSelectedFragmentIndex);
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+        View stub;
+        if ((stub = findViewById(R.id.commit_list_empty)) != null) {
+            stub.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -154,6 +158,11 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 //                Log.wtf("debug", ex.getClass().getName(),ex);
             }
         }
+
+        if (position == 0) {
+            findViewById(R.id.commit_list_empty).setVisibility(View.INVISIBLE);
+        }
+
         findViewById(R.id.activity_home).invalidate();
     }
 

@@ -16,7 +16,6 @@ import org.kohsuke.github.GHRepository;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -65,26 +64,30 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     @Override
     public synchronized void addCommitListener(PropertyChangeListener commitListener) {
 
-        if (commitListener == null)
+        if (commitListener == null) {
             return;
+        }
 
         //Prepare for running and abort termination if possible
         if (!commitPollerRunning && !commitPollerThread.isAlive()) {
             //Start the poller
             commitPollerRunning = true;
-            commitPollerThread.start();
-        }
+            try {
+                commitPollerThread.start();
+                if (!commitPollerRunning) {
+                    commitPollerRunning = true;
+                }
 
-        if(!commitPollerRunning) {
-            commitPollerRunning = true;
-        }
+                //If thread is dead, resurrect it
+                if (!commitPollerThread.isAlive()) {
+                    commitPollerThread.start();
+                }
 
-        //If thread is dead, resurrect it
-        if(!commitPollerThread.isAlive()) {
-            commitPollerThread.start();
+                commitChangeSupport.addPropertyChangeListener(commitListener);
+            }
+            catch (IllegalThreadStateException ex) {
+            }
         }
-
-        commitChangeSupport.addPropertyChangeListener(commitListener);
     }
 
     @Override
@@ -92,7 +95,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         commitChangeSupport.removePropertyChangeListener(commitListener);
 
         //If no more listeners, destroy polling thread
-        if(commitChangeSupport.getPropertyChangeListeners().length <= 0) {
+        if (commitChangeSupport.getPropertyChangeListeners().length <= 0) {
             terminateCommitPoller();
         }
     }
@@ -100,9 +103,14 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private class CommitPollerThread implements Runnable {
         @Override
         public void run() {
-            while(commitPollerRunning) {
+            while (commitPollerRunning) {
                 try {
-                    broker.getAllCommits(brokerListener);
+                    try {
+                        broker.getAllCommits(brokerListener);
+                    }
+                    catch (GitHubBroker.RepositoryNotSelectedException e) {
+                        Log.wtf("debug", e.getClass().getName(), e);
+                    }
                 }
                 catch (GitHubBroker.AlreadyNotConnectedException e) {
                     e.printStackTrace();
@@ -121,8 +129,6 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
         @Override
         public void onAllCommitsRetrieved(boolean result, List<GHCommit> commits) {
-
-
             List<GHCommit> remoteCommitList = commits;
 
             //If change
@@ -138,7 +144,9 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(context, context.getString(R.id.notification_new_commits), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context,
+                                    context.getString(R.id.notification_new_commits),
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -154,6 +162,10 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         public void onRepoSelected(boolean result) {
             commitList = null;
         }
+    }
+
+    public boolean isEmpty() {
+        return commitList.isEmpty();
     }
 
     public List<GHCommit> getCurrentCommitList() {
