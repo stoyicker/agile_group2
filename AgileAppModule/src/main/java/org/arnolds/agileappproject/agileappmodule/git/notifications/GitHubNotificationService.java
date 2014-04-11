@@ -1,5 +1,11 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
 
+import android.app.Activity;
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
@@ -16,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class GitHubNotificationService implements IGitHubNotificationService {
-    public static final int POLL_TIMEOUT_SECONDS = 10;
+    public static final int POLL_TIMEOUT_SECONDS = 5;
     private GHRepository repo;
 
     private static GitHubNotificationService instance;
@@ -28,6 +34,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private volatile boolean commitPollerRunning;
 
+    private Context context;
+
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
 
@@ -35,10 +43,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         brokerListener = new MyGitHubBrokerListener();
         broker = GitHubBroker.getInstance();
 
-        //Start the poller
         commitPollerThread = new Thread(new CommitPollerThread());
-        commitPollerRunning = true;
-        commitPollerThread.start();
+
     }
 
     public static GitHubNotificationService getInstance() {
@@ -52,9 +58,23 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         commitPollerRunning = false;
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     @Override
     public synchronized void addCommitListener(PropertyChangeListener commitListener) {
+
+        if (commitListener == null)
+            return;
+
         //Prepare for running and abort termination if possible
+        if (!commitPollerRunning && !commitPollerThread.isAlive()) {
+            //Start the poller
+            commitPollerRunning = true;
+            commitPollerThread.start();
+        }
+
         if(!commitPollerRunning) {
             commitPollerRunning = true;
         }
@@ -82,7 +102,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         public void run() {
             while(commitPollerRunning) {
                 try {
-                    broker.getAllRepos(brokerListener);
+                    broker.getAllCommits(brokerListener);
                 }
                 catch (GitHubBroker.AlreadyNotConnectedException e) {
                     e.printStackTrace();
@@ -100,17 +120,39 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
         @Override
-        public void onAllReposRetrieved(boolean success, Collection<GHRepository> repos) {
-            Object[] ghRepos = repos.toArray();
-            repo = (GHRepository) ghRepos[0];
-            List<GHCommit> remoteCommitList = repo.listCommits().asList();
+        public void onAllCommitsRetrieved(boolean result, List<GHCommit> commits) {
+
+
+            List<GHCommit> remoteCommitList = commits;
 
             //If change
-            if (remoteCommitList.size() != commitList.size()) {
+            if (commitList == null) {
                 commitList = remoteCommitList;
                 commitChangeSupport
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
             }
+            else if (remoteCommitList.size() != commitList.size()) {
+                Log.wtf("GH NOTIF", "new Commits.");
+
+                if (!commitList.isEmpty()) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, context.getString(R.id.notification_new_commits), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+                commitList = remoteCommitList;
+                commitChangeSupport
+                        .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
+
+            }
+        }
+
+        @Override
+        public void onRepoSelected(boolean result) {
+            commitList = null;
         }
     }
 
