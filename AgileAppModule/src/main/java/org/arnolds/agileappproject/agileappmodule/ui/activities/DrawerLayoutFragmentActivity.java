@@ -18,9 +18,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
-import org.arnolds.agileappproject.agileappmodule.RetrieveBranchesActivity;
-import org.arnolds.agileappproject.agileappmodule.RetrieveIssuesActivity;
-import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
+
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
