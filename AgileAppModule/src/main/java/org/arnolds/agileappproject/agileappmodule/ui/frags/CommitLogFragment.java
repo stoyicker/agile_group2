@@ -1,9 +1,5 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
-
-
-import android.app.LauncherActivity;
-import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -56,6 +52,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         listView.setAdapter(commitAdapter);
 
         GitHubNotificationService service = GitHubNotificationService.getInstance();
+        populateList(service.getCurrentCommitList());
         service.addCommitListener(this);
 
         Log.d("Commit fragment", "on create");
@@ -63,6 +60,17 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
         listView.setOnItemClickListener(this);
 
         return view;
+    }
+
+    private void populateList(List<GHCommit> commitList) {
+        commitAdapter.getCommitCollection().clear();
+        commitAdapter.getCommitCollection().addAll(commitList);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -174,16 +182,7 @@ public class CommitLogFragment extends Fragment implements PropertyChangeListene
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        mCommitList = (List<GHCommit>) event.getNewValue();
-        commitAdapter.getCommitCollection().clear();
-        commitAdapter.getCommitCollection().addAll(mCommitList);
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
-            }
-        });
+        populateList((List<GHCommit>) event.getNewValue());;
     }
-
 
 }

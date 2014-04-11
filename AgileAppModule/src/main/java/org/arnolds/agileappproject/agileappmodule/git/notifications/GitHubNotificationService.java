@@ -14,9 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by thrawn on 08/04/14.
- */
+
 public class GitHubNotificationService implements IGitHubNotificationService {
     public static final int POLL_TIMEOUT_SECONDS = 10;
     private GHRepository repo;
@@ -26,6 +24,9 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private List<GHCommit> commitList;
     private IGitHubBroker broker;
     private IGitHubBrokerListener brokerListener;
+    private Thread commitPollerThread;
+
+    private volatile boolean commitPollerRunning;
 
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
@@ -35,9 +36,9 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         broker = GitHubBroker.getInstance();
 
         //Start the poller
-        Thread thread = new Thread(new PollerThread());
-        thread.start();
-
+        commitPollerThread = new Thread(new CommitPollerThread());
+        commitPollerRunning = true;
+        commitPollerThread.start();
     }
 
     public static GitHubNotificationService getInstance() {
@@ -47,21 +48,39 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         return instance;
     }
 
+    private void terminateCommitPoller() {
+        commitPollerRunning = false;
+    }
 
     @Override
-    public void addCommitListener(PropertyChangeListener commitListener) {
+    public synchronized void addCommitListener(PropertyChangeListener commitListener) {
+        //Prepare for running and abort termination if possible
+        if(!commitPollerRunning) {
+            commitPollerRunning = true;
+        }
+
+        //If thread is dead, resurrect it
+        if(!commitPollerThread.isAlive()) {
+            commitPollerThread.start();
+        }
+
         commitChangeSupport.addPropertyChangeListener(commitListener);
     }
 
     @Override
-    public void removeCommitListener(PropertyChangeListener commitListener) {
+    public synchronized void removeCommitListener(PropertyChangeListener commitListener) {
         commitChangeSupport.removePropertyChangeListener(commitListener);
+
+        //If no more listeners, destroy polling thread
+        if(commitChangeSupport.getPropertyChangeListeners().length <= 0) {
+            terminateCommitPoller();
+        }
     }
 
-    private class PollerThread implements Runnable {
+    private class CommitPollerThread implements Runnable {
         @Override
         public void run() {
-            while (true) {
+            while(commitPollerRunning) {
                 try {
                     broker.getAllRepos(brokerListener);
                 }
@@ -93,5 +112,9 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
             }
         }
+    }
+
+    public List<GHCommit> getCurrentCommitList() {
+        return commitList;
     }
 }

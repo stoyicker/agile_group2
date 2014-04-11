@@ -86,7 +86,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             navigatedItemsStack.add(0, position);
         }
 
-
         lastSelectedFragmentIndex = position;
         Fragment target = fragments[position];
 
@@ -112,7 +111,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getSupportFragmentManager().executePendingTransactions();
         findViewById(R.id.activity_home).invalidate();
     }
-
 
     @Override
     protected void onResume() {
@@ -172,6 +170,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer_fragment,
                 drawerLayout = (DrawerLayout) findViewById(R.id.activity_home));
+
+        //Setup default home fragment
+        onNavigationDrawerItemSelected.onNavigationDrawerItemSelected(0);
     }
 
     public void onSectionAttached(int number) {
