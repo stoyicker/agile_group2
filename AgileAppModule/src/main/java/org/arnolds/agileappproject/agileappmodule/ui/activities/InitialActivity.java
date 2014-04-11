@@ -10,6 +10,7 @@ import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.auth.GitHubAuthenticator;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
@@ -45,6 +46,8 @@ public class InitialActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        GitHubNotificationService.getInstance().setContext(this);
 
         GitHubAuthenticator mGitHubAuthenticator = new GitHubAuthenticator(this);
         Bundle credentials = mGitHubAuthenticator.getCredentials();
