@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -26,7 +24,7 @@ import java.util.List;
 
 public class ListBranchesFragment extends ArnoldSupportFragment {
 
-    private static final long BRANCHES_POLL_INTERVAL_MILLIS = 0;
+    private static final long BRANCHES_POLL_INTERVAL_MILLIS = 2000;
     private final static int MENU_INDEX = 1;
     private BranchesListAdapter listAdapter;
     private IGitHubBrokerListener branchesListener = new BranchesListener();

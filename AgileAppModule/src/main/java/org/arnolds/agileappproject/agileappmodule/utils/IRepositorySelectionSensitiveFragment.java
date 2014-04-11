@@ -1,6 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.utils;
 
-public interface IRepositorySelectionSensitive {
+public interface IRepositorySelectionSensitiveFragment {
 
     public void onNewRepositorySelected();
 }

@@ -49,12 +49,14 @@ public class InitialActivity extends Activity {
         GitHubAuthenticator mGitHubAuthenticator = new GitHubAuthenticator(this);
         Bundle credentials = mGitHubAuthenticator.getCredentials();
 
-        String mUsername, mPassword;
-
         if (GitHubBroker.getInstance().isConnected()) {
             Intent home = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(home);
+            finish();
+            return;
         }
+
+        String mUsername, mPassword;
 
         // != null => there is a stored account.
         if (credentials != null) {

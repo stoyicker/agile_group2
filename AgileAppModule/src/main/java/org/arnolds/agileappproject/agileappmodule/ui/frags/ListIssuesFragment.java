@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ListIssuesFragment extends ArnoldSupportFragment {
 
-    private static final long ISSUES_POLL_INTERVAL_MILLIS = 0;
+    private static final long ISSUES_POLL_INTERVAL_MILLIS = 2000;
     private final static int MENU_INDEX = 2;
     private IssuesListAdapter listAdapter;
     private IGitHubBrokerListener issuesListener = new IssuesListener();

@@ -31,7 +31,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
-    private int lastSelectedFragmentIndex = 0;
+    private static int lastSelectedFragmentIndex = 0;
 
     public static int getLastSelectedNavDavIndex() {
         return navigatedItemsStack.get(0);
@@ -41,6 +41,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem newIssueItem = menu.findItem(R.id.action_create);
+        Log.d("debug", "menu created, lastSelectedFragmentIndex=" + lastSelectedFragmentIndex);
         switch (lastSelectedFragmentIndex) {
             case 2:
                 if (newIssueItem != null) {
@@ -74,6 +75,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     case 2:
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_fragment_container, new CreateIssueFragment())
+                                .addToBackStack("")
                                 .commit();
                         getSupportFragmentManager().executePendingTransactions();
                         break;
@@ -94,6 +96,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(Boolean.TRUE);
+        mTitle = AgileAppModuleUtils.getString(getApplicationContext(),
+                "title_section" + (lastSelectedFragmentIndex + 1), null);
         actionBar.setTitle(mTitle);
     }
 
@@ -102,6 +106,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         super.onConfigurationChanged(newConfig);
         navigatedItemsStack.add(0, navigatedItemsStack.get(0));
         recreate();
+        Log.d("debug", "lastSelectedFragmentIndex" + lastSelectedFragmentIndex);
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
     }
 
@@ -136,9 +141,18 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             fragments[position] = target;
         }
 
-        getSupportFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER, target)
-                .addToBackStack("").commit();
-        getSupportFragmentManager().executePendingTransactions();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager != null) {
+            try {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(MAIN_FRAGMENT_CONTAINER, target)
+                        .addToBackStack("").commit();
+                getSupportFragmentManager().executePendingTransactions();
+            }
+            catch (NullPointerException ex) {
+//                Log.wtf("debug", ex.getClass().getName(),ex);
+            }
+        }
         findViewById(R.id.activity_home).invalidate();
     }
 
@@ -153,8 +167,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     @Override
     public void onBackPressed() {
-        if (navigatedItemsStack.size() > 1) {
+        if (navigatedItemsStack.size() < 2) {
             finish();
+        }
+        else if (getSupportFragmentManager().popBackStackImmediate()) {
+            navigatedItemsStack.remove(0);
+            lastSelectedFragmentIndex = navigatedItemsStack.remove(0);
+            restoreActionBar();
         }
     }
 
@@ -222,6 +241,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 //            Log.wtf("debug", ex.getClass().getName(), ex);
         }
     }
+
 
     public void notifyIssueCreated() {
         Log.d("debug", "ey");

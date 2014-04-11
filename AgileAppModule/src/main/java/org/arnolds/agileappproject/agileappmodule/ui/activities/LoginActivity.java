@@ -6,8 +6,6 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -182,22 +180,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
     public void submit() {
         mUsernameView.setEnabled(Boolean.FALSE);
         mPasswordView.setEnabled(Boolean.FALSE);
-        mUsernameView.setFilters(new InputFilter[]{
-                new InputFilter() {
-                    public CharSequence filter(CharSequence src, int start,
-                                               int end, Spanned dst, int dstart, int dend) {
-                        return src.length() < 1 ? dst.subSequence(dstart, dend) : "";
-                    }
-                }
-        });
-        mPasswordView.setFilters(new InputFilter[]{
-                new InputFilter() {
-                    public CharSequence filter(CharSequence src, int start,
-                                               int end, Spanned dst, int dstart, int dend) {
-                        return src.length() < 1 ? dst.subSequence(dstart, dend) : "";
-                    }
-                }
-        });
         getFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new IndefiniteFancyProgressFragment())
                 .addToBackStack("").commit();
