@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:id="@+id/commit_fragment">
+
+    <ImageView
+        android:id="@+id/commit_expander_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/expander_ic_minimized"
+        android:layout_marginRight="10dp"/>
+
+    <TextView
+        android:id="@+id/commit_message"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Example commit message that is quite long."
+        android:layout_toRightOf="@id/commit_expander_icon"
+        android:textSize="16sp"
+        android:textColor="#000"
+        />
+
+    <TextView
+        android:id="@+id/committer"
+        android:layout_below="@+id/commit_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_alignParentRight="true"
+        android:text="AgileArnold"
+        android:textSize="12sp"
+        android:background="@drawable/committer_tag"
+        android:padding="3sp"
+        android:layout_marginTop="10dp"
+        android:textColor="#000"
+        />
+
+</RelativeLayout>

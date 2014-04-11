@@ -17,6 +17,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         if (target == null) {
             switch (position) {
                 case 0:
-                    //NOTIFICATIONCOMMITFRAGMENT
+                    target = new CommitLogFragment();
                     break;
                 case 1:
                     target = new ListBranchesFragment();
@@ -155,7 +156,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
         findViewById(R.id.activity_home).invalidate();
     }
-
 
     @Override
     protected void onResume() {
@@ -220,6 +220,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer_fragment,
                 drawerLayout = (DrawerLayout) findViewById(R.id.activity_home));
+
+        //Setup default home fragment
+        fragments[CommitLogFragment.DRAWER_POSITION] = new CommitLogFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container,
+                fragments[CommitLogFragment.DRAWER_POSITION])
+                .commit();
+        getSupportFragmentManager().executePendingTransactions();
     }
 
     public void onSectionAttached(int number) {

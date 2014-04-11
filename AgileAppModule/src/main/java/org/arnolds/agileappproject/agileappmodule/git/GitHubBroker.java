@@ -4,17 +4,20 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueBuilder;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.PagedIterable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
@@ -327,5 +330,26 @@ public class GitHubBroker implements IGitHubBroker {
                 }
             }
         }.execute(ib, callback);
+    }
+
+    @Override
+    public void getAllCommits(IGitHubBrokerListener callback) throws RepositoryNotSelectedException, AlreadyNotConnectedException {
+        if (!isConnected()) {
+            throw new AlreadyNotConnectedException();
+        }
+        if (repository == null) {
+            throw new RepositoryNotSelectedException();
+        }
+
+        new AsyncTask<IGitHubBrokerListener, Void, Void>() {
+            @Override
+            protected Void doInBackground(IGitHubBrokerListener... params) {
+                PagedIterable<GHCommit> commits = repository.listCommits();
+                if(params[0] != null) {
+                    params[0].onAllCommitsRetrieved(true, commits.asList());
+                }
+                return null;
+            }
+        }.execute(callback);
     }
 }
