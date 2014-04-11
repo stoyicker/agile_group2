@@ -51,6 +51,11 @@ public class InitialActivity extends Activity {
 
         String mUsername, mPassword;
 
+        if (GitHubBroker.getInstance().isConnected()) {
+            Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+            startActivity(home);
+        }
+
         // != null => there is a stored account.
         if (credentials != null) {
             setContentView(R.layout.activity_initial);

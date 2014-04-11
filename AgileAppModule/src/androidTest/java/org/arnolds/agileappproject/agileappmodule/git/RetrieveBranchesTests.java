@@ -68,7 +68,7 @@ public class RetrieveBranchesTests extends InstrumentationTestCase {
 
     public void test_branches_polling_when_removed() {
         try {
-            broker.selectRepo(repo, listener);
+            broker.selectRepo(repo.getName(), listener);
         }
         catch (GitHubBroker.AlreadyNotConnectedException e) {
             fail();

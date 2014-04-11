@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import org.arnolds.agileappproject.agileappmodule.R;
@@ -36,6 +37,25 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem newIssueItem = menu.findItem(R.id.action_create);
+        switch (lastSelectedFragmentIndex) {
+            case 2:
+                if (newIssueItem != null) {
+                    newIssueItem.setVisible(Boolean.TRUE);
+                }
+                break;
+            default:
+                if (newIssueItem != null) {
+                    newIssueItem.setVisible(Boolean.FALSE);
+                }
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -47,6 +67,16 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         switch (item.getItemId()) {
             case R.id.action_settings:
 //  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
+                break;
+            case R.id.action_create:
+                switch (lastSelectedFragmentIndex) {
+                    case 2:
+                        break;
+                    default:
+                        Log.wtf("debug",
+                                "Should never happen - Index: " + lastSelectedFragmentIndex);
+                        break;
+                }
                 break;
             default: //Up button
                 ret = super.onOptionsItemSelected(item);

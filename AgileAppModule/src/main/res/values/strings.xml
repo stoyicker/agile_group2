@@ -31,4 +31,5 @@
 	<string name="loading">Loading…</string>
 	<string name="error_get_repos">Error retrieving repos</string>
 	<string name="repo_spin_title">Select a repo</string>
+	<string name="action_create_issues">Create issue</string>
 </resources>
