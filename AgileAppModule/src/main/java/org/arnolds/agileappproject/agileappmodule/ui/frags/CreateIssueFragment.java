@@ -23,15 +23,14 @@ import java.util.Collection;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 
-public class CreateIssueFragment extends ArnoldSupportFragment {
+public class CreateIssueFragment extends Fragment{
 
     private View view;
     private EditText editTextTitle;
     private EditText editTextComment;
 
     public CreateIssueFragment() {
-        //TODO change item number
-        super(1);
+
     }
 
     @Override
@@ -138,12 +137,6 @@ public class CreateIssueFragment extends ArnoldSupportFragment {
         editTextComment.setVisibility(View.INVISIBLE);
         editTextTitle.setVisibility(View.INVISIBLE);
         createIssueButton.setVisibility(View.INVISIBLE);
-
-    }
-
-
-    @Override
-    public void onNewRepositorySelected() {
 
     }
 }
