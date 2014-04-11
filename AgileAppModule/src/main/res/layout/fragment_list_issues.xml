@@ -10,4 +10,11 @@
 		android:layout_height="wrap_content"
 		android:padding="@dimen/padding_branch">
 	</ListView>
+	<fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+		android:id="@+id/issues_list_empty"
+		style="@style/IndeterminateFancyProgressBarStyle"
+		android:layout_marginTop="@dimen/loading_list_margin_to_top"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:indeterminate="true"/>
 </LinearLayout>

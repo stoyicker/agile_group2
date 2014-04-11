@@ -84,6 +84,14 @@ public class ListIssuesFragment extends ArnoldSupportFragment {
                 issuesListView.invalidateViews();
             }
         });
+        if (getView() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getView().findViewById(R.id.issues_list_empty).setVisibility(View.INVISIBLE);
+                }
+            });
+        }
         updateShownIssues();
     }
 

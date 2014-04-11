@@ -23,4 +23,5 @@
 	<dimen name="login_arnold_height">250dp</dimen>
 	<dimen name="repo_selector_spinner_to_bottom_margin">30dp</dimen>
 	<dimen name="repo_name_separator">10dp</dimen>
+	<dimen name="loading_list_margin_to_top">100dp</dimen>
 </resources>

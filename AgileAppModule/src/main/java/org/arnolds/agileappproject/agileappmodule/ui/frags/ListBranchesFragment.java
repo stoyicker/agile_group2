@@ -84,6 +84,14 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
                 branchesListView.invalidateViews();
             }
         });
+        if (getView() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getView().findViewById(R.id.branches_list_empty).setVisibility(View.INVISIBLE);
+                }
+            });
+        }
         updateShownBranches();
     }
 
