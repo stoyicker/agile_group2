@@ -46,15 +46,6 @@
 				android:name="android.accounts.AccountAuthenticator"
 				android:resource="@xml/authenticator"/>
 		</service>
-		<activity
-			android:name=".RetrieveIssuesActivity"
-			android:label="@string/title_activity_main"
-			android:launchMode="singleTop">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-			</intent-filter>
-		</activity>
 	</application>
 </manifest>
 

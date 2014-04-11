@@ -1,0 +1,100 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context="org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment">
+
+    <ScrollView
+        android:id="@+id/login_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:id="@+id/create_issue_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/created_issue_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/issue_created"
+                android:visibility="invisible"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:tag="finished"/>
+
+            <TextView
+                android:id="@+id/issue_title_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:tag="finished"/>
+
+            <EditText
+                android:id="@+id/create_issue_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_title"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:tag="start"
+                />
+            <EditText
+                android:id="@+id/create_issue_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_optional"
+                android:inputType="textMultiLine"
+                android:gravity="left|top"
+                android:singleLine="false"
+                android:lines="5"
+                android:tag="start"/>
+
+            <Button
+                android:id="@+id/create_issue_button"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/action_create_issue"
+                android:textStyle="bold"
+                android:tag="start"/>
+
+            <TextView
+                android:id="@+id/create_issue_creating_issue_text"
+                android:text="@string/creating_issue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:tag="progress"/>
+
+            <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+                android:id="@+id/create_issue_progess_bar"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                app:spb_sections_count="4"
+                app:spb_speed="2.0"
+                app:spb_stroke_width="4dp"
+                app:spb_stroke_separator_length="4dp"
+                app:spb_reversed="false"
+                app:spb_mirror_mode="false"
+                app:spb_progressiveStart_activated="true"
+                app:spb_progressiveStart_speed="1.5"
+                app:spb_progressiveStop_speed="3.4"
+                android:visibility="invisible"
+                android:tag="progress"
+                />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

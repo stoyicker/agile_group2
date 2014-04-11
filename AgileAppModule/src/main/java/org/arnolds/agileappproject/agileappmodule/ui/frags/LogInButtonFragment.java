@@ -28,7 +28,7 @@ public class LogInButtonFragment extends android.app.Fragment {
             mCallback = (LogInButtonFragmentCallbacks) activity;
         }
         catch (ClassCastException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
+            Log.wtf("debug", "You have to implement LogInButtonFragmentCallbacks", e);
         }
     }
 

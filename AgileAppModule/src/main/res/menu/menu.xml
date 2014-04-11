@@ -12,5 +12,5 @@
 		android:icon="@drawable/ic_action_create"
 		android:orderInCategory="1"
 		android:showAsAction="always"
-		android:title="@string/action_create_issues"/>
+		android:title="@string/action_create_issue"/>
 </menu>
