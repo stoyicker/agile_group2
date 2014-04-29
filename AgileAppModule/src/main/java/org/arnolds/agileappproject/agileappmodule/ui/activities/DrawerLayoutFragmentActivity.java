@@ -19,6 +19,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.util.ArrayList;
@@ -138,6 +139,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     break;
                 case 2:
                     target = new ListIssuesFragment();
+                    break;
+                case 3:
+                    target = new TimerFragment();
                     break;
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
