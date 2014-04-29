@@ -30,6 +30,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private IGitHubBroker broker;
     private IGitHubBrokerListener brokerListener;
     private Thread commitPollerThread;
+    private String repoName = "";
 
     private volatile boolean commitPollerRunning;
 
@@ -128,33 +129,33 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
         @Override
-        public void onAllCommitsRetrieved(boolean result, List<GHCommit> commits) {
-            List<GHCommit> remoteCommitList = commits;
+        public void onAllCommitsRetrieved(boolean result, List<GHCommit> remoteCommitList) {
+            String currentRepo = broker.getSelectedRepoName();
 
             //If change
-            if (commitList == null) {
+            if (commitList == null || repoName.equals(currentRepo) == false) {
                 commitList = remoteCommitList;
                 commitChangeSupport
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
+                repoName = currentRepo;
             }
             else if (remoteCommitList.size() != commitList.size()) {
-                Log.wtf("GH NOTIF", "new Commits.");
+                    Log.wtf("GH NOTIF", "new Commits.");
 
-                if (!commitList.isEmpty()) {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context,
-                                    context.getString(R.id.notification_new_commits),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
+                    if (!commitList.isEmpty()) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context,
+                                        context.getString(R.id.notification_new_commits),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
 
-                commitList = remoteCommitList;
-                commitChangeSupport
-                        .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
-
+                    commitList = remoteCommitList;
+                    commitChangeSupport
+                            .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
             }
         }
 
