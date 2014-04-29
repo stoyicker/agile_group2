@@ -9,6 +9,7 @@
 	<color name="theme_white">#FFFFFF</color>
 	<color name="theme_dark_blue">#0000FF</color>
 	<color name="theme_black">#000000</color>
-    <color name="list_row_background1">#EEE</color>
-    <color name="list_row_background2">#DDD</color>
+	<color name="list_row_background1">#EEE</color>
+	<color name="list_row_background2">#DDD</color>
+	<color name="timer_background">#D1D1D1</color>
 </resources>

@@ -21,7 +21,7 @@ public class PairTimer {
     private static void setTimePreference(String newChronometerTime) throws ParseException {
         initialValueAsDate = SDF.parse(newChronometerTime);
         String[] values = newChronometerTime.split("\\:");
-        values[0] = ((Integer.parseInt(values[0])) + 1) + "";
+        values[0] = ((Integer.parseInt(values[0]))) + "";
         StringBuilder x = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
             x.append(values[i]);
@@ -30,6 +30,8 @@ public class PairTimer {
         initialValue =
                 new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("01-01-1970 " + x.toString())
                         .getTime();
+
+        initialValue += 3600000;
 
         chronometer = new InnerCountDownTimer(initialValue, 1000);
     }
@@ -83,7 +85,7 @@ public class PairTimer {
         activity = _activity;
 
         String[] values = chronometerTime.split("\\:");
-        values[0] = ((Integer.parseInt(values[0])) + 1) + "";
+        values[0] = ((Integer.parseInt(values[0]))) + "";
         StringBuilder x = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
             Log.d("debug", values[i]);
@@ -94,6 +96,8 @@ public class PairTimer {
                 new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("01-01-1970 " + x.toString())
                         .getTime();
 
+        initialValue += 3600000;
+
         initialValueAsDate = SDF.parse(chronometerTime);
 
         chronometerTextView = textView;
@@ -101,7 +105,7 @@ public class PairTimer {
         chronometer = new InnerCountDownTimer(initialValue, 1000);
     }
 
-    public void togglePlayPause() {
+    public boolean togglePlayPause() {
         if (!isChronometerRunning) {
             chronometer.start();
             isChronometerRunning = Boolean.TRUE;
@@ -111,17 +115,30 @@ public class PairTimer {
             chronometer = new InnerCountDownTimer(lastTimeTracked, 1000);
             isChronometerRunning = Boolean.FALSE;
         }
+        return isChronometerRunning;
     }
 
     public void completeStop() {
-        if (!isChronometerRunning) {
-            chronometer.start();
-            isChronometerRunning = Boolean.TRUE;
-        }
-        else {
-            chronometer.cancel();
-            chronometer = new InnerCountDownTimer(lastTimeTracked, 1000);
-            isChronometerRunning = Boolean.FALSE;
+        chronometer.cancel();
+        chronometer = new InnerCountDownTimer(initialValue, 1000);
+        lastTimeTracked = 0;
+        isChronometerRunning = Boolean.FALSE;
+        chronometerTextView.setText(SDF.format(initialValueAsDate));
+    }
+
+    public boolean isRunning() {
+        return isChronometerRunning;
+    }
+
+    public void forceTick() {
+        if (chronometerTextView != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    chronometerTextView.setText(SDF
+                            .format(new Date(lastTimeTracked - 3600000).getTime()));
+                }
+            });
         }
     }
 
@@ -134,30 +151,28 @@ public class PairTimer {
         @Override
         public void onTick(final long millisUntilFinished) {
             lastTimeTracked = millisUntilFinished;
-            Log.d("debug", "time: " + SDF.format(new Date(millisUntilFinished).getTime()));
-            //TODO Uncomment this
-//            if (chronometerTextView != null) {
-//                activity.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        chronometerTextView.setText(SDF
-//                                .format(new Date(millisUntilFinished).getTime()));
-//                    }
-//                });
-//            }
+            if (chronometerTextView != null) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        chronometerTextView.setText(SDF
+                                .format(new Date(millisUntilFinished - 3600000).getTime()));
+                    }
+                });
+            }
         }
 
         @Override
         public void onFinish() {
-            //TODO Uncomment this
-//            activity.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (chronometerTextView != null) {
-//                        chronometerTextView.setText(SDF.format(initialValueAsDate));
-//                    }
-//                }
-//            });
+            Log.d("debug", "finish!");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (chronometerTextView != null) {
+                        chronometerTextView.setText(SDF.format(initialValueAsDate));
+                    }
+                }
+            });
             isChronometerRunning = Boolean.FALSE;
         }
     }
