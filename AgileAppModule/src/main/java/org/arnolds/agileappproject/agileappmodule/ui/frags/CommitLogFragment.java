@@ -2,7 +2,6 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,8 +57,6 @@ public class CommitLogFragment extends ArnoldSupportFragment
         GitHubNotificationService service = GitHubNotificationService.getInstance();
         populateList(service.getCurrentCommitList());
         service.addCommitListener(this);
-
-        Log.d("Commit fragment", "on create");
 
         listView.setOnItemClickListener(this);
 

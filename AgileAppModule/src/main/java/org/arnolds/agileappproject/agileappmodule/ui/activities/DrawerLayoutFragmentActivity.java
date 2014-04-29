@@ -43,7 +43,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem newIssueItem = menu.findItem(R.id.action_create);
-        Log.d("debug", "menu created, lastSelectedFragmentIndex=" + lastSelectedFragmentIndex);
+
         switch (lastSelectedFragmentIndex) {
             case 2:
                 if (newIssueItem != null) {
