@@ -148,6 +148,11 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
+    public String getSelectedRepoName(){
+        return this.repository == null ? null : this.repository.getName();
+    }
+
+    @Override
     public void selectRepo(String repoName, IGitHubBrokerListener callback)
             throws NullArgumentException, AlreadyNotConnectedException {
         if (!isConnected()) {
