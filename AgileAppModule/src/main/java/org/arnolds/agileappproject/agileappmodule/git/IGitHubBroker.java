@@ -28,6 +28,12 @@ public interface IGitHubBroker {
     public void disconnect() throws GitHubBroker.AlreadyNotConnectedException;
 
     /**
+     * Returns the name of the currently selected repo. Returns null if no repo has been selected.
+     * @return String representation of the currently selected repo.
+     */
+    public String getSelectedRepoName();
+
+    /**
      * Creates an issue in the currently selected repository.
      *
      * @param title    {@link String} Title of the issue.
