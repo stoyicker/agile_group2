@@ -149,6 +149,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
                 remoteCommitList.removeAll(commitList);
 
+
                 ((Activity) context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -170,6 +171,18 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         public void onRepoSelected(boolean result) {
             commitList = null;
         }
+    }
+
+    private Set<GitFile> conflictingFiles(GHBranch branch, GHCommit commit){
+        Set<GitFile> newFiles = new HashSet<GitFile>();
+        Set<GitFile> branchFiles = filesOnBranch(branch);
+
+        for (GHCommit.File file : commit.getFiles()){
+            newFiles.add(new GitFile(file.getFileName(), file.getBlobUrl().getPath()));
+        }
+
+        branchFiles.retainAll(newFiles);
+        return branchFiles;
     }
 
     private Set<GitFile> filesOnBranch(GHBranch branch) {
