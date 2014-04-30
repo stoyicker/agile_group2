@@ -11,13 +11,18 @@ import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
+import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -132,11 +137,11 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
         @Override
-        public void onAllCommitsRetrieved(boolean result, List<GHCommit> remoteCommitList) {
+        public void onAllCommitsRetrieved(boolean result, final List<GHCommit> remoteCommitList) {
             String currentRepo = broker.getSelectedRepoName();
 
-            //If change
-            if (commitList == null || repoName.equals(currentRepo) == false) {
+            //If no previous list or repo change.
+            if (commitList == null || !repoName.equals(currentRepo)) {
                 commitList = remoteCommitList;
                 commitChangeSupport
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
@@ -165,6 +170,71 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         @Override
         public void onRepoSelected(boolean result) {
             commitList = null;
+        }
+    }
+
+    private Set<GitFile> filesOnBranch(GHBranch branch) {
+        String branchHeadId = branch.getSHA1();
+        ListIterator<GHCommit> iterator = commitList.listIterator();
+
+        GHCommit commit = null;
+        while (iterator.hasNext()) {
+            commit = iterator.next();
+            if (commit.getSHA1().equals(branchHeadId)) {
+                break;
+            }
+        }
+
+        Set<GitFile> files = new HashSet<GitFile>();
+        getFiles(commit, files);
+
+        return files;
+    }
+
+    private Set<GitFile> getFiles(GHCommit commit, Set<GitFile> files) {
+        for (GHCommit.File file : commit.getFiles()) {
+            files.add(new GitFile(file.getFileName(), file.getBlobUrl().getPath()));
+        }
+
+        try {
+            for (GHCommit commitParent : commit.getParents()) {
+                getFiles(commitParent, files);
+            }
+        } catch (IOException e) {}
+
+        return files;
+    }
+
+    private class GitFile {
+        String fileName;
+        String url;
+
+        public GitFile(String fileName, String url) {
+            this.fileName = fileName;
+            this.url = url;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o != null && o instanceof GitFile) {
+                GitFile otherFile = (GitFile) o;
+                return (otherFile.getFileName().equals(this.fileName)
+                    && otherFile.getUrl().equals(this.url));
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return fileName.hashCode() * url.hashCode();
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public String getUrl() {
+            return url;
         }
     }
 
