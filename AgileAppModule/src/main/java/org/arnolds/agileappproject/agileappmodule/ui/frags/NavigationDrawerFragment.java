@@ -88,6 +88,8 @@ public class NavigationDrawerFragment extends Fragment {
                 String repoName = mRepoSelectionSpinner.getItemAtPosition(position).toString();
                 if (!repoName.isEmpty() && !repoName.contentEquals(latestSelectedRepoName)) {
                     NavigationDrawerFragment.this.latestSelectedRepoName = repoName;
+                    TextView t=(TextView) getActivity().findViewById(R.id.selected_branch);
+                    t.setText(" No branch selected");
                     try {
                         GitHubBroker.getInstance().selectRepo(repoName, selectionListener);
                     }
@@ -251,6 +253,7 @@ public class NavigationDrawerFragment extends Fragment {
     private void selectItem(int position) {
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
+
         }
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
