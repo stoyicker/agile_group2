@@ -109,8 +109,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
-        recreate();
+//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
+//        recreate();
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
     }
 
@@ -280,7 +280,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public void onNewRepoSelected(String repoName) {
         for (ArnoldSupportFragment x : fragments)
             try {
-                Log.d("debug", "notifying fragment " + x.getClass().getName());
                 x.onNewRepositorySelected();
             }
             catch (NullPointerException ex) {
