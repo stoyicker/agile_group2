@@ -77,6 +77,7 @@ public class GitHubBroker implements IGitHubBroker {
     private GitHub session;
     private GHUser user;
     private GHRepository repository;
+    private GHBranch selectedBranch;
     private static IGitHubBroker instance;
 
     private final Object asyncLock = new Object();
@@ -356,5 +357,15 @@ public class GitHubBroker implements IGitHubBroker {
                 return null;
             }
         }.execute(callback);
+    }
+
+    @Override
+    public GHBranch getSelectedBranch() {
+        return selectedBranch;
+    }
+
+    @Override
+    public void setSelectedBranch(GHBranch selectedBranch) {
+        this.selectedBranch = selectedBranch;
     }
 }

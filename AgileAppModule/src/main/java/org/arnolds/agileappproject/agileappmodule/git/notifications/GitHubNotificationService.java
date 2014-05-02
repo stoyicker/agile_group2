@@ -145,17 +145,39 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 commitList = remoteCommitList;
                 commitChangeSupport
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
-                repoName = currentRepo;
+                repoName = currentRepo;//TODO: don't store repoName locally.
             }
-            else if (remoteCommitList.size() != commitList.size()) {
+            else if (remoteCommitList.size() > commitList.size()) {
                 Log.wtf("GH NOTIF", "new Commits.");
+
+                //Filter out new commits
+                remoteCommitList.removeAll(commitList);
+                GHBranch selectedBranch = broker.getSelectedBranch();
+
+                if (selectedBranch != null) {
+                    final Set<GitFile> conflictingFiles = new HashSet<GitFile>();
+                    for (GHCommit newCommit : remoteCommitList) {
+                         conflictingFiles.addAll(NotificationUtils.conflictingFiles(selectedBranch, newCommit, commitList));
+                    }
+
+                    if (conflictingFiles.size() > 0) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context,
+                                        conflictingFiles.size() + "# FILES CONFLICT!!! =(",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
 
                 if (!commitList.isEmpty()) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(context,
-                                    context.getString(R.id.notification_new_commits),
+                                    "#" + remoteCommitList.size() + " " + context.getString(R.id.notification_new_commits),
                                     Toast.LENGTH_LONG).show();
                         }
                     });
