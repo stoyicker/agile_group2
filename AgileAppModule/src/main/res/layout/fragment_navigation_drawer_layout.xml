@@ -17,4 +17,16 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
 		android:layout_marginBottom="@dimen/repo_selector_spinner_to_bottom_margin"/>
+    <TextView
+        android:id="@+id/selected_branch"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="90dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#999"
+        android:text="@string/selected_branch"
+        style="@style/BranchNameStyle"/>
+        />
+
 </RelativeLayout>

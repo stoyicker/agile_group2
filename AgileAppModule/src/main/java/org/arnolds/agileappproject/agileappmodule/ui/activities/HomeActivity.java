@@ -6,6 +6,8 @@ import org.arnolds.agileappproject.agileappmodule.R;
 
 public class HomeActivity extends DrawerLayoutFragmentActivity {
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
