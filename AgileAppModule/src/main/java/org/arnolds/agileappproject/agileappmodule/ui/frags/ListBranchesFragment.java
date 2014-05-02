@@ -2,11 +2,13 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,6 +18,7 @@ import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.HomeActivity;
 import org.kohsuke.github.GHBranch;
 
 import java.util.Collection;
@@ -29,7 +32,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
     private BranchesListAdapter listAdapter;
     private IGitHubBrokerListener branchesListener = new BranchesListener();
     private ListView branchesListView;
-
+    private Collection<GHBranch> branches1;
     public ListBranchesFragment() {
         super(MENU_INDEX);
     }
@@ -71,12 +74,15 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
     }
 
     private synchronized void onBranchesReceived(Collection<GHBranch> branches) {
+        branches1=branches;
         if (getActivity() == null || listAdapter == null) {
             //If the device is rotated this is going to trigger, so return to end the refresh cycle
             return;
         }
         listAdapter.getBranchCollection().clear();
         listAdapter.getBranchCollection().addAll(branches);
+
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -186,8 +192,24 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
         branchesListView = (ListView) ret.findViewById(R.id.branch_list);
         listAdapter = new BranchesListAdapter();
         branchesListView.setAdapter(listAdapter);
+        branchesListView.setOnItemClickListener(new OnItemClickListenerListViewItem());
         return ret;
     }
+
+    public class OnItemClickListenerListViewItem implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            Context context = view.getContext();
+            TextView t=(TextView) getActivity().findViewById(R.id.selected_branch);
+            t.setText(" Working on "+listAdapter.getItem(position).getName().toString()+" branch");
+            Toast.makeText(context, listAdapter.getItem(position).getName().toString() +" selected" , Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
 
     private void updateShownBranches() {
         try {

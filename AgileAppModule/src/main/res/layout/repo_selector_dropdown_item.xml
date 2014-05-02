@@ -8,3 +8,4 @@
                  android:layout_height="wrap_content"
                  android:padding="@dimen/repo_name_separator"
                  android:ellipsize="marquee"/>
+
