@@ -1,6 +1,8 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
 
 
+import android.util.Log;
+
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 
@@ -17,6 +19,8 @@ public class NotificationUtils {
         Set<GitFile> newFiles = new HashSet<GitFile>();
         Set<GitFile> branchFiles = filesOnBranch(branch, oldCommits);
 
+        Log.wtf("GH NOTIF", "conflictingFiles");
+
         for (GHCommit.File file : newCommit.getFiles()){
             newFiles.add(new GitFile(file.getFileName(), file.getBlobUrl().getPath()));
         }
@@ -28,6 +32,7 @@ public class NotificationUtils {
     private static Set<GitFile> filesOnBranch(final GHBranch branch, final List<GHCommit> oldCommits) {
         String branchHeadId = branch.getSHA1();
         ListIterator<GHCommit> iterator = oldCommits.listIterator();
+        Log.wtf("GH NOTIF", "filesOnBranch");
 
         GHCommit commit = null;
         while (iterator.hasNext()) {
@@ -47,7 +52,6 @@ public class NotificationUtils {
         for (GHCommit.File file : commit.getFiles()) {
             files.add(new GitFile(file.getFileName(), file.getBlobUrl().getPath()));
         }
-
         try {
             for (GHCommit commitParent : commit.getParents()) {
                 getFiles(commitParent, files);

@@ -142,6 +142,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
             //If no previous list or repo change.
             if (commitList == null || !repoName.equals(currentRepo)) {
+                Log.wtf("GH NOTIF", "no repo name");
                 commitList = remoteCommitList;
                 commitChangeSupport
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
@@ -149,14 +150,15 @@ public class GitHubNotificationService implements IGitHubNotificationService {
             }
             else if (remoteCommitList.size() > commitList.size()) {
                 Log.wtf("GH NOTIF", "new Commits.");
-
+                final List<GHCommit> newCommits = remoteCommitList.subList(0, remoteCommitList.size()-commitList.size());
                 //Filter out new commits
-                remoteCommitList.removeAll(commitList);
+                Log.wtf("GH NOTIF", "size:"+newCommits.size());
+
                 GHBranch selectedBranch = broker.getSelectedBranch();
 
                 if (selectedBranch != null) {
                     final Set<GitFile> conflictingFiles = new HashSet<GitFile>();
-                    for (GHCommit newCommit : remoteCommitList) {
+                    for (GHCommit newCommit : newCommits) {
                          conflictingFiles.addAll(NotificationUtils.conflictingFiles(selectedBranch, newCommit, commitList));
                     }
 
@@ -177,12 +179,12 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                         @Override
                         public void run() {
                             Toast.makeText(context,
-                                    "#" + remoteCommitList.size() + " " + context.getString(R.id.notification_new_commits),
+                                    "#" + newCommits.size() + " " + context.getString(R.id.notification_new_commits),
                                     Toast.LENGTH_LONG).show();
                         }
                     });
                 }
-                commitList = remoteCommitList;
+                commitList.addAll(newCommits);
                 commitChangeSupport
                         .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
             }
