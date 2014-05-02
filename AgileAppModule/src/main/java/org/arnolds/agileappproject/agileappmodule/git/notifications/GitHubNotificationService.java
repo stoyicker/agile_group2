@@ -11,18 +11,13 @@ import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
-import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -139,13 +134,21 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         @Override
         public void onAllCommitsRetrieved(boolean result, final List<GHCommit> remoteCommitList) {
             String currentRepo = broker.getSelectedRepoName();
-
+            List<GHCommit> oldValues = commitList;
             //If no previous list or repo change.
-            if (commitList == null || !repoName.equals(currentRepo)) {
+            Log.d("DEBUG", "This is a pass, repoName is " + repoName);
+            if ((!repoName.equals(currentRepo)) ||
+                    commitList == null) {
                 commitList = remoteCommitList;
-                commitChangeSupport
-                        .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
-                repoName = currentRepo;
+                try {
+                    commitChangeSupport
+                            .firePropertyChange("New ", oldValues,
+                                    commitList); //TODO: don't send pointer.
+                    repoName = currentRepo;
+                }
+                catch (NullPointerException ex) {
+
+                }
             }
             else if (remoteCommitList.size() != commitList.size()) {
                 Log.wtf("GH NOTIF", "new Commits.");
@@ -162,7 +165,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 }
                 commitList = remoteCommitList;
                 commitChangeSupport
-                        .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
+                        .firePropertyChange("New ", oldValues,
+                                commitList); //TODO: don't send pointer.
             }
         }
 

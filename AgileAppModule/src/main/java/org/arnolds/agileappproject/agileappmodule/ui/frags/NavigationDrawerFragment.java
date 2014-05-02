@@ -65,6 +65,7 @@ public class NavigationDrawerFragment extends Fragment {
         @Override
         public void onRepoSelected(boolean result) {
             try {
+                Log.d("debug", "SelectionListener.onRepoSelected");
                 mCallbacks.onNewRepoSelected(latestSelectedRepoName);
             }
             catch (NullPointerException ex) {
@@ -88,7 +89,7 @@ public class NavigationDrawerFragment extends Fragment {
                 String repoName = mRepoSelectionSpinner.getItemAtPosition(position).toString();
                 if (!repoName.isEmpty() && !repoName.contentEquals(latestSelectedRepoName)) {
                     NavigationDrawerFragment.this.latestSelectedRepoName = repoName;
-                    TextView t=(TextView) getActivity().findViewById(R.id.selected_branch);
+                    TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
                     t.setText(" No branch selected");
                     try {
                         GitHubBroker.getInstance().selectRepo(repoName, selectionListener);
@@ -99,6 +100,7 @@ public class NavigationDrawerFragment extends Fragment {
                     catch (GitHubBroker.NullArgumentException e) {
                         Log.wtf("debug", e.getClass().getName(), e);
                     }
+                    mCallbacks.onStartLoad();
                 }
             }
 
@@ -327,6 +329,8 @@ public class NavigationDrawerFragment extends Fragment {
         void onNavigationDrawerItemSelected(int position);
 
         void onNewRepoSelected(String repoName);
+
+        void onStartLoad();
     }
 
     private class NavigationDrawerArrayAdapter extends BaseAdapter {

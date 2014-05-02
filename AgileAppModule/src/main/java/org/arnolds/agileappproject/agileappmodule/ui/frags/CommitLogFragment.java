@@ -1,9 +1,9 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHCommit;
 
 import java.beans.PropertyChangeEvent;
@@ -29,6 +30,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
     CommitAdapter commitAdapter;
 
     public final static int DRAWER_POSITION = 0;
+    private FragmentActivity mActivity;
 
     public CommitLogFragment() {
         super(DRAWER_POSITION);
@@ -48,9 +50,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_commit_log, container, false);
 
-        if (!GitHubNotificationService.getInstance().isEmpty()) {
-            view.findViewById(R.id.commit_list_empty).setVisibility(View.INVISIBLE);
-        }
+        mActivity = getActivity();
 
         mContext = getActivity().getApplicationContext();
         ListView listView = (ListView) view.findViewById(R.id.commit_list_view);
@@ -69,7 +69,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
     private void populateList(List<GHCommit> commitList) {
         commitAdapter.getCommitCollection().clear();
         commitAdapter.getCommitCollection().addAll(commitList);
-        getActivity().runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
@@ -79,6 +79,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     @Override
     public void onNewRepositorySelected() {
+        Log.d("debug", "onNR");
     }
 
     public final class CommitAdapter extends BaseAdapter {
@@ -161,7 +162,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
             private boolean expanded = true;
 
-            public void setExpandIconVisible(boolean visible){
+            public void setExpandIconVisible(boolean visible) {
                 expandIconImageView.setAlpha(visible ? 1f : 0f);
             }
 
@@ -204,16 +205,25 @@ public class CommitLogFragment extends ArnoldSupportFragment
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+
+        Log.d("debug", "Detaching");
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        new Exception().printStackTrace(System.err);
+    }
+
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (getView() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getView().findViewById(R.id.commit_list_empty).setVisibility(View.INVISIBLE);
-                }
-            });
-        }
         populateList((List<GHCommit>) event.getNewValue());
+        if (event.getNewValue() != event.getOldValue()) {
+            ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
+        }
     }
 
 }

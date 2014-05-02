@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
@@ -148,7 +147,7 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public String getSelectedRepoName(){
+    public String getSelectedRepoName() {
         return this.repository == null ? null : this.repository.getName();
     }
 
@@ -338,7 +337,8 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllCommits(IGitHubBrokerListener callback) throws RepositoryNotSelectedException, AlreadyNotConnectedException {
+    public void getAllCommits(IGitHubBrokerListener callback)
+            throws RepositoryNotSelectedException, AlreadyNotConnectedException {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
         }
@@ -350,7 +350,7 @@ public class GitHubBroker implements IGitHubBroker {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
                 PagedIterable<GHCommit> commits = repository.listCommits();
-                if(params[0] != null) {
+                if (params[0] != null) {
                     params[0].onAllCommitsRetrieved(true, commits.asList());
                 }
                 return null;

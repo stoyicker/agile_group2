@@ -2,7 +2,6 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +17,7 @@ import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
-import org.arnolds.agileappproject.agileappmodule.ui.activities.HomeActivity;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHBranch;
 
 import java.util.Collection;
@@ -33,6 +32,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
     private IGitHubBrokerListener branchesListener = new BranchesListener();
     private ListView branchesListView;
     private Collection<GHBranch> branches1;
+
     public ListBranchesFragment() {
         super(MENU_INDEX);
     }
@@ -74,7 +74,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
     }
 
     private synchronized void onBranchesReceived(Collection<GHBranch> branches) {
-        branches1=branches;
+        branches1 = branches;
         if (getActivity() == null || listAdapter == null) {
             //If the device is rotated this is going to trigger, so return to end the refresh cycle
             return;
@@ -91,12 +91,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
             }
         });
         if (getView() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getView().findViewById(R.id.branches_list_empty).setVisibility(View.INVISIBLE);
-                }
-            });
+            ((DrawerLayoutFragmentActivity) getActivity()).onStopLoad();
         }
         updateShownBranches();
     }
@@ -202,9 +197,12 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             Context context = view.getContext();
-            TextView t=(TextView) getActivity().findViewById(R.id.selected_branch);
-            t.setText(" Working on "+listAdapter.getItem(position).getName().toString()+" branch");
-            Toast.makeText(context, listAdapter.getItem(position).getName().toString() +" selected" , Toast.LENGTH_SHORT).show();
+            TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
+            t.setText(" Working on " + listAdapter.getItem(position).getName().toString() +
+                    " branch");
+            Toast.makeText(context,
+                    listAdapter.getItem(position).getName().toString() + " selected",
+                    Toast.LENGTH_SHORT).show();
 
         }
 

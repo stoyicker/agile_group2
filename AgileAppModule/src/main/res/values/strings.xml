@@ -40,4 +40,5 @@
     <string name="issue_created">Issue created</string>
     <item name="notification_new_commits" type="id">New commit!</item>
     <string name="selected_branch">  No branch selected</string>
+	<string name="error_retri_commit">Error retrieving commits</string>
 </resources>

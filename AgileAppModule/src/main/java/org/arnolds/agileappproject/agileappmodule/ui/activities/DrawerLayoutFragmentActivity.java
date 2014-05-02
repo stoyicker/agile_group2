@@ -10,12 +10,12 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
@@ -35,6 +35,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
     private static int lastSelectedFragmentIndex = 0;
+    private final IndefiniteFancyProgressFragment progressFragment =
+            new IndefiniteFancyProgressFragment();
 
     public static int getLastSelectedNavDavIndex() {
         return navigatedItemsStack.get(0);
@@ -110,10 +112,37 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         navigatedItemsStack.add(0, navigatedItemsStack.get(0));
         recreate();
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
-        View stub;
-        if ((stub = findViewById(R.id.commit_list_empty)) != null) {
-            stub.setVisibility(View.INVISIBLE);
-        }
+    }
+
+    @Override
+    public void onStartLoad() {
+        Log.d("debug", "onStartLoad");
+        getSupportFragmentManager().beginTransaction().remove(fragments[lastSelectedFragmentIndex])
+                .commit();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.main_fragment_container, progressFragment)
+                .commit();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getFragmentManager().executePendingTransactions();
+                getSupportFragmentManager().executePendingTransactions();
+            }
+        });
+    }
+
+    public void onStopLoad() {
+        getFragmentManager().beginTransaction().remove(progressFragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
+                .commit();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getFragmentManager().executePendingTransactions();
+                getSupportFragmentManager().executePendingTransactions();
+            }
+        });
     }
 
     @Override
@@ -161,10 +190,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             catch (NullPointerException ex) {
 //                Log.wtf("debug", ex.getClass().getName(),ex);
             }
-        }
-
-        if (position == 0) {
-            findViewById(R.id.commit_list_empty).setVisibility(View.INVISIBLE);
         }
 
         findViewById(R.id.activity_home).invalidate();
@@ -253,13 +278,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     @Override
     public void onNewRepoSelected(String repoName) {
-        try {
-            for (ArnoldSupportFragment x : fragments)
+        for (ArnoldSupportFragment x : fragments)
+            try {
+                Log.d("debug", "notifying fragment " + x.getClass().getName());
                 x.onNewRepositorySelected();
-        }
-        catch (NullPointerException ex) {
+            }
+            catch (NullPointerException ex) {
 //            Log.wtf("debug", ex.getClass().getName(), ex);
-        }
+            }
     }
 
 

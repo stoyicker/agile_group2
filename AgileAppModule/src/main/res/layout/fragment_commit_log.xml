@@ -9,12 +9,4 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 	</ListView>
-	<fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-		android:id="@+id/commit_list_empty"
-		style="@style/IndeterminateFancyProgressBarStyle"
-		android:layout_gravity="center_vertical"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:indeterminate="true"/>
-
 </FrameLayout>

@@ -16,6 +16,7 @@ import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
+import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHIssue;
 
 import java.util.Collection;
@@ -85,12 +86,7 @@ public class ListIssuesFragment extends ArnoldSupportFragment {
             }
         });
         if (getView() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getView().findViewById(R.id.issues_list_empty).setVisibility(View.INVISIBLE);
-                }
-            });
+            ((DrawerLayoutFragmentActivity) getActivity()).onStopLoad();
         }
         updateShownIssues();
     }
