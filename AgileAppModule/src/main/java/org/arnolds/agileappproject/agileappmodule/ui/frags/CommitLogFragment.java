@@ -1,7 +1,10 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.content.Context;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,18 +105,18 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
+            final ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = ((LayoutInflater) mContext
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                         .inflate(R.layout.list_item_commit, null);
                 viewHolder = new ViewHolder();
-                viewHolder.setExpandIconImageView(
-                        (ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 viewHolder.setCommentView((TextView) convertView.findViewById(R.id.commit_message));
                 viewHolder.setCommitterView((TextView) convertView.findViewById(R.id.committer));
+                viewHolder.setExpandIconImageView(
+                        (ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 convertView.setTag(viewHolder);
-                viewHolder.setExpanded(false);
+                // viewHolder.setExpanded(false);
             }
             else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -128,11 +131,27 @@ public class CommitLogFragment extends ArnoldSupportFragment
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
-            GHCommit commit = getItem(position);
+            final GHCommit commit = getItem(position);
+
+            // Set commit and commenter texts
             viewHolder.getCommentView().setText(commit.getCommitShortInfo().getMessage());
             viewHolder.getCommitterView()
                     .setText(commit.getCommitShortInfo().getCommitter().getName());
 
+            // All expand-buttons are hidden by default
+            viewHolder.setExpandIconVisible(false);
+            // Logic to show expand-button if there is something to expand
+            viewHolder.getCommentView().post(new Runnable() {
+                @Override
+                public void run() {
+                    // Guard makes sure we do not update GUI stuff unnecessarily
+                    if (viewHolder.getCommentView().getLineCount() > 1) {
+                        viewHolder.setExpandIconVisible(true);
+                    }
+                }
+            });
+            // Per default, all comments are collapsed
+            viewHolder.setExpanded(false);
             return convertView;
         }
 
@@ -141,6 +160,10 @@ public class CommitLogFragment extends ArnoldSupportFragment
             private ImageView expandIconImageView;
 
             private boolean expanded = true;
+
+            public void setExpandIconVisible(boolean visible){
+                expandIconImageView.setAlpha(visible ? 1f : 0f);
+            }
 
             public void toggleExpanded() {
                 setExpanded(!expanded);
