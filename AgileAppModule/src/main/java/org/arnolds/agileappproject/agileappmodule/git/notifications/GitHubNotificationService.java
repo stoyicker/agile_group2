@@ -2,6 +2,7 @@ package org.arnolds.agileappproject.agileappmodule.git.notifications;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -107,7 +108,9 @@ public class GitHubNotificationService implements IGitHubNotificationService {
             while (commitPollerRunning) {
                 try {
                     try {
-                        broker.getAllCommits(brokerListener);
+                        if (!TextUtils.isEmpty(GitHubBroker.getInstance().getSelectedRepoName())) {
+                            broker.getAllCommits(brokerListener);
+                        }
                     }
                     catch (GitHubBroker.RepositoryNotSelectedException e) {
                         Log.wtf("debug", e.getClass().getName(), e);
@@ -140,22 +143,22 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 repoName = currentRepo;
             }
             else if (remoteCommitList.size() != commitList.size()) {
-                    Log.wtf("GH NOTIF", "new Commits.");
+                Log.wtf("GH NOTIF", "new Commits.");
 
-                    if (!commitList.isEmpty()) {
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context,
-                                        context.getString(R.id.notification_new_commits),
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
+                if (!commitList.isEmpty()) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,
+                                    context.getString(R.id.notification_new_commits),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
 
-                    commitList = remoteCommitList;
-                    commitChangeSupport
-                            .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
+                commitList = remoteCommitList;
+                commitChangeSupport
+                        .firePropertyChange("New ", null, commitList); //TODO: don't send pointer.
             }
         }
 
