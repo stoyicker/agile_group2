@@ -37,6 +37,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private static int lastSelectedFragmentIndex = 0;
     private final IndefiniteFancyProgressFragment progressFragment =
             new IndefiniteFancyProgressFragment();
+    private Boolean isLoading = Boolean.FALSE;
 
     public static int getLastSelectedNavDavIndex() {
         return navigatedItemsStack.get(0);
@@ -115,8 +116,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
-    public void onStartLoad() {
+    public synchronized void onStartLoad() {
         Log.d("debug", "onStartLoad");
+        isLoading = Boolean.TRUE;
         getSupportFragmentManager().beginTransaction().remove(fragments[lastSelectedFragmentIndex])
                 .commit();
         getFragmentManager().beginTransaction()
@@ -131,7 +133,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         });
     }
 
-    public void onStopLoad() {
+    public synchronized void onStopLoad() {
         getFragmentManager().beginTransaction().remove(progressFragment).commit();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
@@ -143,6 +145,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 getSupportFragmentManager().executePendingTransactions();
             }
         });
+        isLoading = Boolean.FALSE;
     }
 
     @Override
@@ -154,8 +157,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         else {
             navigatedItemsStack.add(0, position);
         }
-
-        lastSelectedFragmentIndex = position;
         ArnoldSupportFragment target = fragments[position];
 
         if (target == null) {
@@ -180,7 +181,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager != null) {
+        if (fragmentManager != null && (!isLoading || position > 2)) {
             try {
                 getSupportFragmentManager().beginTransaction()
                         .replace(MAIN_FRAGMENT_CONTAINER, target)
@@ -191,6 +192,18 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 //                Log.wtf("debug", ex.getClass().getName(),ex);
             }
         }
+        else if (fragmentManager != null && isLoading && position != 3) {
+            Log.d("newDebug", "I'm in");
+            Log.d("newDebug", "lsfi is " + lastSelectedFragmentIndex);
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragments[lastSelectedFragmentIndex]).commit();
+            getFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER,
+                    progressFragment).commit();
+            getFragmentManager().executePendingTransactions();
+            getSupportFragmentManager().executePendingTransactions();
+        }
+
+        lastSelectedFragmentIndex = position;
 
         findViewById(R.id.activity_home).invalidate();
     }
