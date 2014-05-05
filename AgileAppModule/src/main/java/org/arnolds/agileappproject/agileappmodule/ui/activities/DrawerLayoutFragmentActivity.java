@@ -117,7 +117,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public synchronized void onStartLoad() {
         Log.d("debug", "onStartLoad");
         isLoading = Boolean.TRUE;
-        getSupportFragmentManager().beginTransaction().remove(fragments[lastSelectedFragmentIndex])
+        if(fragments[lastSelectedFragmentIndex] != null)
+            getSupportFragmentManager().beginTransaction().remove(fragments[lastSelectedFragmentIndex])
                 .commit();
         getFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_container, progressFragment)
