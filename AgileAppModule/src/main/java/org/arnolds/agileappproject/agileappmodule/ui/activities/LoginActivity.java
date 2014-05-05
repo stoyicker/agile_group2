@@ -173,8 +173,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements
 
     private boolean isGitHubPasswordValid(String password) {
         //Implemented real GitHub credentials validation
-        return password.length() >= MINIMUM_PASSWORD_LENGTH && password.matches(".*\\d.*") &&
-                password.matches(".*[a-z].*");
+        return password.length() >= MINIMUM_PASSWORD_LENGTH;
+            /* && password.matches(".*\\d.*") &&
+           password.matches(".*[a-z].*"); */
     }
 
     public void submit() {
