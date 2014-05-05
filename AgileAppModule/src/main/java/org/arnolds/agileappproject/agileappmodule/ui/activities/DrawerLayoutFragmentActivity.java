@@ -28,8 +28,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         NavigationDrawerFragment.NavigationDrawerCallbacks,
         CreateIssueFragment.IssueCreationCallbacks {
 
-    private static final ArrayList<Integer> navigatedItemsStack =
-            new ArrayList<Integer>();
     private static int MAIN_FRAGMENT_CONTAINER;
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
@@ -40,7 +38,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private Boolean isLoading = Boolean.FALSE;
 
     public static int getLastSelectedNavDavIndex() {
-        return navigatedItemsStack.get(0);
+        return 0; // TODO: FIX
     }
 
     @Override
@@ -154,9 +152,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             //We don't want to perform an unnecessary Activity reload
             return;
         }
-        else {
-            navigatedItemsStack.add(0, position);
-        }
+
         ArnoldSupportFragment target = fragments[position];
 
         if (target == null) {
@@ -216,7 +212,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         restoreActionBar();
     }
 
-    @Override
+    /*@Override
     public void onBackPressed() {
         if (navigatedItemsStack.size() < 2) {
             finish();
@@ -226,13 +222,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             lastSelectedFragmentIndex = navigatedItemsStack.remove(0);
             restoreActionBar();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        navigatedItemsStack.remove(0);
-        super.onDestroy();
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,10 +243,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
 
         fragments = new ArnoldSupportFragment[amountOfSections];
-
-        if (navigatedItemsStack.isEmpty()) {
-            navigatedItemsStack.add(0);
-        }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
