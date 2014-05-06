@@ -39,7 +39,7 @@
     <TextView
         android:id="@+id/issue_creator"
         android:layout_below="@+id/issue_header_panel"
-        android:text="[CREATOR]"
+        android:text="Mr Octopus"
         android:layout_alignParentRight="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,10 +57,11 @@
 
         <TextView
             android:id="@+id/issue_body"
-            android:text="[BODY BODY BODY]"
+            android:text="Sve su zene oko mene, Jedna ko nijedna, Jos moja bila bi, Da me je vredna"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#000000"
+            android:textColor="#343434"
+            android:textStyle="bold"
             android:textSize="14dp"/>
     </RelativeLayout>
 

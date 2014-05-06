@@ -163,7 +163,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
             private boolean expanded = true;
 
             public void setExpandIconVisible(boolean visible) {
-                expandIconImageView.setAlpha(visible ? 1f : 0f);
+                expandIconImageView.setVisibility(visible ? ImageView.VISIBLE : ImageView.GONE);
             }
 
             public void toggleExpanded() {
