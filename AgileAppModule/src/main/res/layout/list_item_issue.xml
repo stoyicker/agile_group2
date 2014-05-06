@@ -1,15 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:padding="@dimen/padding_branch">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_branch"
+    android:id="@+id/issue_item_fragment"
+    >
 
-	<TextView
-		android:id="@+id/title_issue"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		style="@style/BranchNameStyle"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/issue_header_panel">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/issue_expander_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/expander_ic_minimized"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="-4dp"
+            />
+
+        <TextView
+            android:id="@+id/title_issue"
+            android:text="[TITLE]"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:textSize="16dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/issue_creator"
+        android:layout_below="@+id/issue_header_panel"
+        android:text="[CREATOR]"
+        android:layout_alignParentRight="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="italic"
+        android:textSize="12dp"
+        android:textColor="#000"
+        />
+
+    <RelativeLayout
+        android:id="@+id/issue_expand_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/issue_creator"
+        >
+
+        <TextView
+            android:id="@+id/issue_body"
+            android:text="[BODY BODY BODY]"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="14dp"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/issue_assignee"
+        android:layout_below="@+id/issue_expand_panel"
+        android:text="[ASSIGNEE]"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/IssueAssigneeStyle"/>
+
+    <TextView
+        android:id="@+id/issue_created"
+        android:layout_below="@+id/issue_assignee"
+        android:text="[CREATED]"
+        android:textStyle="italic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/IssueDateStyle"/>
+
+</RelativeLayout>

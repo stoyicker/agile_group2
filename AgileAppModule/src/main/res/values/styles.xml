@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="BranchNameStyle">
+    <style name="IssueAssigneeStyle">
+        <item name="android:textColor">@color/theme_black</item>
+        <item name="android:textSize">@dimen/issue_creator_textsize</item>
+        <item name="android:background">@drawable/committer_tag</item>
+    </style>
+    <style name="IssueDateStyle">
+        <item name="android:textColor">@color/theme_black</item>
+        <item name="android:textSize">@dimen/issue_date_textsize</item>
+        <item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
+    </style>
+    <style name="BranchNameStyle">
 		<item name="android:textColor">@color/theme_black</item>
 		<item name="android:textSize">@dimen/repo_name_textsize</item>
 		<item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
