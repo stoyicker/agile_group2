@@ -179,7 +179,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             return;
         }
 
-        Log.wtf("debug", "Adding " + position, new Exception());
         selectedItemsQueue.add(lastSelectedFragmentIndex);
 
         ArnoldSupportFragment target = fragments[position];
