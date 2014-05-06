@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
@@ -351,8 +352,18 @@ public class GitHubBroker implements IGitHubBroker {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
                 PagedIterable<GHCommit> commits = repository.listCommits();
+
+                LinkedHashMap<String, GHCommit> commitMap = new LinkedHashMap<String, GHCommit>();
+                for (GHCommit commit : commits){
+                    try {
+                        GHCommit newCommit = repository.getCommit(commit.getSHA1());
+                        commitMap.put(newCommit.getSHA1(), newCommit);
+                    } catch (IOException e) {
+
+                    }
+                }
                 if(params[0] != null) {
-                    params[0].onAllCommitsRetrieved(true, commits.asList());
+                    params[0].onAllCommitsRetrieved(true, commitMap);
                 }
                 return null;
             }
@@ -368,4 +379,6 @@ public class GitHubBroker implements IGitHubBroker {
     public void setSelectedBranch(GHBranch selectedBranch) {
         this.selectedBranch = selectedBranch;
     }
+
 }
+

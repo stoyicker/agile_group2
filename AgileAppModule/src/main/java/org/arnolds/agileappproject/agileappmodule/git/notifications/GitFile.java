@@ -14,15 +14,14 @@ public final class GitFile {
     public boolean equals(final Object o) {
         if (o != null && o instanceof GitFile) {
             GitFile otherFile = (GitFile) o;
-            return (otherFile.getFileName().equals(this.fileName)
-                    && otherFile.getUrl().equals(this.url));
+            return (otherFile.getFileName().equals(this.fileName));
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return fileName.hashCode() * url.hashCode();
+        return fileName.hashCode();
     }
 
     public String getFileName() {

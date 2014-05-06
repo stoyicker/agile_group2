@@ -20,6 +20,8 @@ import org.kohsuke.github.GHCommit;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -213,7 +215,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
                 }
             });
         }
-        populateList((List<GHCommit>) event.getNewValue());
+        LinkedHashMap<String, GHCommit> commits = (LinkedHashMap<String, GHCommit>) event.getNewValue();
+        populateList(new ArrayList<GHCommit>(commits.values()));
     }
 
 }
