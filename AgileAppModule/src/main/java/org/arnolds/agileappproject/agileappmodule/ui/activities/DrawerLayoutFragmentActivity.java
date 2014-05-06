@@ -92,11 +92,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             case R.id.action_create:
                 switch (lastSelectedFragmentIndex) {
                     case 2:
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_fragment_container, new CreateIssueFragment())
-                                .addToBackStack("")
-                                .commit();
-                        getSupportFragmentManager().executePendingTransactions();
+                        if (!isLoading) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_fragment_container,
+                                            new CreateIssueFragment())
+                                    .addToBackStack("")
+                                    .commit();
+                            getSupportFragmentManager().executePendingTransactions();
+                        }
                         break;
                     default:
                         Log.wtf("debug",
