@@ -1,6 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -22,25 +23,37 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragm
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
-import java.util.ArrayList;
+import java.util.Stack;
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
         CreateIssueFragment.IssueCreationCallbacks {
 
-    private static final ArrayList<Integer> navigatedItemsStack =
-            new ArrayList<Integer>();
     private static int MAIN_FRAGMENT_CONTAINER;
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
+
+    public static int getLastSelectedFragmentIndex() {
+        return lastSelectedFragmentIndex;
+    }
+
     private static int lastSelectedFragmentIndex = 0;
     private final IndefiniteFancyProgressFragment progressFragment =
             new IndefiniteFancyProgressFragment();
+    private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
 
     public static int getLastSelectedNavDavIndex() {
-        return navigatedItemsStack.get(0);
+        Integer ret;
+        if (selectedItemsQueue.isEmpty()) {
+            ret = 0;
+        }
+        else {
+            ret = selectedItemsQueue.peek();
+        }
+
+        return ret.intValue();
     }
 
     @Override
@@ -79,11 +92,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             case R.id.action_create:
                 switch (lastSelectedFragmentIndex) {
                     case 2:
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_fragment_container, new CreateIssueFragment())
-                                .addToBackStack("")
-                                .commit();
-                        getSupportFragmentManager().executePendingTransactions();
+                        if (!isLoading) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_fragment_container,
+                                            new CreateIssueFragment())
+                                    .addToBackStack("")
+                                    .commit();
+                            getSupportFragmentManager().executePendingTransactions();
+                        }
                         break;
                     default:
                         Log.wtf("debug",
@@ -110,17 +126,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
-//        recreate();
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
+////        recreate();
+//        onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+        //TODO
     }
 
     @Override
     public synchronized void onStartLoad() {
-        Log.d("debug", "onStartLoad");
         isLoading = Boolean.TRUE;
-        getSupportFragmentManager().beginTransaction().remove(fragments[lastSelectedFragmentIndex])
-                .commit();
+        if (fragments[lastSelectedFragmentIndex] != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragments[lastSelectedFragmentIndex])
+                    .commit();
+        }
         getFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_container, progressFragment)
                 .commit();
@@ -134,29 +154,34 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     public synchronized void onStopLoad() {
-        getFragmentManager().beginTransaction().remove(progressFragment).commit();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
-                .commit();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getFragmentManager().executePendingTransactions();
-                getSupportFragmentManager().executePendingTransactions();
-            }
-        });
+        try {
+            getFragmentManager().beginTransaction().remove(progressFragment).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
+                    .commit();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getFragmentManager().executePendingTransactions();
+                    getSupportFragmentManager().executePendingTransactions();
+                }
+            });
+        }
+        catch (IllegalStateException ex) {
+        }
         isLoading = Boolean.FALSE;
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        if (position == getLastSelectedNavDavIndex()) {
+        if (position == lastSelectedFragmentIndex) {
             //We don't want to perform an unnecessary Activity reload
             return;
         }
-        else {
-            navigatedItemsStack.add(0, position);
-        }
+
+        Log.wtf("debug", "Adding " + position, new Exception());
+        selectedItemsQueue.add(lastSelectedFragmentIndex);
+
         ArnoldSupportFragment target = fragments[position];
 
         if (target == null) {
@@ -183,55 +208,71 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager != null && (!isLoading || position > 2)) {
             try {
-                getSupportFragmentManager().beginTransaction()
+                fragmentManager.beginTransaction().remove(fragments[lastSelectedFragmentIndex])
+                        .commit();
+                fragmentManager.beginTransaction()
                         .replace(MAIN_FRAGMENT_CONTAINER, target)
                         .addToBackStack("").commit();
-                getSupportFragmentManager().executePendingTransactions();
+                fragmentManager.executePendingTransactions();
             }
             catch (NullPointerException ex) {
 //                Log.wtf("debug", ex.getClass().getName(),ex);
             }
         }
         else if (fragmentManager != null && isLoading && position != 3) {
-            Log.d("newDebug", "I'm in");
-            Log.d("newDebug", "lsfi is " + lastSelectedFragmentIndex);
-            getSupportFragmentManager().beginTransaction()
+            fragmentManager.beginTransaction()
                     .remove(fragments[lastSelectedFragmentIndex]).commit();
             getFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER,
                     progressFragment).commit();
-            getFragmentManager().executePendingTransactions();
-            getSupportFragmentManager().executePendingTransactions();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getFragmentManager().executePendingTransactions();
+                    getSupportFragmentManager().executePendingTransactions();
+                }
+            });
         }
 
         lastSelectedFragmentIndex = position;
 
-        findViewById(R.id.activity_home).invalidate();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DrawerLayoutFragmentActivity.this.findViewById(R.id.activity_home).invalidate();
+//                restoreActionBar();
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mTitle = AgileAppModuleUtils
-                .getString(this, "title_section" + (getLastSelectedNavDavIndex() + 1), "");
+                .getString(this, "title_section" + (lastSelectedFragmentIndex + 1), "");
         restoreActionBar();
     }
 
     @Override
     public void onBackPressed() {
-        if (navigatedItemsStack.size() < 2) {
-            finish();
+        if (selectedItemsQueue.isEmpty()) {
+            Intent i = new Intent(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_HOME);
+            startActivity(i);
         }
-        else if (getSupportFragmentManager().popBackStackImmediate()) {
-            navigatedItemsStack.remove(0);
-            lastSelectedFragmentIndex = navigatedItemsStack.remove(0);
+        else {
+            if (lastSelectedFragmentIndex == 2 &&
+                    CreateIssueFragment.isShown) {//If the new issue fragment is being shown
+                getSupportFragmentManager().popBackStackImmediate();
+                CreateIssueFragment.isShown = Boolean.FALSE;
+            }
+            else {
+                Integer x = selectedItemsQueue.pop();
+                onNavigationDrawerItemSelected(x == null ? 0 : x);
+                selectedItemsQueue.pop();
+            }
+
             restoreActionBar();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        navigatedItemsStack.remove(0);
-        super.onDestroy();
     }
 
     @Override
@@ -253,10 +294,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
 
         fragments = new ArnoldSupportFragment[amountOfSections];
-
-        if (navigatedItemsStack.isEmpty()) {
-            navigatedItemsStack.add(0);
-        }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -282,7 +319,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     public void onSectionAttached(int number) {
         int shiftedPos = number + 1;
-        Log.d("tagThis", "shiftedPost" + shiftedPos);
         mTitle = AgileAppModuleUtils.getString(this, "title_section" + shiftedPos, "");
         if (mTitle.toString().isEmpty()) {
             mTitle = getString(R.string.title_section1);
@@ -291,18 +327,23 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     @Override
     public void onNewRepoSelected(String repoName) {
-        for (ArnoldSupportFragment x : fragments)
+        for (ArnoldSupportFragment x : fragments) {
             try {
                 x.onNewRepositorySelected();
             }
             catch (NullPointerException ex) {
 //            Log.wtf("debug", ex.getClass().getName(), ex);
             }
+            getSupportFragmentManager()
+                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            selectedItemsQueue.clear();
+//            lastSelectedFragmentIndex = 0;
+            onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+        }
     }
 
 
     public void notifyIssueCreated() {
-        Log.d("debug", "ey");
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.beginTransaction()
                 .replace(R.id.main_fragment_container, fragments[2]).commit();

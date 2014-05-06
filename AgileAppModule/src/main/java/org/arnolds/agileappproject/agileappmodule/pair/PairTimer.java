@@ -2,7 +2,6 @@ package org.arnolds.agileappproject.agileappmodule.pair;
 
 import android.app.Activity;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -88,7 +87,6 @@ public class PairTimer {
         values[0] = ((Integer.parseInt(values[0]))) + "";
         StringBuilder x = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
-            Log.d("debug", values[i]);
             x.append(values[i]);
             x.append(i < (values.length - 1) ? ":" : "");
         }
@@ -164,7 +162,6 @@ public class PairTimer {
 
         @Override
         public void onFinish() {
-            Log.d("debug", "finish!");
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +78,6 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     @Override
     public void onNewRepositorySelected() {
-        Log.d("debug", "onNR");
     }
 
     public final class CommitAdapter extends BaseAdapter {
@@ -202,13 +200,6 @@ public class CommitLogFragment extends ArnoldSupportFragment
                 this.committerView = committerView;
             }
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        Log.d("debug", "Detaching");
     }
 
     @Override
