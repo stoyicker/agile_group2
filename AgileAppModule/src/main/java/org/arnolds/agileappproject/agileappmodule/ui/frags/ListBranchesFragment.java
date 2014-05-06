@@ -2,6 +2,7 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -200,6 +201,11 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
             TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
             t.setText(" Working on " + listAdapter.getItem(position).getName().toString() +
                     " branch");
+            for (int j = 0; j < parent.getChildCount(); j++)
+                parent.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
+
+            // change the background color of the selected element
+            view.setBackgroundColor(Color.CYAN);
             Toast.makeText(context,
                     listAdapter.getItem(position).getName().toString() + " selected",
                     Toast.LENGTH_SHORT).show();
