@@ -26,9 +26,9 @@
 
         <TextView
             android:id="@+id/title_issue"
-            android:text="[TITLE]"
+            android:text="[TITLE][TITLE][TITLE][TITLE][TITLE][TITLE]"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textStyle="bold"
             android:textColor="#000000"
