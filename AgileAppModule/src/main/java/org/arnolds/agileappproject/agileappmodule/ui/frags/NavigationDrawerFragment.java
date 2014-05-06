@@ -65,7 +65,6 @@ public class NavigationDrawerFragment extends Fragment {
         @Override
         public void onRepoSelected(boolean result) {
             try {
-                Log.d("debug", "SelectionListener.onRepoSelected");
                 mCallbacks.onNewRepoSelected(latestSelectedRepoName);
             }
             catch (NullPointerException ex) {
@@ -109,7 +108,7 @@ public class NavigationDrawerFragment extends Fragment {
             }
         });
 
-        mRepoSelectionSpinner.setBackgroundResource(R.color.theme_white);
+        mRepoSelectionSpinner.setBackgroundColor(getResources().getColor(R.color.theme_white));
 
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -246,7 +245,7 @@ public class NavigationDrawerFragment extends Fragment {
         actionBar.setDisplayShowTitleEnabled(Boolean.TRUE);
         actionBar.setTitle(
                 AgileAppModuleUtils.getString(getActivity(), "title_section" + (
-                                DrawerLayoutFragmentActivity.getLastSelectedNavDavIndex() + 1),
+                                DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex() + 1),
                         "Home"
                 )
         );

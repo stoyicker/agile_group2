@@ -136,7 +136,6 @@ public class GitHubNotificationService implements IGitHubNotificationService {
             String currentRepo = broker.getSelectedRepoName();
             List<GHCommit> oldValues = commitList;
             //If no previous list or repo change.
-            Log.d("DEBUG", "This is a pass, repoName is " + repoName);
             if ((!repoName.equals(currentRepo)) ||
                     commitList == null) {
                 commitList = remoteCommitList;
