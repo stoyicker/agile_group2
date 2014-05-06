@@ -233,7 +233,7 @@ public class GitHubBroker implements IGitHubBroker {
             protected Void doInBackground(IGitHubBrokerListener... params) {
                 Map<String, GHRepository> repos = null;
                 try {
-                    repos = user.getRepositories();
+                    repos = session.getMyself().getAllRepositories();
                 }
                 catch (IOException e) {
                     Log.wtf("debug", IO_EXCEPTION_LOG, e);
