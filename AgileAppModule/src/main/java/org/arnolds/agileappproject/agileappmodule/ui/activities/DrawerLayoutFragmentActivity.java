@@ -254,15 +254,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     @Override
     public void onBackPressed() {
-        printQueue();
-        Log.d("debug", "selectedItemsQueue size: " + selectedItemsQueue.size());
-        if (selectedItemsQueue.isEmpty()) {
-            Log.d("debug", "the queue is empty");
-        }
-        else {
-            Log.d("debug", "selectedItemsQueue head: " + selectedItemsQueue.peek());
-        }
-        Log.d("debug", "lastSelectedFragmentIndex " + lastSelectedFragmentIndex);
         if (selectedItemsQueue.isEmpty()) {
             Intent i = new Intent(Intent.ACTION_MAIN);
             i.addCategory(Intent.CATEGORY_HOME);
@@ -276,23 +267,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             }
             else {
                 Integer x = selectedItemsQueue.pop();
-                Log.d("debug", "Polled a " + x);
                 onNavigationDrawerItemSelected(x == null ? 0 : x);
-                Integer y = selectedItemsQueue.pop();
-                Log.d("debug", "Removed the (should be duplicated) " + y);
+                selectedItemsQueue.pop();
             }
 
             restoreActionBar();
         }
-        printQueue();
-    }
-
-    private void printQueue() {
-        StringBuilder builder = new StringBuilder("");
-        for (Integer x : selectedItemsQueue) {
-            builder.append(x).append("\n");
-        }
-        Log.d("debug", "Queue: " + builder.toString());
     }
 
     @Override
