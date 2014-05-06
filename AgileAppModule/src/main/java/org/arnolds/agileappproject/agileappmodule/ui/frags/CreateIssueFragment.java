@@ -28,6 +28,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 public class CreateIssueFragment extends Fragment {
 
     private static final long ISSUE_CREATED_SHOW_TIME_MILLIS = 1000;
+    public static boolean isShown = Boolean.FALSE;
     private View view;
     private EditText editTextTitle, editTextComment;
     private IssueCreationCallbacks mCallback;
@@ -66,6 +67,8 @@ public class CreateIssueFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        isShown = Boolean.TRUE;
         view = inflater.inflate(R.layout.fragment_create_issue, container, false);
         Button createIssueButton = (Button) view.findViewById(R.id.create_issue_button);
         createIssueButton.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +106,7 @@ public class CreateIssueFragment extends Fragment {
                 @Override
                 public void onIssueCreation(boolean result, GHIssue issue) {
                     super.onIssueCreation(result, issue);
+                    isShown = Boolean.FALSE;
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
                             show_progress(false);

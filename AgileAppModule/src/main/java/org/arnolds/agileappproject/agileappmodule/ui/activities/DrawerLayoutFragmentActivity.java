@@ -1,6 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -22,7 +23,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragm
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
-import java.util.ArrayList;
+import java.util.Stack;
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -32,13 +33,27 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
+
+    public static int getLastSelectedFragmentIndex() {
+        return lastSelectedFragmentIndex;
+    }
+
     private static int lastSelectedFragmentIndex = 0;
     private final IndefiniteFancyProgressFragment progressFragment =
             new IndefiniteFancyProgressFragment();
+    private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
 
     public static int getLastSelectedNavDavIndex() {
-        return 0; // TODO: FIX
+        Integer ret;
+        if (selectedItemsQueue.isEmpty()) {
+            ret = 0;
+        }
+        else {
+            ret = selectedItemsQueue.peek();
+        }
+
+        return ret.intValue();
     }
 
     @Override
@@ -108,18 +123,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
-//        recreate();
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
+////        recreate();
+//        onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+        //TODO
     }
 
     @Override
     public synchronized void onStartLoad() {
-        Log.d("debug", "onStartLoad");
         isLoading = Boolean.TRUE;
-        if(fragments[lastSelectedFragmentIndex] != null)
-            getSupportFragmentManager().beginTransaction().remove(fragments[lastSelectedFragmentIndex])
-                .commit();
+        if (fragments[lastSelectedFragmentIndex] != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragments[lastSelectedFragmentIndex])
+                    .commit();
+        }
         getFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_container, progressFragment)
                 .commit();
@@ -133,26 +151,33 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     public synchronized void onStopLoad() {
-        getFragmentManager().beginTransaction().remove(progressFragment).commit();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
-                .commit();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getFragmentManager().executePendingTransactions();
-                getSupportFragmentManager().executePendingTransactions();
-            }
-        });
+        try {
+            getFragmentManager().beginTransaction().remove(progressFragment).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
+                    .commit();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getFragmentManager().executePendingTransactions();
+                    getSupportFragmentManager().executePendingTransactions();
+                }
+            });
+        }
+        catch (IllegalStateException ex) {
+        }
         isLoading = Boolean.FALSE;
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        if (position == getLastSelectedNavDavIndex()) {
+        if (position == lastSelectedFragmentIndex) {
             //We don't want to perform an unnecessary Activity reload
             return;
         }
+
+        Log.wtf("debug", "Adding " + position, new Exception());
+        selectedItemsQueue.add(lastSelectedFragmentIndex);
 
         ArnoldSupportFragment target = fragments[position];
 
@@ -180,50 +205,92 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager != null && (!isLoading || position > 2)) {
             try {
-                getSupportFragmentManager().beginTransaction()
+                fragmentManager.beginTransaction().remove(fragments[lastSelectedFragmentIndex])
+                        .commit();
+                fragmentManager.beginTransaction()
                         .replace(MAIN_FRAGMENT_CONTAINER, target)
                         .addToBackStack("").commit();
-                getSupportFragmentManager().executePendingTransactions();
+                fragmentManager.executePendingTransactions();
             }
             catch (NullPointerException ex) {
 //                Log.wtf("debug", ex.getClass().getName(),ex);
             }
         }
         else if (fragmentManager != null && isLoading && position != 3) {
-            Log.d("newDebug", "I'm in");
-            Log.d("newDebug", "lsfi is " + lastSelectedFragmentIndex);
-            getSupportFragmentManager().beginTransaction()
+            fragmentManager.beginTransaction()
                     .remove(fragments[lastSelectedFragmentIndex]).commit();
             getFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER,
                     progressFragment).commit();
-            getFragmentManager().executePendingTransactions();
-            getSupportFragmentManager().executePendingTransactions();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getFragmentManager().executePendingTransactions();
+                    getSupportFragmentManager().executePendingTransactions();
+                }
+            });
         }
 
         lastSelectedFragmentIndex = position;
 
-        findViewById(R.id.activity_home).invalidate();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DrawerLayoutFragmentActivity.this.findViewById(R.id.activity_home).invalidate();
+//                restoreActionBar();
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mTitle = AgileAppModuleUtils
-                .getString(this, "title_section" + (getLastSelectedNavDavIndex() + 1), "");
+                .getString(this, "title_section" + (lastSelectedFragmentIndex + 1), "");
         restoreActionBar();
     }
 
-    /*@Override
+    @Override
     public void onBackPressed() {
-        if (navigatedItemsStack.size() < 2) {
-            finish();
+        printQueue();
+        Log.d("debug", "selectedItemsQueue size: " + selectedItemsQueue.size());
+        if (selectedItemsQueue.isEmpty()) {
+            Log.d("debug", "the queue is empty");
         }
-        else if (getSupportFragmentManager().popBackStackImmediate()) {
-            navigatedItemsStack.remove(0);
-            lastSelectedFragmentIndex = navigatedItemsStack.remove(0);
+        else {
+            Log.d("debug", "selectedItemsQueue head: " + selectedItemsQueue.peek());
+        }
+        Log.d("debug", "lastSelectedFragmentIndex " + lastSelectedFragmentIndex);
+        if (selectedItemsQueue.isEmpty()) {
+            Intent i = new Intent(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_HOME);
+            startActivity(i);
+        }
+        else {
+            if (lastSelectedFragmentIndex == 2 &&
+                    CreateIssueFragment.isShown) {//If the new issue fragment is being shown
+                getSupportFragmentManager().popBackStackImmediate();
+                CreateIssueFragment.isShown = Boolean.FALSE;
+            }
+            else {
+                Integer x = selectedItemsQueue.pop();
+                Log.d("debug", "Polled a " + x);
+                onNavigationDrawerItemSelected(x == null ? 0 : x);
+                Integer y = selectedItemsQueue.pop();
+                Log.d("debug", "Removed the (should be duplicated) " + y);
+            }
+
             restoreActionBar();
         }
-    }*/
+        printQueue();
+    }
+
+    private void printQueue() {
+        StringBuilder builder = new StringBuilder("");
+        for (Integer x : selectedItemsQueue) {
+            builder.append(x).append("\n");
+        }
+        Log.d("debug", "Queue: " + builder.toString());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,7 +336,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     public void onSectionAttached(int number) {
         int shiftedPos = number + 1;
-        Log.d("tagThis", "shiftedPost" + shiftedPos);
         mTitle = AgileAppModuleUtils.getString(this, "title_section" + shiftedPos, "");
         if (mTitle.toString().isEmpty()) {
             mTitle = getString(R.string.title_section1);
@@ -278,18 +344,23 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     @Override
     public void onNewRepoSelected(String repoName) {
-        for (ArnoldSupportFragment x : fragments)
+        for (ArnoldSupportFragment x : fragments) {
             try {
                 x.onNewRepositorySelected();
             }
             catch (NullPointerException ex) {
 //            Log.wtf("debug", ex.getClass().getName(), ex);
             }
+            getSupportFragmentManager()
+                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            selectedItemsQueue.clear();
+//            lastSelectedFragmentIndex = 0;
+            onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+        }
     }
 
 
     public void notifyIssueCreated() {
-        Log.d("debug", "ey");
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.beginTransaction()
                 .replace(R.id.main_fragment_container, fragments[2]).commit();
