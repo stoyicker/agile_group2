@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
@@ -33,6 +35,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
+    private Spinner mEventLogSpinner;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -60,6 +63,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem newIssueItem = menu.findItem(R.id.action_create);
+
+        //Save event log pointer
+        mEventLogSpinner = (Spinner) menu.findItem(R.id.action_event_log).getActionView();
+        TextView text = new TextView(this);
+        text.setText("Coolt!");
+        mEventLogSpinner.addView(text);
 
         switch (lastSelectedFragmentIndex) {
             case 2:
