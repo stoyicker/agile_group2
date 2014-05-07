@@ -1,6 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,10 +10,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
@@ -25,7 +36,11 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragm
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
+
+
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -35,7 +50,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
-    private Spinner mEventLogSpinner;
+    private MenuItem mEventLogButton;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -64,11 +79,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem newIssueItem = menu.findItem(R.id.action_create);
 
-        //Save event log pointer
-        mEventLogSpinner = (Spinner) menu.findItem(R.id.action_event_log).getActionView();
-        TextView text = new TextView(this);
-        text.setText("Coolt!");
-        mEventLogSpinner.addView(text);
+        mEventLogButton = menu.findItem(R.id.action_event_log);
 
         switch (lastSelectedFragmentIndex) {
             case 2:
@@ -127,6 +138,24 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     private void eventLogPressed() {
+        Log.wtf("event", "event pressed");
+
+        LayoutInflater layoutInflater
+                = (LayoutInflater)getBaseContext()
+                .getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = layoutInflater.inflate(R.layout.event_log, null);
+        ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+
+        List<String> items = new ArrayList<String>();
+        items.add("asd");
+        items.add("asddas");
+
+        listView.setAdapter(new EventLogAdapter(this, items));
+
+        final PopupWindow popupWindow = new PopupWindow(
+                popupView, 500, 800);
+
+        popupWindow.showAsDropDown(findViewById(R.id.action_event_log));
 
     }
 
@@ -369,6 +398,42 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     supportFragmentManager.executePendingTransactions();
                 }
             });
+        }
+    }
+
+    private class EventLogAdapter extends BaseAdapter{
+
+        private List<String> mItems;
+        private LayoutInflater mInflater;
+
+        public EventLogAdapter(Context context, List<String> items){
+            mItems = items;
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            convertView = mInflater.inflate(R.layout.event_log_row, null);
+            TextView textView = (TextView) convertView.findViewById(R.id.event_name);
+            textView.setText(mItems.get(position));
+
+            return convertView;
         }
     }
 }

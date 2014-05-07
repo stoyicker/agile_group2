@@ -6,7 +6,6 @@
         android:icon="@drawable/ic_arnold"
         android:orderInCategory="1"
         android:showAsAction="always"
-        android:actionViewClass="android.widget.Spinner"
         android:title="@string/event_log_title"/>
 	<item
 		android:id="@+id/action_settings"
