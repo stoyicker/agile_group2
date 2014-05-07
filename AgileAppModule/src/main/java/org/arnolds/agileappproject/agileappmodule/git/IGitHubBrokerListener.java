@@ -6,7 +6,9 @@ import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRepository;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for listeners to git-hub-broker callbacks.
@@ -67,5 +69,5 @@ public interface IGitHubBrokerListener {
      * @param result {@link boolean} True if commits could be retrieved; otherwise false.
      * @param commits {@link List<org.kohsuke.github.GHCommit>} All commits, null if commits could not be retrieved.
      */
-    public void onAllCommitsRetrieved(boolean result, List<GHCommit> commits);
+    public void onAllCommitsRetrieved(boolean result, LinkedHashMap<String, GHCommit> commits);
 }

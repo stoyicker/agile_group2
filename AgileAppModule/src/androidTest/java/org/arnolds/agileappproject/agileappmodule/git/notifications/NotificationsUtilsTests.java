@@ -13,16 +13,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
 public class NotificationsUtilsTests extends InstrumentationTestCase {
 
     private static final String NEW_COMMIT_SHA1 = "newCommitSHA1";
+    private static final String ROOT_SHA1 = "rootSHA1";
+    private static final String FIRST_BRANCH_COMMIT_SHA1 = "firstBranchCommitSHA1";
+    private static final String SECOND_COMMIT_SHA1 = "secondCommitSHA1";
+    private static final String UNRELATED_COMMIT_SHA1 = "unrelatedCommitSHA1";
 
     GHBranch branch;
     GHCommit newCommit;
-    List<GHCommit> oldCommits = new ArrayList<GHCommit>();
+    LinkedHashMap<String, GHCommit> oldCommits = new LinkedHashMap<String, GHCommit>();
     List<GHCommit.File> ghFiles = new ArrayList<GHCommit.File>();
 
     GitFile[] files = {new GitFile("file0", "/github/file0"), new GitFile("file1", "/github/file1"),
@@ -52,7 +57,7 @@ public class NotificationsUtilsTests extends InstrumentationTestCase {
         GHCommit root = Mockito.mock(GHCommit.class);
         Mockito.when(root.getParents()).thenThrow(new IOException());
 
-        Mockito.when(root.getSHA1()).thenReturn("rootSHA1");
+        Mockito.when(root.getSHA1()).thenReturn(ROOT_SHA1);
         Mockito.when(root.getFiles()).thenReturn(ghFiles.subList(0,2));
         List<GHCommit> rootList = new ArrayList<GHCommit>();
         rootList.add(root);
@@ -64,13 +69,13 @@ public class NotificationsUtilsTests extends InstrumentationTestCase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Mockito.when(secondCommit.getSHA1()).thenReturn("secondSHA1");
+        Mockito.when(secondCommit.getSHA1()).thenReturn(SECOND_COMMIT_SHA1);
         Mockito.when(secondCommit.getFiles()).thenReturn(ghFiles.subList(2,3));
 
         GHCommit firstBranchCommit = Mockito.mock(GHCommit.class);
 
         Mockito.when(firstBranchCommit.getParents()).thenReturn(rootList);
-        Mockito.when(firstBranchCommit.getSHA1()).thenReturn("firstBranchCommitSHA1");
+        Mockito.when(firstBranchCommit.getSHA1()).thenReturn(FIRST_BRANCH_COMMIT_SHA1);
         Mockito.when(firstBranchCommit.getFiles()).thenReturn(ghFiles.subList(1,2));
 
         List<GHCommit> firstBranchCommitList = new ArrayList<GHCommit>();
@@ -84,14 +89,14 @@ public class NotificationsUtilsTests extends InstrumentationTestCase {
         unRelatedCommit = Mockito.mock(GHCommit.class);
         Mockito.when(unRelatedCommit.getFiles()).thenReturn(ghFiles.subList(3,4));
         Mockito.when(unRelatedCommit.getParents()).thenReturn(rootList);
-        Mockito.when(unRelatedCommit.getSHA1()).thenReturn("urelated_commit");
+        Mockito.when(unRelatedCommit.getSHA1()).thenReturn(UNRELATED_COMMIT_SHA1);
 
-        oldCommits.add(root);
-        oldCommits.add(secondCommit);
-        oldCommits.add(firstBranchCommit);
+        oldCommits.put(ROOT_SHA1, root);
+        oldCommits.put(SECOND_COMMIT_SHA1, secondCommit);
+        oldCommits.put(FIRST_BRANCH_COMMIT_SHA1, firstBranchCommit);
 
         branch = Mockito.mock(GHBranch.class);
-        Mockito.when(branch.getSHA1()).thenReturn(NEW_COMMIT_SHA1);
+        Mockito.when(branch.getSHA1()).thenReturn(FIRST_BRANCH_COMMIT_SHA1);
 
     }
     public void test_conflictingFiles_conflict(){

@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
@@ -76,6 +78,7 @@ public class GitHubBroker implements IGitHubBroker {
     private GitHub session;
     private GHUser user;
     private GHRepository repository;
+    private GHBranch selectedBranch;
     private static IGitHubBroker instance;
 
     private final Object asyncLock = new Object();
@@ -350,11 +353,33 @@ public class GitHubBroker implements IGitHubBroker {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
                 PagedIterable<GHCommit> commits = repository.listCommits();
-                if (params[0] != null) {
-                    params[0].onAllCommitsRetrieved(true, commits.asList());
+
+                LinkedHashMap<String, GHCommit> commitMap = new LinkedHashMap<String, GHCommit>();
+                for (GHCommit commit : commits){
+                    try {
+                        GHCommit newCommit = repository.getCommit(commit.getSHA1());
+                        commitMap.put(newCommit.getSHA1(), newCommit);
+                    } catch (IOException e) {
+
+                    }
+                }
+                if(params[0] != null) {
+                    params[0].onAllCommitsRetrieved(true, commitMap);
                 }
                 return null;
             }
         }.execute(callback);
     }
+
+    @Override
+    public GHBranch getSelectedBranch() {
+        return selectedBranch;
+    }
+
+    @Override
+    public void setSelectedBranch(GHBranch selectedBranch) {
+        this.selectedBranch = selectedBranch;
+    }
+
 }
+
