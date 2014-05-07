@@ -4,17 +4,13 @@
 		<item name="android:textColor">@color/theme_black</item>
 		<item name="android:textSize">@dimen/repo_name_textsize</item>
 		<item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
-		<item name="android:shadowDx">2</item>
-		<item name="android:shadowDy">2</item>
-		<item name="android:shadowRadius">2</item>
+
 	</style>
 	<style name="BranchSHAStyle">
 		<item name="android:textColor">@color/theme_black</item>
 		<item name="android:textSize">@dimen/repo_sha_textsize</item>
 		<item name="android:shadowColor">@color/theme_navigation_drawer_background</item>
-		<item name="android:shadowDx">2</item>
-		<item name="android:shadowDy">2</item>
-		<item name="android:shadowRadius">2</item>
+
 	</style>
 	<style name="NavigationDrawerItemStyle">
 		<item name="android:textSize">@dimen/navigation_drawer_item_text_size</item>

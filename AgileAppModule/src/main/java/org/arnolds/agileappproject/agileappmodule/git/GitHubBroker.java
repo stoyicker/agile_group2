@@ -357,4 +357,10 @@ public class GitHubBroker implements IGitHubBroker {
             }
         }.execute(callback);
     }
+
+    public GHCommit getCommit(String hash) throws IOException {
+        return repository.getCommit(hash);
+    }
+
+
 }

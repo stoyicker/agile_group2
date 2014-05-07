@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+    android:id="@+id/branch_fragment"
+    android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:padding="@dimen/padding_branch">
+              android:padding="@dimen/padding_branch"
+              >
 
 	<TextView
 		android:id="@+id/name_branch"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+        android:textStyle="bold"
 		style="@style/BranchNameStyle"/>
 	<TextView
 		android:id="@+id/sha_branch"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		style="@style/BranchSHAStyle"/>
+		style="@style/BranchSHAStyle"
+        android:text="0"/>
+
+    <TextView
+        android:id="@+id/message_branch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/BranchSHAStyle"
+        android:text="Much message, very commit"/>
 
 </LinearLayout>

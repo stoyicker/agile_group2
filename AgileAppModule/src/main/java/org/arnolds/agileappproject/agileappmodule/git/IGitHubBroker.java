@@ -1,5 +1,9 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import org.kohsuke.github.GHCommit;
+
+import java.io.IOException;
+
 public interface IGitHubBroker {
 
     /**
@@ -102,4 +106,6 @@ public interface IGitHubBroker {
      */
     public void getAllCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
+
+    public GHCommit getCommit(String hash) throws IOException;
 }
