@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="40dp"
-    android:layout_height="40dp">
-
-    <TextView
-        android:layout_width="264dp"
-        android:layout_height="123dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textView"
-        android:singleLine="true" />
-
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/event_log_background">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/drawer_list_divider">
+        <Button
+            android:id="@+id/dismiss_all_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_all"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
     <ListView
         android:id="@+id/event_log_list"
         android:layout_width="match_parent"

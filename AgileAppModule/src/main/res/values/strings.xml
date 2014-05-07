@@ -42,4 +42,5 @@
 	<string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
     <string name="event_log_title">Event Log</string>
+    <string name="clear_all">Clear all</string>
 </resources>

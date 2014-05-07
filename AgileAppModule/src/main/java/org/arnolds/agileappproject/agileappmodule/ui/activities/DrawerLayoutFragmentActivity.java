@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
@@ -149,13 +152,48 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         List<String> items = new ArrayList<String>();
         items.add("asd");
         items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+        items.add("asd");
+        items.add("asddas");
+
 
         listView.setAdapter(new EventLogAdapter(this, items));
 
         final PopupWindow popupWindow = new PopupWindow(
-                popupView, 500, 800);
+                popupView, (int) getResources().getDimension(R.dimen.event_log_width),(int) getResources().getDimension(R.dimen.event_log_height));
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                popupWindow.dismiss();
+            }
+        });
+
+        popupWindow.setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
 
         popupWindow.showAsDropDown(findViewById(R.id.action_event_log));
+
 
     }
 
@@ -432,6 +470,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             convertView = mInflater.inflate(R.layout.event_log_row, null);
             TextView textView = (TextView) convertView.findViewById(R.id.event_name);
             textView.setText(mItems.get(position));
+
+            ImageView imageView = (ImageView) convertView.findViewById(R.id.event_icon);
+            imageView.setImageResource(R.drawable.warning);
 
             return convertView;
         }
