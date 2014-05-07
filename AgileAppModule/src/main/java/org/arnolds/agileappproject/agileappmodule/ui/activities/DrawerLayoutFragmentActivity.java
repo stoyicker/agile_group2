@@ -86,6 +86,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public boolean onOptionsItemSelected(MenuItem item) {
         Boolean ret = Boolean.TRUE;
         switch (item.getItemId()) {
+            case R.id.action_event_log:
+                eventLogPressed();
+                break;
             case R.id.action_settings:
 //  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
                 break;
@@ -112,6 +115,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
         restoreActionBar();
         return ret;
+    }
+
+    private void eventLogPressed() {
+
     }
 
     private void restoreActionBar() {
