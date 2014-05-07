@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,10 +27,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class ListBranchesFragment extends ArnoldSupportFragment {
 
-    private static final long BRANCHES_POLL_INTERVAL_MILLIS = 2000;
+    private static final long BRANCHES_POLL_INTERVAL_MILLIS = 5000;
     private final static int MENU_INDEX = 1;
     private BranchesListAdapter listAdapter;
     private IGitHubBrokerListener branchesListener = new BranchesListener();
@@ -122,7 +126,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
+            final ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = ((LayoutInflater) getActivity().getApplicationContext()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
@@ -158,17 +162,28 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
                             .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
                 }
             }
-            String commitMessage = "";
-            try {
-                commitMessage = GitHubBroker.getInstance().getCommit(branch.getSHA1()).getCommitShortInfo().getMessage();
-            } catch (IOException e) {
-                Log.wtf("debug", e.getClass().getName(), e);
-            }
+
 
             viewHolder.getNameView().setText(branch.getName());
             viewHolder.getShaView().setText("Latest commit: " + branch.getSHA1());
-            viewHolder.getMessageView().setText("Message: "+commitMessage);
 
+            AsyncTask task = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        final String commitMessage = branch.getOwner().getCommit(branch.getSHA1()).getCommitShortInfo().getMessage();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewHolder.getMessageView().setText("Commit message: " + commitMessage);
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute();
 
             return convertView;
         }
