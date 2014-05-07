@@ -37,6 +37,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private IGitHubBrokerListener brokerListener;
     private Thread commitPollerThread;
     private String repoName = "";
+    private String branchName = "";
 
     private volatile boolean commitPollerRunning;
 
@@ -139,9 +140,10 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         @Override
         public void onAllCommitsRetrieved(boolean result, final LinkedHashMap<String, GHCommit> remoteCommits) {
             String currentRepo = broker.getSelectedRepoName();
+            String currentBranch = broker.getSelectedBranch().getName();
             //If no previous list or repo change.
 
-            if (commits == null || !repoName.equals(currentRepo)) {
+            if (commits == null || !branchName.equals(currentBranch) || !repoName.equals(currentRepo)) {
                 commits = remoteCommits;
                 try {   //TODO Why is this necessary?
                     commitChangeSupport
@@ -149,7 +151,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 }catch (NullPointerException np){
 
                 }
-                repoName = currentRepo;//TODO: don't store repoName locally.
+                repoName = currentRepo;
+                branchName = currentBranch;//TODO: don't store repoName locally.
             }
             else if (remoteCommits.size() > commits.size()) {
 

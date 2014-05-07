@@ -16,9 +16,10 @@ import org.kohsuke.github.PagedIterable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
-
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
@@ -179,6 +180,7 @@ public class GitHubBroker implements IGitHubBroker {
                     boolean success = repo != null;
                     if (success) {
                         repository = repo;
+                        selectedBranch = repository.getBranches().get("master");
                     }
                     synchronized (asyncLock) {
                         if (callback != null) {
@@ -352,17 +354,18 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<IGitHubBrokerListener, Void, Void>() {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
-                PagedIterable<GHCommit> commits = repository.listCommits();
 
                 LinkedHashMap<String, GHCommit> commitMap = new LinkedHashMap<String, GHCommit>();
-                for (GHCommit commit : commits){
-                    try {
-                        GHCommit newCommit = repository.getCommit(commit.getSHA1());
-                        commitMap.put(newCommit.getSHA1(), newCommit);
-                    } catch (IOException e) {
+                try {
+                    GHCommit head = repository.getCommit(getSelectedBranch().getSHA1());
 
-                    }
+                    commitMap.put(head.getSHA1(), head);
+                    commitMap = listCommits(commitMap, head.getSHA1());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
                 if(params[0] != null) {
                     params[0].onAllCommitsRetrieved(true, commitMap);
                 }
@@ -371,14 +374,38 @@ public class GitHubBroker implements IGitHubBroker {
         }.execute(callback);
     }
 
+
     @Override
     public GHBranch getSelectedBranch() {
-        return selectedBranch;
+        if (selectedBranch != null) {
+            return selectedBranch;
+        }
+        GHBranch branch = null;
+        try {
+
+            branch = repository.getBranches().get("master");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return branch;
     }
 
     @Override
     public void setSelectedBranch(GHBranch selectedBranch) {
         this.selectedBranch = selectedBranch;
+    }
+
+
+    private LinkedHashMap<String, GHCommit> listCommits(LinkedHashMap<String, GHCommit> commitMap, String pointer) throws IOException {
+        List<GHCommit> parents = commitMap.get(pointer).getParents();
+
+        for (GHCommit parent : parents) {
+            commitMap.put(parent.getSHA1(), parent);
+            commitMap = listCommits(commitMap, parent.getSHA1());
+        }
+
+        return commitMap;
     }
 
 }

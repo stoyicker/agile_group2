@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -208,7 +209,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        new Exception().printStackTrace(System.err);
+//        new Exception().printStackTrace(System.err);
     }
 
     @Override
