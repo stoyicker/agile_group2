@@ -54,6 +54,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
     private MenuItem mEventLogButton;
+    private Button eventCount;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -78,11 +79,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem newIssueItem = menu.findItem(R.id.action_create);
 
-        mEventLogButton = menu.findItem(R.id.action_event_log);
+        final MenuItem eventMenuItem = menu.findItem(R.id.action_event_log);
+        View count = eventMenuItem.getActionView();
+        eventCount = (Button) count.findViewById(R.id.feed_event_count);
+        eventCount.setText("0");
+
+        eventCount.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menu.performIdentifierAction(eventMenuItem.getItemId(), 0);
+            }
+        });
 
         switch (lastSelectedFragmentIndex) {
             case 2:
@@ -152,29 +163,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         List<String> items = new ArrayList<String>();
         items.add("asd");
         items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-        items.add("asd");
-        items.add("asddas");
-
 
         listView.setAdapter(new EventLogAdapter(this, items));
 
@@ -192,7 +180,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
 
-        popupWindow.showAsDropDown(findViewById(R.id.action_event_log));
+        popupWindow.showAsDropDown(eventCount);
 
 
     }
@@ -467,14 +455,22 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            convertView = mInflater.inflate(R.layout.event_log_row, null);
-            TextView textView = (TextView) convertView.findViewById(R.id.event_name);
+            final View view = mInflater.inflate(R.layout.event_log_row, null);
+            TextView textView = (TextView) view.findViewById(R.id.event_name);
             textView.setText(mItems.get(position));
 
-            ImageView imageView = (ImageView) convertView.findViewById(R.id.event_icon);
+            ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
             imageView.setImageResource(R.drawable.warning);
 
-            return convertView;
+            ImageButton dismissButton = (ImageButton) view.findViewById(R.id.dismiss_event);
+            dismissButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+            return view;
         }
     }
 }
