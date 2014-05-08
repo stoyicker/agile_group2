@@ -96,7 +96,7 @@ public interface IGitHubBroker {
 
 
     /**
-     * Asynchronously returns all commits in the working repository, giving response on the provided callback.
+     * Asynchronously returns all commits in the current branch, giving response on the provided callback.
      *
      * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
