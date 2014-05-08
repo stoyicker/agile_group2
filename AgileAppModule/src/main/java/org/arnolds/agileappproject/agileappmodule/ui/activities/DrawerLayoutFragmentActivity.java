@@ -1,16 +1,32 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
@@ -23,7 +39,11 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragm
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
+
+
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -33,6 +53,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
+    private MenuItem mEventLogButton;
+    private Button eventCount;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -57,9 +79,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem newIssueItem = menu.findItem(R.id.action_create);
+
+        final MenuItem eventMenuItem = menu.findItem(R.id.action_event_log);
+        View count = eventMenuItem.getActionView();
+        eventCount = (Button) count.findViewById(R.id.feed_event_count);
+        eventCount.setText("0");
+
+        eventCount.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menu.performIdentifierAction(eventMenuItem.getItemId(), 0);
+            }
+        });
 
         switch (lastSelectedFragmentIndex) {
             case 2:
@@ -86,6 +120,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public boolean onOptionsItemSelected(MenuItem item) {
         Boolean ret = Boolean.TRUE;
         switch (item.getItemId()) {
+            case R.id.action_event_log:
+                eventLogPressed();
+                break;
             case R.id.action_settings:
 //  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
                 break;
@@ -112,6 +149,40 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
         restoreActionBar();
         return ret;
+    }
+
+    private void eventLogPressed() {
+        Log.wtf("event", "event pressed");
+
+        LayoutInflater layoutInflater
+                = (LayoutInflater)getBaseContext()
+                .getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = layoutInflater.inflate(R.layout.event_log, null);
+        ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+
+        List<String> items = new ArrayList<String>();
+        items.add("asd");
+        items.add("asddas");
+
+        listView.setAdapter(new EventLogAdapter(this, items));
+
+        final PopupWindow popupWindow = new PopupWindow(
+                popupView, (int) getResources().getDimension(R.dimen.event_log_width),(int) getResources().getDimension(R.dimen.event_log_height));
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                popupWindow.dismiss();
+            }
+        });
+
+        popupWindow.setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+
+        popupWindow.showAsDropDown(eventCount);
+
+
     }
 
     private void restoreActionBar() {
@@ -353,6 +424,53 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     supportFragmentManager.executePendingTransactions();
                 }
             });
+        }
+    }
+
+    private class EventLogAdapter extends BaseAdapter{
+
+        private List<String> mItems;
+        private LayoutInflater mInflater;
+
+        public EventLogAdapter(Context context, List<String> items){
+            mItems = items;
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            final View view = mInflater.inflate(R.layout.event_log_row, null);
+            TextView textView = (TextView) view.findViewById(R.id.event_name);
+            textView.setText(mItems.get(position));
+
+            ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
+            imageView.setImageResource(R.drawable.warning);
+
+            ImageButton dismissButton = (ImageButton) view.findViewById(R.id.dismiss_event);
+            dismissButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+            return view;
         }
     }
 }
