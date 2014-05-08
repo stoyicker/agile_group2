@@ -362,6 +362,7 @@ public class GitHubBroker implements IGitHubBroker {
                     commitMap.put(head.getSHA1(), head);
                     commitMap = listCommits(commitMap, head.getSHA1());
 
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -408,5 +409,35 @@ public class GitHubBroker implements IGitHubBroker {
         return commitMap;
     }
 
-}
+    @Override
+    public void getAllCommitsOld(IGitHubBrokerListener callback) throws RepositoryNotSelectedException, AlreadyNotConnectedException {
+        if (!isConnected()) {
+            throw new AlreadyNotConnectedException();
+        }
+        if (repository == null) {
+            throw new RepositoryNotSelectedException();
+        }
 
+        new AsyncTask<IGitHubBrokerListener, Void, Void>() {
+            @Override
+            protected Void doInBackground(IGitHubBrokerListener... params) {
+                PagedIterable<GHCommit> commits = repository.listCommits();
+
+                LinkedHashMap<String, GHCommit> commitMap = new LinkedHashMap<String, GHCommit>();
+                for (GHCommit commit : commits){
+                    try {
+                        GHCommit newCommit = repository.getCommit(commit.getSHA1());
+                        commitMap.put(newCommit.getSHA1(), newCommit);
+                    } catch (IOException e) {
+
+                    }
+                }
+                if(params[0] != null) {
+                    params[0].onAllCommitsRetrieved(true, commitMap);
+                }
+                return null;
+            }
+        }.execute(callback);
+    }
+
+}

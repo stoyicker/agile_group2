@@ -89,6 +89,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         View count = eventMenuItem.getActionView();
         eventCount = (Button) count.findViewById(R.id.feed_event_count);
         eventCount.setText("0");
+        dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
         eventCount.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -479,7 +480,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 @Override
                 public void onClick(View v) {
                     dataModel.removeEvent(event);
-                    parent.removeView(v);
+                    mEvents.remove(event);
+                    notifyDataSetChanged();
                 }
             });
 
@@ -497,8 +499,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             if(event.getNewValue() != null && event.getNewValue() instanceof List) {
-                List eventList = (List) event.getNewValue();
-                button.setText(eventList.size());
+                final List<GitEvent> eventList = (List<GitEvent>) event.getNewValue();
+                DrawerLayoutFragmentActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.setText(eventList.size()+"");
+                    }
+                });
+
             }
         }
     }

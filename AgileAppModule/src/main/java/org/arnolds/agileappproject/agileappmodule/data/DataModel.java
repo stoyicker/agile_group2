@@ -55,6 +55,7 @@ public class DataModel implements IDataModel {
     @Override
     public void removeEvent(GitEvent event) {
         eventList.remove(event);
+        firePropertyEvent();
     }
 
     @Override

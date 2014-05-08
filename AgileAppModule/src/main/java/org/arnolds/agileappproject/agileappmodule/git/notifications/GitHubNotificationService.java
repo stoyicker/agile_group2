@@ -119,7 +119,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 try {
                     try {
                         if (!TextUtils.isEmpty(GitHubBroker.getInstance().getSelectedRepoName())) {
-                            broker.getAllCommits(brokerListener);
+                            broker.getAllCommitsOld(brokerListener);
                         }
                     }
                     catch (GitHubBroker.RepositoryNotSelectedException e) {
@@ -174,7 +174,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                         conflictingFiles = NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
                     }
 
-                    if (conflictingFiles != null && conflictingFiles.size() > 0) {
+                    if (conflictingFiles !=  null && conflictingFiles.size() > 0) {
                         makeToast(context.getString(R.id.file_conflict));
                         dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
                     } else {

@@ -116,4 +116,7 @@ public interface IGitHubBroker {
      * @param selectedBranch the branch that should be selected.
      */
     public void setSelectedBranch(GHBranch selectedBranch);
+
+    public void getAllCommitsOld(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
+            GitHubBroker.AlreadyNotConnectedException;
 }
