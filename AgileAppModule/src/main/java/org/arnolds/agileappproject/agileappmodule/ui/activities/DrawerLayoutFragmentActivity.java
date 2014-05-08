@@ -404,11 +404,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             catch (NullPointerException ex) {
 //            Log.wtf("debug", ex.getClass().getName(), ex);
             }
-            getSupportFragmentManager()
-                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            selectedItemsQueue.clear();
-//            lastSelectedFragmentIndex = 0;
-            onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
+//            getSupportFragmentManager()
+//                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//            selectedItemsQueue.clear();
+//            onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
         }
     }
 
