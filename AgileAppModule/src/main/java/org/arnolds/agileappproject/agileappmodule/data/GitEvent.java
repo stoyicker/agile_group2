@@ -55,5 +55,4 @@ public class GitEvent {
     public EventType getType() {
         return type;
     }
-
 }

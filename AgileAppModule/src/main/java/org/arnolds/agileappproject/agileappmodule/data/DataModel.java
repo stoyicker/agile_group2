@@ -53,6 +53,11 @@ public class DataModel implements IDataModel {
     }
 
     @Override
+    public void removeEvent(GitEvent event) {
+        eventList.remove(event);
+    }
+
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }

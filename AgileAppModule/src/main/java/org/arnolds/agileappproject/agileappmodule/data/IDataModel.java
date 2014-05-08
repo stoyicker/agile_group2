@@ -36,6 +36,12 @@ public interface IDataModel {
     public void addLateIssue(final GHIssue issue);
 
     /**
+     * Removes an event from the stored events.
+     * @param event the event that should be removed.
+     */
+    public void removeEvent(final GitEvent event);
+
+    /**
      * Adds a listener that should be added.
      * Null is ignored and if a listener already exists it will now receive one additional event.
      * @param listener the listener that should be added.
