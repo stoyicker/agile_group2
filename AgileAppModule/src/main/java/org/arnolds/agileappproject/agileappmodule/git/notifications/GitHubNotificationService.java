@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
+import org.arnolds.agileappproject.agileappmodule.data.DataModel;
+import org.arnolds.agileappproject.agileappmodule.data.IDataModel;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
@@ -38,6 +40,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private Thread commitPollerThread;
     private String repoName = "";
     private String branchName = "";
+    private IDataModel dataModel;
 
     private volatile boolean commitPollerRunning;
 
@@ -49,6 +52,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         commits = new LinkedHashMap<String, GHCommit>();
         brokerListener = new MyGitHubBrokerListener();
         broker = GitHubBroker.getInstance();
+        dataModel = DataModel.getInstance();
 
         commitPollerThread = new Thread(new CommitPollerThread());
 
@@ -158,40 +162,27 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
                 //Filter out new commits
                 //Removes old commits from remoteCommits
-                for (GHCommit commit : commits.values()){
+                for (GHCommit commit : commits.values()) {
                     remoteCommits.remove(commit.getSHA1());
                 }
 
                 GHBranch selectedBranch = broker.getSelectedBranch();
 
-                if (selectedBranch != null) {
-                    final Set<GitFile> conflictingFiles = new HashSet<GitFile>();
-                    for (GHCommit newCommit : remoteCommits.values()) {
-                         conflictingFiles.addAll(NotificationUtils.conflictingFiles(selectedBranch, newCommit, commits));
+                for (GHCommit commit : remoteCommits.values()) {
+                    Set<GitFile> conflictingFiles = null;
+                    if (selectedBranch != null) {
+                        conflictingFiles = NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
                     }
-                    if (conflictingFiles.size() > 0) {
 
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context,
-                                        conflictingFiles.size() + "# FILES CONFLICT!!! =(",
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        });
+                    if (conflictingFiles != null && conflictingFiles.size() > 0) {
+                        makeToast(context.getString(R.id.file_conflict));
+                        dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
+                    } else {
+                        makeToast(context.getString(R.id.notification_new_commits) +" " + commit.getCommitShortInfo().getMessage());
+                        dataModel.addLateCommit(commit);
                     }
                 }
 
-                if (!commits.isEmpty()) {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context,
-                                    "#" + remoteCommits.size() + " " + context.getString(R.id.notification_new_commits),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
                 commits.putAll(remoteCommits);
                 commitChangeSupport.firePropertyChange("New ", null, commits); //TODO: don't send pointer.
             }
@@ -200,6 +191,17 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         @Override
         public void onRepoSelected(boolean result) {
             commits = null;
+        }
+
+        private void makeToast(final String toastString) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,
+                            toastString,
+                            Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
