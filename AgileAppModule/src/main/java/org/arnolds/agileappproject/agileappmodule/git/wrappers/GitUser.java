@@ -13,12 +13,13 @@ public class GitUser {
     private String name;
     private String email;
     private String avatarUrl;
+    private String login;
 
     public GitUser() {}
 
     public GitUser(GHUser apiUser) {
         this.userId = apiUser.getId();
-
+        this.login = apiUser.getLogin();
         this.avatarUrl = apiUser.getAvatarUrl();
 
         try {
@@ -43,8 +44,7 @@ public class GitUser {
 
     @Override
     public int hashCode() {
-        int multiplier = (userId != 0) ? userId : 13;
-        return name.hashCode()*email.hashCode()*multiplier;
+        return name.hashCode()*email.hashCode()*login.hashCode()*39;
     }
 
     @Override
@@ -66,5 +66,9 @@ public class GitUser {
 
     public String getAvatarUrl() {
         return avatarUrl;
+    }
+
+    public String getLogin() {
+        return login;
     }
 }
