@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -22,13 +21,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
+import org.arnolds.agileappproject.agileappmodule.data.DataModel;
+import org.arnolds.agileappproject.agileappmodule.data.GitEvent;
+import org.arnolds.agileappproject.agileappmodule.data.IDataModel;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
@@ -39,6 +38,8 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragm
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -55,6 +56,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private ArnoldSupportFragment[] fragments;
     private MenuItem mEventLogButton;
     private Button eventCount;
+    private IDataModel dataModel;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -87,6 +89,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         View count = eventMenuItem.getActionView();
         eventCount = (Button) count.findViewById(R.id.feed_event_count);
         eventCount.setText("0");
+        dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
         eventCount.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -160,11 +163,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         View popupView = layoutInflater.inflate(R.layout.event_log, null);
         ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
 
-        List<String> items = new ArrayList<String>();
-        items.add("asd");
-        items.add("asddas");
 
-        listView.setAdapter(new EventLogAdapter(this, items));
+        listView.setAdapter(new EventLogAdapter(this, dataModel.getEventList()));
 
         final PopupWindow popupWindow = new PopupWindow(
                 popupView, (int) getResources().getDimension(R.dimen.event_log_width),(int) getResources().getDimension(R.dimen.event_log_height));
@@ -385,6 +385,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 fragments[CommitLogFragment.DRAWER_POSITION])
                 .commit();
         getSupportFragmentManager().executePendingTransactions();
+
+        dataModel = DataModel.getInstance();
     }
 
     public void onSectionAttached(int number) {
@@ -428,22 +430,22 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
     private class EventLogAdapter extends BaseAdapter{
 
-        private List<String> mItems;
+        private List<GitEvent> mEvents;
         private LayoutInflater mInflater;
 
-        public EventLogAdapter(Context context, List<String> items){
-            mItems = items;
+        public EventLogAdapter(Context context, List<GitEvent> events){
+            mEvents = events;
             mInflater = LayoutInflater.from(context);
         }
 
         @Override
         public int getCount() {
-            return mItems.size();
+            return mEvents.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return mItems.get(position);
+            return mEvents.get(position);
         }
 
         @Override
@@ -452,24 +454,59 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
+        public View getView(int position, View convertView, final ViewGroup parent) {
+            final GitEvent event = mEvents.get(position);
             final View view = mInflater.inflate(R.layout.event_log_row, null);
-            TextView textView = (TextView) view.findViewById(R.id.event_name);
-            textView.setText(mItems.get(position));
 
             ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
-            imageView.setImageResource(R.drawable.warning);
+            switch (event.getType()) {
+                case COMMIT:
+                    imageView.setImageResource(R.drawable.icon_section1);
+                    break;
+                case FILE_CONFLICT:
+                    imageView.setImageResource(R.drawable.warning);
+                    break;
+                case ISSUE:
+                    imageView.setImageResource(R.drawable.icon_section3);
+                    break;
+            }
+
+            TextView textView = (TextView) view.findViewById(R.id.event_name);
+            textView.setText(event.getEventText());
 
             ImageButton dismissButton = (ImageButton) view.findViewById(R.id.dismiss_event);
             dismissButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    dataModel.removeEvent(event);
+                    mEvents.remove(event);
+                    notifyDataSetChanged();
                 }
             });
 
             return view;
+        }
+    }
+
+    private class EventLogListener implements PropertyChangeListener {
+        private Button button;
+
+        public EventLogListener(Button button) {
+            this.button = button;
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent event) {
+            if(event.getNewValue() != null && event.getNewValue() instanceof List) {
+                final List<GitEvent> eventList = (List<GitEvent>) event.getNewValue();
+                DrawerLayoutFragmentActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.setText(eventList.size()+"");
+                    }
+                });
+
+            }
         }
     }
 }

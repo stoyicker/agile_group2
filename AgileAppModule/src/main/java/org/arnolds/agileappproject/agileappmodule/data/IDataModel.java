@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule.data;
 
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHIssue;
 
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -29,6 +30,18 @@ public interface IDataModel {
     public void addFileConflict(final GHCommit commit, final List<GitFile> affectedFiles);
 
     /**
+     * Adds a issue that has been polled after the initial population.
+     * @param issue - The issue that should be stored.
+     */
+    public void addLateIssue(final GHIssue issue);
+
+    /**
+     * Removes an event from the stored events.
+     * @param event the event that should be removed.
+     */
+    public void removeEvent(final GitEvent event);
+
+    /**
      * Adds a listener that should be added.
      * Null is ignored and if a listener already exists it will now receive one additional event.
      * @param listener the listener that should be added.
@@ -41,4 +54,10 @@ public interface IDataModel {
      * @param listener the lister that should be removed.
      */
     public void removePropertChangeListener(final PropertyChangeListener listener);
+
+    /**
+     * Returns the EventList.
+     * @return the stored eventList.
+     */
+    public List<GitEvent> getEventList();
 }
