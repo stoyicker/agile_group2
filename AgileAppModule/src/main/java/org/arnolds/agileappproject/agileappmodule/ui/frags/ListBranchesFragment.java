@@ -18,21 +18,27 @@ import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHBranch;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class ListBranchesFragment extends ArnoldSupportFragment {
+public class ListBranchesFragment extends ArnoldSupportFragment implements PropertyChangeListener {
 
-    private static final long BRANCHES_POLL_INTERVAL_MILLIS = 2000;
+
     private final static int MENU_INDEX = 1;
     private BranchesListAdapter listAdapter;
-    private IGitHubBrokerListener branchesListener = new BranchesListener();
+
     private ListView branchesListView;
-    private Collection<GHBranch> branches1;
+    private Map<String, GitBranch> branches;
 
     public ListBranchesFragment() {
         super(MENU_INDEX);
@@ -40,67 +46,42 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
 
     @Override
     public void onNewRepositorySelected() {
-        updateShownBranches();
+        populateList();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            GitHubBroker.getInstance().getAllBranches(branchesListener);
-        }
-        catch (GitHubBroker.RepositoryNotSelectedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
-        catch (GitHubBroker.AlreadyNotConnectedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
+        branches = GitHubBroker.getInstance().getAllBranches();
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        try {
-            GitHubBroker.getInstance().getAllBranches(branchesListener);
-        }
-        catch (GitHubBroker.RepositoryNotSelectedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
-        catch (GitHubBroker.AlreadyNotConnectedException e) {
-            if (GitHubBroker.getInstance().isConnected()) {
-                updateShownBranches();
-            }
-        }
     }
 
-    private synchronized void onBranchesReceived(Collection<GHBranch> branches) {
-        branches1 = branches;
-        if (getActivity() == null || listAdapter == null) {
-            //If the device is rotated this is going to trigger, so return to end the refresh cycle
-            return;
-        }
-        listAdapter.getBranchCollection().clear();
-        listAdapter.getBranchCollection().addAll(branches);
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        populateList();
+    }
 
-
+    private void populateList() {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ListBranchesFragment.this.listAdapter.notifyDataSetChanged();
-                branchesListView.invalidateViews();
+                listAdapter.getBranchCollection().clear();
+                listAdapter.getBranchCollection().addAll(GitHubBroker.getInstance().getAllBranches().values());
+                listAdapter.notifyDataSetChanged();
+
+                Log.wtf("BLAH",GitHubBroker.getInstance().getAllBranches().values().size()+"");
             }
         });
-        if (getView() != null) {
-            ((DrawerLayoutFragmentActivity) getActivity()).onStopLoad();
-        }
-        updateShownBranches();
     }
 
     private final class BranchesListAdapter extends BaseAdapter {
-        private final List<GHBranch> branchCollection = new LinkedList<GHBranch>();
+        private final List<GitBranch> branchCollection = new ArrayList<GitBranch>();
 
-        public List<GHBranch> getBranchCollection() {
+        public List<GitBranch> getBranchCollection() {
             return branchCollection;
         }
 
@@ -110,7 +91,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
         }
 
         @Override
-        public GHBranch getItem(int position) {
+        public GitBranch getItem(int position) {
             return branchCollection.get(position);
         }
 
@@ -134,7 +115,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
             else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            GHBranch branch = getItem(position);
+            GitBranch branch = getItem(position);
             viewHolder.getNameView().setText(branch.getName());
             viewHolder.getShaView().setText(branch.getSHA1());
             return convertView;
@@ -161,34 +142,20 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
         }
     }
 
-    private final class BranchesListener extends GitHubBrokerListener {
-        @Override
-        public void onAllBranchesRetrieved(boolean success, Collection<GHBranch> branches) {
-            if (success) {
-                onBranchesReceived(branches);
-            }
-            else {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                getResources().getString(R.string.error_retri_branches),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View ret = inflater.inflate(R.layout.fragment_list_branches, container, Boolean.FALSE);
 
+        GitHubNotificationService.getInstance().addCommitListener(this);
+
         branchesListView = (ListView) ret.findViewById(R.id.branch_list);
         listAdapter = new BranchesListAdapter();
         branchesListView.setAdapter(listAdapter);
         branchesListView.setOnItemClickListener(new OnItemClickListenerListViewItem());
+
+        populateList();
+
         return ret;
     }
 
@@ -197,7 +164,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             IGitHubBroker broker = GitHubBroker.getInstance();
-            GHBranch selectedBranch = listAdapter.getItem(position);
+            GitBranch selectedBranch = listAdapter.getItem(position);
             broker.setSelectedBranch(selectedBranch.getName());
 
             Context context = view.getContext();
@@ -207,26 +174,5 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
 
         }
 
-    }
-
-
-    private void updateShownBranches() {
-        try {
-            Thread.sleep(BRANCHES_POLL_INTERVAL_MILLIS);
-        }
-        catch (InterruptedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
-        try {
-            GitHubBroker.getInstance().getAllBranches(branchesListener);
-        }
-        catch (GitHubBroker.RepositoryNotSelectedException e) {
-            Log.wtf("debug", e.getClass().getName(), e);
-        }
-        catch (GitHubBroker.AlreadyNotConnectedException e) {
-            if (GitHubBroker.getInstance().isConnected()) {
-                updateShownBranches();
-            }
-        }
     }
 }

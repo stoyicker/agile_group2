@@ -77,7 +77,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
         IGitHubBroker broker = GitHubBroker.getInstance();
 
         commitAdapter.getCommitCollection().clear();
-        commitAdapter.getCommitCollection().addAll(broker.getCurrentCommitList().values());
+        commitAdapter.getCommitCollection().addAll(broker.getCommitsFromSelectedBranch());
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -88,6 +88,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     @Override
     public void onNewRepositorySelected() {
+        Log.wtf("BLAH", "new Repo");
+        populateList();
     }
 
     public final class CommitAdapter extends BaseAdapter {

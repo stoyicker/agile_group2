@@ -5,6 +5,7 @@ import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IGitHubBroker {
@@ -69,15 +70,10 @@ public interface IGitHubBroker {
             throws GitHubBroker.AlreadyNotConnectedException, GitHubBroker.NullArgumentException;
 
     /**
-     * Asynchronously return all branches of the working repository, giving response on the provided callback.
-     *
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
-     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
-     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
+     * Returns all branches in the select repo.
      */
-    public void getAllBranches(IGitHubBrokerListener callback)
-            throws GitHubBroker.RepositoryNotSelectedException,
-            GitHubBroker.AlreadyNotConnectedException;
+    public Map<String, GitBranch> getAllBranches();
+
 
     /**
      * Asynchronously return all repos of the currently logged in user, giving response on the provided callback.
@@ -122,8 +118,7 @@ public interface IGitHubBroker {
      */
     public void setSelectedBranch(String branchName);
 
-    public void getAllCommitsOld(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
-            GitHubBroker.AlreadyNotConnectedException;
+
 
     public void fetchNewCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
@@ -134,4 +129,10 @@ public interface IGitHubBroker {
      */
     public Map<String,GitCommit> getCurrentCommitList();
 
+    /**
+     * Get all commits from the currently selected branch.
+     *
+     * @return List<GitCommit> the commits
+     */
+    public List<GitCommit> getCommitsFromSelectedBranch();
 }

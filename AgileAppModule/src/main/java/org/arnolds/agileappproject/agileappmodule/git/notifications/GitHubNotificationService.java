@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 public class GitHubNotificationService implements IGitHubNotificationService {
     public static final int POLL_TIMEOUT_SECONDS = 5;
-    private GHRepository repo;
 
     private static GitHubNotificationService instance;
     private PropertyChangeSupport commitChangeSupport;
@@ -123,7 +122,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 try {
                     try {
                         if (!TextUtils.isEmpty(GitHubBroker.getInstance().getSelectedRepoName())) {
-                            broker.getAllCommitsOld(brokerListener);
+                            broker.fetchNewCommits(brokerListener);
                         }
                     }
                     catch (GitHubBroker.RepositoryNotSelectedException e) {
@@ -174,7 +173,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
         @Override
         public void onRepoSelected(boolean result) {
-            commits = null;
+
+
         }
 
         private void makeToast(final String toastString) {
