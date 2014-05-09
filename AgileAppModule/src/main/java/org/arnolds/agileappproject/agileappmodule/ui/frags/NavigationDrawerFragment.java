@@ -62,6 +62,10 @@ public class NavigationDrawerFragment extends Fragment {
         setHasOptionsMenu(Boolean.TRUE);
     }
 
+    public void invalidateListView() {
+        mDrawerListView.invalidateViews();
+    }
+
     private class SelectionListener extends GitHubBrokerListener {
         @Override
         public void onRepoSelected(boolean result) {
@@ -372,6 +376,9 @@ public class NavigationDrawerFragment extends Fragment {
             ImageView imageView =
                     (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
 
+            Log.d("debug", "selected item es " +
+                    DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex() +
+                    " and position is " + position);
             if (position == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())) {
                 convertView.setBackgroundColor(Color.GRAY);
                 textView.setTypeface(null, Typeface.BOLD);

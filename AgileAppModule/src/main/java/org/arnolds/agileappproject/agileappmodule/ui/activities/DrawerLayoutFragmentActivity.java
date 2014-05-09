@@ -186,10 +186,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
-//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
-////        recreate();
-//        onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
-        //TODO
     }
 
     @Override
@@ -232,7 +228,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(final int position) {
         if (position == lastSelectedFragmentIndex) {
             //We don't want to perform an unnecessary Activity reload
             return;
@@ -331,6 +327,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 selectedItemsQueue.pop();
             }
 
+            mNavigationDrawerFragment.invalidateListView();
             restoreActionBar();
         }
     }
@@ -397,10 +394,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             catch (NullPointerException ex) {
 //            Log.wtf("debug", ex.getClass().getName(), ex);
             }
-//            getSupportFragmentManager()
-//                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//            selectedItemsQueue.clear();
-//            onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
         }
     }
 
