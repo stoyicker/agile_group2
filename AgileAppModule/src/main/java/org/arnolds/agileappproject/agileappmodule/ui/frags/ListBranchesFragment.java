@@ -22,15 +22,11 @@ import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHRepository;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ListBranchesFragment extends ArnoldSupportFragment {
 
@@ -260,8 +256,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
 
             Context context = view.getContext();
             TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
-            t.setText(" Working on " + listAdapter.getItem(position).getName().toString() +
-                    " branch");
+
             for (int chosen = 0; chosen < parent.getChildCount(); chosen++) {
                 parent.getChildAt(chosen).setBackgroundColor(Color.TRANSPARENT);
 
@@ -273,6 +268,11 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
                             listAdapter.getItem(position).getName().toString() + " selected",
                     Toast.LENGTH_SHORT
             ).show();
+
+
+            t.setText(" Working on origin/" + selectedBranch.getName().toString() + " branch");
+            Toast.makeText(context, selectedBranch.getName().toString() + " selected",
+                    Toast.LENGTH_SHORT).show();
 
 
         }
