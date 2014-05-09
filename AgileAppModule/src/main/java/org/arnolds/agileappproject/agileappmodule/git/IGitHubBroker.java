@@ -1,7 +1,11 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
+
+import java.util.Map;
 
 public interface IGitHubBroker {
 
@@ -123,4 +127,11 @@ public interface IGitHubBroker {
 
     public void fetchNewCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
+
+    /**
+     *
+     * @return Map<String,GHCommit>, Contains all commits in selected repo. Returns empty if there are no commits.
+     */
+    public Map<String,GitCommit> getCurrentCommitList();
+
 }

@@ -15,7 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHCommit;
 
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class CommitLogFragment extends ArnoldSupportFragment
         implements PropertyChangeListener, AdapterView.OnItemClickListener {
@@ -60,7 +64,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
         listView.setAdapter(commitAdapter);
 
         GitHubNotificationService service = GitHubNotificationService.getInstance();
-        populateList(service.getCurrentCommitList());
+
+        populateList();
         service.addCommitListener(this);
 
         listView.setOnItemClickListener(this);
@@ -68,9 +73,11 @@ public class CommitLogFragment extends ArnoldSupportFragment
         return view;
     }
 
-    private void populateList(List<GHCommit> commitList) {
+    private void populateList() {
+        IGitHubBroker broker = GitHubBroker.getInstance();
+
         commitAdapter.getCommitCollection().clear();
-        commitAdapter.getCommitCollection().addAll(commitList);
+        commitAdapter.getCommitCollection().addAll(broker.getCurrentCommitList().values());
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -84,9 +91,9 @@ public class CommitLogFragment extends ArnoldSupportFragment
     }
 
     public final class CommitAdapter extends BaseAdapter {
-        private final List<GHCommit> commitCollection = new LinkedList<GHCommit>();
+        private final List<GitCommit> commitCollection = new ArrayList<GitCommit>();
 
-        public List<GHCommit> getCommitCollection() {
+        public List<GitCommit> getCommitCollection() {
             return commitCollection;
         }
 
@@ -96,7 +103,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
         }
 
         @Override
-        public GHCommit getItem(int position) {
+        public GitCommit getItem(int position) {
             return commitCollection.get(position);
         }
 
@@ -133,12 +140,12 @@ public class CommitLogFragment extends ArnoldSupportFragment
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
-            final GHCommit commit = getItem(position);
+            final GitCommit commit = getItem(position);
 
             // Set commit and commenter texts
-            viewHolder.getCommentView().setText(commit.getCommitShortInfo().getMessage());
+            viewHolder.getCommentView().setText(commit.getMessage());
             viewHolder.getCommitterView()
-                    .setText(commit.getCommitShortInfo().getCommitter().getName());
+                    .setText(commit.getCommitter().getName());
 
             // All expand-buttons are hidden by default
             viewHolder.setExpandIconVisible(false);
@@ -214,12 +221,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-
-        LinkedHashMap<String, GHCommit> commits = (LinkedHashMap<String, GHCommit>) event.getNewValue();
-        populateList(new ArrayList<GHCommit>(commits.values()));
-        if (event.getNewValue() != event.getOldValue()) {
-            ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
-        }
+        populateList();
+        ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
     }
 
 }

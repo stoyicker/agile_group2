@@ -72,5 +72,12 @@ public interface IGitHubBrokerListener {
      */
     public void onAllCommitsRetrieved(boolean result, LinkedHashMap<String, GHCommit> commits);
 
-    public void onNewCommitsReceived(boolean b, Map<String, GitCommit> newCommits);
+    /**
+     *
+     * @param result {@link boolean} True if commits could be retrieved; otherwise false.
+     * @param newCommits All new commits, empty if no new commits retrieved
+     * @param commits All commits in the repo
+     */
+    public void onNewCommitsReceived(boolean result, Map<String, GitCommit> newCommits, Map<String, GitCommit> commits);
+
 }

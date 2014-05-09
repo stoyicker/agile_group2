@@ -198,7 +198,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             IGitHubBroker broker = GitHubBroker.getInstance();
             GHBranch selectedBranch = listAdapter.getItem(position);
-            broker.setSelectedBranch(selectedBranch);
+            broker.setSelectedBranch(selectedBranch.getName());
 
             Context context = view.getContext();
             TextView t=(TextView) getActivity().findViewById(R.id.selected_branch);

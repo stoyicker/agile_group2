@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule.data;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -30,7 +31,7 @@ public class DataModel implements IDataModel {
     }
 
     @Override
-    public void addLateCommit(GHCommit commit) {
+    public void addLateCommit(GitCommit commit) {
         eventList.add(new GitEvent(commit));
         firePropertyEvent();
     }
@@ -47,7 +48,7 @@ public class DataModel implements IDataModel {
     }
 
     @Override
-    public void addFileConflict(GHCommit commit, List<GitFile> affectedFiles) {
+    public void addFileConflict(GitCommit commit, List<GitFile> affectedFiles) {
         eventList.add(new GitEvent(commit, affectedFiles));
         firePropertyEvent();
     }

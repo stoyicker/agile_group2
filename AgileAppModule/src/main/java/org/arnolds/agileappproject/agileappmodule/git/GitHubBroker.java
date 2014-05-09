@@ -190,7 +190,7 @@ public class GitHubBroker implements IGitHubBroker {
                     boolean success = repo != null;
                     if (success) {
                         repository = repo;
-                        selectedBranch = repository.getBranches().get("master");
+                        refreshAll();
                     }
                     synchronized (asyncLock) {
                         if (callback != null) {
@@ -204,6 +204,14 @@ public class GitHubBroker implements IGitHubBroker {
                 return null;
             }
         }.execute(repoName, callback);
+    }
+
+    private void refreshAll() {
+        //Clear data from previous repo
+        commits.clear();
+        branches.clear();
+        fetchRepository();
+        selectedBranch = branches.get(DEFAULT_BRANCH_NAME);
     }
 
     @Override
@@ -454,27 +462,32 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<IGitHubBrokerListener, Void, Void>() {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
-                branches.clear();
-                newCommits.clear();
-                try {
-                    Map<String, GHBranch> ghBranchMap = repository.getBranches();
-                    for (GHBranch ghBranch : ghBranchMap.values()){
-                        fetchCommits(ghBranch.getSHA1());
-                        branches.put(ghBranch.getName(),new GitBranch(ghBranch.getName(),commits.get(ghBranch.getSHA1())));
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                fetchRepository();
                 if(params[0] != null) {
-                    params[0].onNewCommitsReceived(true, newCommits);
+                    params[0].onNewCommitsReceived(true, newCommits, commits);
                 }
                 return null;
             }
         }.execute(callback);
 
     }
+
+    private void fetchRepository() {
+        Log.wtf("broker", "fetchRepository");
+        branches.clear();
+        newCommits.clear();
+        try {
+            Map<String, GHBranch> ghBranchMap = repository.getBranches();
+            for (GHBranch ghBranch : ghBranchMap.values()){
+                fetchCommits(ghBranch.getSHA1());
+                branches.put(ghBranch.getName(),new GitBranch(ghBranch.getName(),commits.get(ghBranch.getSHA1())));
+            }
+            Log.wtf("broker commitlist", commits.size()+"");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //TODO return map instead of modifying commits
     private void fetchCommits(String SHA1){
         if (!commits.containsKey(SHA1)) {
@@ -493,6 +506,10 @@ public class GitHubBroker implements IGitHubBroker {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Map<String, GitCommit> getCurrentCommitList() {
+        return commits; //TODO implement clone
     }
 
 }
