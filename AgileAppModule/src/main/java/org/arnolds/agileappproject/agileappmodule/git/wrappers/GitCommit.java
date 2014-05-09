@@ -1,8 +1,11 @@
 package org.arnolds.agileappproject.agileappmodule.git.wrappers;
 
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.kohsuke.github.GHCommit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Value object for Git Commits.
@@ -64,5 +67,20 @@ public class GitCommit {
 
     public String getMessage() {
         return apiCommit.getCommitShortInfo().getMessage();
+    }
+
+    public List<GitFile> getFiles() {
+        List<GHCommit.File> apiFiles = apiCommit.getFiles();
+        List<GitFile> files = new ArrayList<GitFile>();
+
+        for (GHCommit.File apiFile : apiFiles) {
+            files.add(new GitFile(apiFile.getFileName(), apiFile.getBlobUrl().getPath()));
+        }
+
+        return files;
+    }
+
+    public List<String> getParentsSHA1() {
+        return apiCommit.getParentSHA1s();
     }
 }
