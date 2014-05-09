@@ -101,7 +101,7 @@ public class TimerFragment extends ArnoldSupportFragment {
                 int value;
                 try {
                     value = Integer.parseInt(s.toString());
-                    if (value < 0) {
+                    if (value < 0 || value > 23) {
                         Toast.makeText(getActivity().getApplicationContext(),
                                 R.string.wrong_time_format,
                                 Toast.LENGTH_SHORT).show();

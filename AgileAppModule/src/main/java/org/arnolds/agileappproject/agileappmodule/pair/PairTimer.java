@@ -2,6 +2,7 @@ package org.arnolds.agileappproject.agileappmodule.pair;
 
 import android.app.Activity;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
@@ -21,6 +22,7 @@ public class PairTimer {
      */
     public static void setTimePreference(String newChronometerTime) throws ParseException {
         initialValueAsDate = SDF.parse(newChronometerTime);
+        Log.d("debug", "nCT is " + newChronometerTime);
         String[] values = newChronometerTime.split("\\:");
         values[0] = ((Integer.parseInt(values[0]))) + "";
         StringBuilder x = new StringBuilder();
