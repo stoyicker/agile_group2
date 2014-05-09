@@ -3,7 +3,7 @@
     android:shape="rectangle" >
 
     <!-- Background colour -->
-    <solid android:color="@color/it_section_colour" >
+    <solid android:color="@color/event_log_colour" >
     </solid>
     <stroke android:color="@color/timer_background"
         android:width="2dp"></stroke>

@@ -43,7 +43,7 @@
     <string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
 	<string name="event_log_title">Event Log</string>
-	<string name="clear_all">Clear all</string>
+	<string name="clear_event_log">Clear</string>
 	<string name="wrong_time_format">Incorrect time format</string>
 	<string name="pause_the_timer">Please pause or stop the timer before trying to change its
 		setup

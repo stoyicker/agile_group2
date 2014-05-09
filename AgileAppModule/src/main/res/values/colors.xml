@@ -5,6 +5,7 @@
 	<color name="navigation_drawer_item_text">#EEEEEE</color>
 	<color name="drawer_list_divider">#333333</color>
 	<color name="it_section_colour">#09CDDA</color>
+    <color name="event_log_colour">#09CDFA</color>
 	<color name="socialist_red">#FF2400</color>
 	<color name="theme_white">#FFFFFF</color>
 	<color name="theme_dark_blue">#0000FF</color>
