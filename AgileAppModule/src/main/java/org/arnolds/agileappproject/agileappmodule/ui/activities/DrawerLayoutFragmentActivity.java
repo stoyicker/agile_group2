@@ -40,10 +40,8 @@ import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
 
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
@@ -54,9 +52,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
-    private MenuItem mEventLogButton;
     private Button eventCount;
     private IDataModel dataModel;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -67,18 +65,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             new IndefiniteFancyProgressFragment();
     private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
-
-    public static int getLastSelectedNavDavIndex() {
-        Integer ret;
-        if (selectedItemsQueue.isEmpty()) {
-            ret = 0;
-        }
-        else {
-            ret = selectedItemsQueue.peek();
-        }
-
-        return ret.intValue();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -92,7 +78,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
-        eventCount.setOnClickListener( new View.OnClickListener() {
+        eventCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 menu.performIdentifierAction(eventMenuItem.getItemId(), 0);
@@ -159,7 +145,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         Log.wtf("event", "event pressed");
 
         LayoutInflater layoutInflater
-                = (LayoutInflater)getBaseContext()
+                = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = layoutInflater.inflate(R.layout.event_log, null);
         ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
@@ -168,7 +154,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         listView.setAdapter(new EventLogAdapter(this, dataModel.getEventList()));
 
         final PopupWindow popupWindow = new PopupWindow(
-                popupView, (int) getResources().getDimension(R.dimen.event_log_width),(int) getResources().getDimension(R.dimen.event_log_height));
+                popupView, (int) getResources().getDimension(R.dimen.event_log_width),
+                (int) getResources().getDimension(R.dimen.event_log_height));
 
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -339,6 +326,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             else {
                 Integer x = selectedItemsQueue.pop();
                 onNavigationDrawerItemSelected(x == null ? 0 : x);
+                Log.d("debug", "Am I in the else?");
+                lastSelectedFragmentIndex = (x == null) ? 0 : x;
                 selectedItemsQueue.pop();
             }
 
@@ -371,7 +360,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        NavigationDrawerFragment mNavigationDrawerFragment = (NavigationDrawerFragment)
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
                 fragmentManager.findFragmentById(R.id.navigation_drawer_fragment);
 
         mNavigationDrawerFragment.setHasOptionsMenu(Boolean.TRUE);
@@ -430,12 +419,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
     }
 
-    private class EventLogAdapter extends BaseAdapter{
+    private class EventLogAdapter extends BaseAdapter {
 
         private List<GitEvent> mEvents;
         private LayoutInflater mInflater;
 
-        public EventLogAdapter(Context context, List<GitEvent> events){
+        public EventLogAdapter(Context context, List<GitEvent> events) {
             mEvents = events;
             mInflater = LayoutInflater.from(context);
         }
@@ -499,12 +488,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            if(event.getNewValue() != null && event.getNewValue() instanceof List) {
+            if (event.getNewValue() != null && event.getNewValue() instanceof List) {
                 final List<GitEvent> eventList = (List<GitEvent>) event.getNewValue();
                 DrawerLayoutFragmentActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        button.setText(eventList.size()+"");
+                        button.setText(eventList.size() + "");
                     }
                 });
 

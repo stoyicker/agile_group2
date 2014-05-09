@@ -51,7 +51,6 @@ public class NavigationDrawerFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
-    private int latestMenuItemSelected = -1;
     private Spinner mRepoSelectionSpinner;
     private String latestSelectedRepoName = "";
     private final SelectionListener selectionListener = new SelectionListener();
@@ -114,7 +113,6 @@ public class NavigationDrawerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectItem(position);
-                latestMenuItemSelected = position;
             }
         });
         mDrawerListView
@@ -374,12 +372,10 @@ public class NavigationDrawerFragment extends Fragment {
             ImageView imageView =
                     (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
 
-            if (latestMenuItemSelected != -1)
-                if (position==(DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())){
-                    convertView.setBackgroundColor(Color.GRAY);
-                    textView.setTypeface(null, Typeface.BOLD);
-                }
-
+            if (position == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())) {
+                convertView.setBackgroundColor(Color.GRAY);
+                textView.setTypeface(null, Typeface.BOLD);
+            }
 
             textView.setText(AgileAppModuleUtils
                     .getString(getActivity().getApplicationContext(), "title_section" + +temp, ""));
