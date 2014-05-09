@@ -201,9 +201,10 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
             broker.setSelectedBranch(selectedBranch);
 
             Context context = view.getContext();
-            TextView t=(TextView) getActivity().findViewById(R.id.selected_branch);
-            t.setText(" Working on "+selectedBranch.getName().toString()+" branch");
-            Toast.makeText(context, selectedBranch.getName().toString() +" selected" , Toast.LENGTH_SHORT).show();
+            TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
+            t.setText(" Working on origin/" + selectedBranch.getName().toString() + " branch");
+            Toast.makeText(context, selectedBranch.getName().toString() + " selected",
+                    Toast.LENGTH_SHORT).show();
 
         }
 
