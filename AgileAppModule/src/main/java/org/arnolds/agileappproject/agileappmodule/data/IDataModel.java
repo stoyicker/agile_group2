@@ -2,6 +2,7 @@ package org.arnolds.agileappproject.agileappmodule.data;
 
 
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -14,7 +15,7 @@ public interface IDataModel {
      * Stores a commit that has been polled after the initial population.
      * @param commit the commit that should be stored.
      */
-    public void addLateCommit(final GHCommit commit);
+    public void addLateCommit(final GitCommit commit);
 
     /**
      * Stores commits that has been polled after the initial population.
@@ -27,7 +28,7 @@ public interface IDataModel {
      * @param commit - The commit that is associated with the file conflicts.
      * @param affectedFiles - The files that are in conflict.
      */
-    public void addFileConflict(final GHCommit commit, final List<GitFile> affectedFiles);
+    public void addFileConflict(final GitCommit commit, final List<GitFile> affectedFiles);
 
     /**
      * Adds a issue that has been polled after the initial population.

@@ -3,6 +3,9 @@ package org.arnolds.agileappproject.agileappmodule.git;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
@@ -11,17 +14,21 @@ import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.PagedIterable;
+
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class GitHubBroker implements IGitHubBroker {
+
+    private static final String DEFAULT_BRANCH_NAME = "master";
 
     private abstract class GitHubBrokerException extends Exception {
         protected String reason;
@@ -78,8 +85,12 @@ public class GitHubBroker implements IGitHubBroker {
     private GitHub session;
     private GHUser user;
     private GHRepository repository;
-    private GHBranch selectedBranch;
+    private GitBranch selectedBranch;
     private static IGitHubBroker instance;
+
+    private Map<String, GitCommit> commits= new HashMap<String, GitCommit>();
+    private Map<String, GitCommit> newCommits= new HashMap<String, GitCommit>();
+    private Map<String, GitBranch> branches = new HashMap<String, GitBranch>();
 
     private final Object asyncLock = new Object();
 
@@ -116,7 +127,9 @@ public class GitHubBroker implements IGitHubBroker {
                     if (tempSession.isCredentialValid()) {
                         session = tempSession;
                         user = session.getMyself();
-                    } else if (callback != null) {
+                        selectDefaultRepo();
+                    }
+                    else if (callback != null) {
                         callback.onConnectionRefused(INVALID_CREDENTIALS);
                     }
                 } catch (IOException e) {
@@ -151,7 +164,13 @@ public class GitHubBroker implements IGitHubBroker {
     public String getSelectedRepoName() {
         return this.repository == null ? null : this.repository.getName();
     }
-
+    private void selectDefaultRepo(){
+        try {
+            repository = user.getRepositories().values().iterator().next();
+            fetchRepository();
+        } catch (IOException e) {
+        }
+    }
     @Override
     public void selectRepo(String repoName, IGitHubBrokerListener callback)
             throws NullArgumentException, AlreadyNotConnectedException {
@@ -177,7 +196,7 @@ public class GitHubBroker implements IGitHubBroker {
                     boolean success = repo != null;
                     if (success) {
                         repository = repo;
-                        selectedBranch = repository.getBranches().get("master");
+                        refreshAll();
                     }
                     synchronized (asyncLock) {
                         if (callback != null) {
@@ -192,35 +211,18 @@ public class GitHubBroker implements IGitHubBroker {
         }.execute(repoName, callback);
     }
 
+    private void refreshAll() {
+        //Clear data from previous repo
+        commits.clear();
+        branches.clear();
+        fetchRepository();
+        selectedBranch = branches.get(DEFAULT_BRANCH_NAME);
+    }
+
     @Override
-    public void getAllBranches(IGitHubBrokerListener callback)
-            throws RepositoryNotSelectedException,
-            AlreadyNotConnectedException {
-        if (!isConnected()) {
-            throw new AlreadyNotConnectedException();
-        }
-        if (repository == null) {
-            throw new RepositoryNotSelectedException();
-        }
-        new AsyncTask<IGitHubBrokerListener, Void, Void>() {
-            @Override
-            protected Void doInBackground(IGitHubBrokerListener... params) {
-                Map<String, GHBranch> branches = null;
-                try {
-                    branches = repository.getBranches();
-                } catch (IOException e) {
-                    Log.wtf("debug", IO_EXCEPTION_LOG, e);
-                }
-                boolean success = branches != null;
-                synchronized (asyncLock) {
-                    if (params[0] != null) {
-                        params[0].onAllBranchesRetrieved(success,
-                                success ? branches.values() : null);
-                    }
-                }
-                return null;
-            }
-        }.execute(callback);
+    public Map<String, GitBranch> getAllBranches() {
+        return branches;
+
     }
 
     @Override
@@ -369,24 +371,16 @@ public class GitHubBroker implements IGitHubBroker {
 
 
     @Override
-    public GHBranch getSelectedBranch() {
+    public GitBranch getSelectedBranch() {
         if (selectedBranch != null) {
             return selectedBranch;
         }
-        GHBranch branch = null;
-        try {
-
-            branch = repository.getBranches().get("master");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return branch;
+        return  branches.get(DEFAULT_BRANCH_NAME);
     }
 
     @Override
-    public void setSelectedBranch(GHBranch selectedBranch) {
-        this.selectedBranch = selectedBranch;
+    public void setSelectedBranch(String branchName) {
+        this.selectedBranch = branches.get(branchName);
     }
 
 
@@ -402,7 +396,7 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     @Override
-    public void getAllCommitsOld(IGitHubBrokerListener callback) throws RepositoryNotSelectedException, AlreadyNotConnectedException {
+    public void fetchNewCommits(IGitHubBrokerListener callback) throws RepositoryNotSelectedException, AlreadyNotConnectedException {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
         }
@@ -413,23 +407,75 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<IGitHubBrokerListener, Void, Void>() {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
-                PagedIterable<GHCommit> commits = repository.listCommits();
 
-                LinkedHashMap<String, GHCommit> commitMap = new LinkedHashMap<String, GHCommit>();
-                for (GHCommit commit : commits) {
-                    try {
-                        GHCommit newCommit = repository.getCommit(commit.getSHA1());
-                        commitMap.put(newCommit.getSHA1(), newCommit);
-                    } catch (IOException e) {
+                fetchRepository();
+                if(params[0] != null) {
+                    params[0].onNewCommitsReceived(true, newCommits, commits);
 
-                    }
-                }
-                if (params[0] != null) {
-                    params[0].onAllCommitsRetrieved(true, commitMap);
                 }
                 return null;
             }
         }.execute(callback);
+
+    }
+
+    private void fetchRepository() {
+        Log.wtf("broker", "fetchRepository");
+        branches.clear();
+        newCommits.clear();
+        try {
+            Map<String, GHBranch> ghBranchMap = repository.getBranches();
+            for (GHBranch ghBranch : ghBranchMap.values()){
+                fetchCommits(ghBranch.getSHA1());
+                branches.put(ghBranch.getName(),new GitBranch(ghBranch.getName(),commits.get(ghBranch.getSHA1())));
+            }
+            Log.wtf("broker commitlist", commits.size()+"");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //TODO return map instead of modifying commits
+    private void fetchCommits(String SHA1){
+        if (!commits.containsKey(SHA1)) {
+            try {
+                GHCommit ghCommit = repository.getCommit(SHA1);
+                GitCommit gitCommit = new GitCommit(ghCommit);
+
+                commits.put(ghCommit.getSHA1(), gitCommit);
+                newCommits.put(ghCommit.getSHA1(), gitCommit);
+
+                for (String parentSHA1 : ghCommit.getParentSHA1s()) {
+                    fetchCommits(parentSHA1);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public Map<String, GitCommit> getCurrentCommitList() {
+        return commits; //TODO implement clone
+    }
+
+    @Override
+    public List<GitCommit> getCommitsFromSelectedBranch() {
+        GitCommit head = getSelectedBranch().getCommit();
+        List<GitCommit> commits = new ArrayList<GitCommit>();
+        commits.add(head);
+        return getCommitsFromSelectedBranch(commits);
+    }
+
+
+    private List<GitCommit> getCommitsFromSelectedBranch(List<GitCommit> commits) {
+        GitCommit newHead = commits.get(commits.size()-1);
+        for (String parent : newHead.getParentsSHA1()) {
+            commits.add(this.commits.get(parent));
+            commits = getCommitsFromSelectedBranch(commits);
+        }
+        return commits;
     }
 
 

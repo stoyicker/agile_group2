@@ -2,6 +2,7 @@ package org.arnolds.agileappproject.agileappmodule.data;
 
 
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -15,11 +16,11 @@ public class GitEvent {
     }
 
     private EventType type;
-    private GHCommit commit;
+    private GitCommit commit;
     private GHIssue issue;
     private List<GitFile> fileConflicts;
 
-    public GitEvent(GHCommit commit) {
+    public GitEvent(GitCommit commit) {
         this.type = EventType.COMMIT;
         this.commit = commit;
     }
@@ -29,7 +30,7 @@ public class GitEvent {
         this.issue = issue;
     }
 
-    public GitEvent(GHCommit commit, List<GitFile> fileConflicts) {
+    public GitEvent(GitCommit commit, List<GitFile> fileConflicts) {
         this.type = EventType.FILE_CONFLICT;
         this.commit = commit;
         this.fileConflicts = fileConflicts;
@@ -39,13 +40,13 @@ public class GitEvent {
         String eventText = null;
         switch (type) {
             case COMMIT:
-                eventText = commit.getCommitShortInfo().getMessage();
+                eventText = commit.getMessage();
                 break;
             case ISSUE:
                 eventText = issue.getTitle();
                 break;
             case FILE_CONFLICT:
-                eventText = commit.getCommitShortInfo().getMessage();
+                eventText = commit.getMessage();
                 break;
         }
 
