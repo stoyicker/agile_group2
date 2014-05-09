@@ -98,7 +98,7 @@ public class NavigationDrawerFragment extends Fragment {
                     catch (GitHubBroker.NullArgumentException e) {
                         Log.wtf("debug", e.getClass().getName(), e);
                     }
-                    mCallbacks.onStartLoad();
+                    //mCallbacks.onStartLoad();
                 }
             }
 
