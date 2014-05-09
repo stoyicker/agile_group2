@@ -88,7 +88,7 @@ public class TimerFragment extends ArnoldSupportFragment {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                originalText = minutesEditTimeView.getText().toString();
+                originalText = hoursEditTimeView.getText().toString();
             }
 
             @Override
@@ -105,7 +105,7 @@ public class TimerFragment extends ArnoldSupportFragment {
                         Toast.makeText(getActivity().getApplicationContext(),
                                 R.string.wrong_time_format,
                                 Toast.LENGTH_SHORT).show();
-                        minutesEditTimeView.setText(originalText);
+                        hoursEditTimeView.setText(originalText);
                     }
                 }
                 catch (NumberFormatException ex) {
@@ -116,7 +116,7 @@ public class TimerFragment extends ArnoldSupportFragment {
                     }
                     catch (InflateException e) {
                     }
-                    minutesEditTimeView.setText(originalText);
+                    hoursEditTimeView.setText(originalText);
                 }
             }
         });
