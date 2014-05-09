@@ -118,16 +118,14 @@ public class CommitLogFragment extends ArnoldSupportFragment
                         (ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 convertView.setTag(viewHolder);
                 // viewHolder.setExpanded(false);
-            }
-            else {
+            } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
             if (position % 2 == 0) {
                 convertView.findViewById(R.id.commit_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background1));
-            }
-            else {
+            } else {
                 convertView.findViewById(R.id.commit_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
@@ -175,8 +173,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
                 if (expanded) {
                     commentView.setMaxLines(Integer.MAX_VALUE);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_maximized);
-                }
-                else {
+                } else {
                     commentView.setMaxLines(1);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_minimized);
                 }
@@ -222,7 +219,11 @@ public class CommitLogFragment extends ArnoldSupportFragment
     public void propertyChange(PropertyChangeEvent event) {
         populateList((List<GHCommit>) event.getNewValue());
         if (event.getNewValue() != event.getOldValue()) {
-            ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
+            try {
+                ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
+            } catch (IllegalStateException e) {
+
+            }
         }
     }
 

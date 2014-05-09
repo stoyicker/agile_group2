@@ -167,7 +167,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
             viewHolder.getNameView().setText(branch.getName());
             viewHolder.getShaView().setText("Latest commit: " + branch.getSHA1());
 
-            AsyncTask task = new AsyncTask<Void, Void, Void>() {
+            new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
