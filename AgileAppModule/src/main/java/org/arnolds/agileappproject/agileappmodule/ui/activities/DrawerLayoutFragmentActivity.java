@@ -89,6 +89,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         View count = eventMenuItem.getActionView();
         eventCount = (Button) count.findViewById(R.id.feed_event_count);
         eventCount.setText("0");
+
         dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
         eventCount.setOnClickListener( new View.OnClickListener() {
@@ -348,6 +349,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dataModel = DataModel.getInstance();
+
         setContentView(savedInstanceState.getInt("layout"));
 
         MAIN_FRAGMENT_CONTAINER = savedInstanceState.getInt("main_fragment_container");
@@ -385,8 +389,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 fragments[CommitLogFragment.DRAWER_POSITION])
                 .commit();
         getSupportFragmentManager().executePendingTransactions();
-
-        dataModel = DataModel.getInstance();
     }
 
     public void onSectionAttached(int number) {
