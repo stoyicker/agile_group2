@@ -64,7 +64,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:src="@drawable/icon_ok"
-			android:background="@null"
+			android:background="@color/theme_navigation_drawer_background"
 			android:padding="@dimen/timer_view_padding"
 			/>
 	</LinearLayout>

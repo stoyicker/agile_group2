@@ -26,7 +26,8 @@ public class TimerFragment extends ArnoldSupportFragment {
 
     private static final int DRAWER_POSITION = 3;
     private TextView timerTextView;
-    private EditText secondsEditTimeView, minutesEditTimeView, hoursEditTimeView;
+    private static EditText secondsEditTimeView, minutesEditTimeView, hoursEditTimeView;
+    private static ImageButton newTimeAcceptButton;
     private static ImageButton toggleButton;
 
     public TimerFragment() {
@@ -56,7 +57,7 @@ public class TimerFragment extends ArnoldSupportFragment {
         View ret = inflater.inflate(R.layout.fragment_timer, container,
                 Boolean.FALSE);
 
-        ImageButton newTimeAcceptButton =
+        newTimeAcceptButton =
                 (ImageButton) ret.findViewById(R.id.button_confirm_new_time_amount);
 
         newTimeAcceptButton.setOnClickListener(new View.OnClickListener() {
@@ -221,14 +222,22 @@ public class TimerFragment extends ArnoldSupportFragment {
         toggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean b = false;
                 try {
-                    toggleButton.setBackgroundResource(
-                            !PairTimer.getInstance().togglePlayPause() ? R.drawable.icon_play :
-                                    R.drawable.icon_paused
-                    );
+                    b = !PairTimer.getInstance().togglePlayPause();
                 }
                 catch (ParseException e) {
                     Log.wtf("debug", e.getClass().getName(), e);
+                }
+                toggleButton.setBackgroundResource(
+                        b ? R.drawable.icon_play :
+                                R.drawable.icon_paused
+                );
+                if (b) {
+                    setEditTimeThingiesEnabled(true);
+                }
+                else {
+                    setEditTimeThingiesEnabled(false);
                 }
             }
         });
@@ -239,6 +248,7 @@ public class TimerFragment extends ArnoldSupportFragment {
                 try {
                     PairTimer.getInstance().completeStop();
                     toggleButton.setBackgroundResource(R.drawable.icon_play);
+                    setEditTimeThingiesEnabled(true);
                 }
                 catch (ParseException e) {
                     Log.wtf("debug", e.getClass().getName(), e);
@@ -247,6 +257,13 @@ public class TimerFragment extends ArnoldSupportFragment {
         });
 
         return ret;
+    }
+
+    private static void setEditTimeThingiesEnabled(boolean b) {
+        secondsEditTimeView.setEnabled(b);
+        hoursEditTimeView.setEnabled(b);
+        minutesEditTimeView.setEnabled(b);
+        newTimeAcceptButton.setEnabled(b);
     }
 
     private void fireNewTimeSet() {
@@ -278,5 +295,6 @@ public class TimerFragment extends ArnoldSupportFragment {
 
     public static void setPaused() {
         toggleButton.setBackgroundResource(R.drawable.icon_play);
+        setEditTimeThingiesEnabled(true);
     }
 }

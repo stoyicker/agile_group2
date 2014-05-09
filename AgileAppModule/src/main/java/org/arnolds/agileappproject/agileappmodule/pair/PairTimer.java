@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 
 import java.text.ParseException;
@@ -173,6 +175,7 @@ public class PairTimer {
                         chronometerTextView.setText(SDF.format(initialValueAsDate));
                         TimerFragment.setPaused();
                     }
+                    Toast.makeText(activity, R.string.timer_done,Toast.LENGTH_LONG).show();
                 }
             });
             isChronometerRunning = Boolean.FALSE;

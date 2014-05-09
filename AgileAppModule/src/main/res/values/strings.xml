@@ -48,4 +48,5 @@
 	<string name="pause_the_timer">Please pause or stop the timer before trying to change its
 		setup
 	</string>
+	<string name="timer_done">Time is up!</string>
 </resources>
