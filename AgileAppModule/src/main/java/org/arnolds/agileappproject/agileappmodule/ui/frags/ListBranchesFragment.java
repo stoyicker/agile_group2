@@ -155,7 +155,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
             }
             else {
                 TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
-                t.setText(" Working on origin/" + branch.getName().toString() + " branch");
+                t.setText("Working on origin/" + branch.getName().toString() + " branch");
                 convertView.findViewById(R.id.branch_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.orange));
             }
