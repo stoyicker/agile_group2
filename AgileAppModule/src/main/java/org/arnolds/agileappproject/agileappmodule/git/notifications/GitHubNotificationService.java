@@ -148,8 +148,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
         @Override
         public void onNewCommitsReceived(boolean result, Map<String, GitCommit> newCommits, Map<String, GitCommit> commits) {
-            
-            
+
             if (!firstRecieve && !newCommits.isEmpty() ){
 
                 GitBranch selectedBranch = broker.getSelectedBranch();

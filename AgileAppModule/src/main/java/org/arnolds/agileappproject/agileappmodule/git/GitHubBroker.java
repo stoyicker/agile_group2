@@ -127,6 +127,7 @@ public class GitHubBroker implements IGitHubBroker {
                     if (tempSession.isCredentialValid()) {
                         session = tempSession;
                         user = session.getMyself();
+                        selectDefaultRepo();
                     }
                     else if (callback != null) {
                         callback.onConnectionRefused(INVALID_CREDENTIALS);
@@ -164,7 +165,13 @@ public class GitHubBroker implements IGitHubBroker {
     public String getSelectedRepoName() {
         return this.repository == null ? null : this.repository.getName();
     }
-
+    private void selectDefaultRepo(){
+        try {
+            repository = user.getRepositories().values().iterator().next();
+            fetchRepository();
+        } catch (IOException e) {
+        }
+    }
     @Override
     public void selectRepo(String repoName, IGitHubBrokerListener callback)
             throws NullArgumentException, AlreadyNotConnectedException {
