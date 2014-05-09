@@ -1,9 +1,11 @@
 package org.arnolds.agileappproject.agileappmodule.git.wrappers;
 
 
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Immutable value object for the Git User.
@@ -71,4 +73,5 @@ public class GitUser {
     public String getLogin() {
         return login;
     }
+
 }

@@ -1,5 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.kohsuke.github.GHBranch;
 
 public interface IGitHubBroker {
@@ -109,14 +110,17 @@ public interface IGitHubBroker {
      * Gets the selected branch.
      * @return the selected branch or null if no branch is selected.
      */
-    public GHBranch getSelectedBranch();
+    public GitBranch getSelectedBranch();
 
     /**
      * Sets the selected branch.
-     * @param selectedBranch the branch that should be selected.
+     * @param branchName the name of the branch that should be selected.
      */
-    public void setSelectedBranch(GHBranch selectedBranch);
+    public void setSelectedBranch(String branchName);
 
     public void getAllCommitsOld(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
+            GitHubBroker.AlreadyNotConnectedException;
+
+    public void fetchNewCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
 }

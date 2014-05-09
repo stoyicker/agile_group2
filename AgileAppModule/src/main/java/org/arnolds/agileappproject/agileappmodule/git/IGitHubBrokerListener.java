@@ -1,5 +1,6 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
@@ -70,4 +71,6 @@ public interface IGitHubBrokerListener {
      * @param commits {@link List<org.kohsuke.github.GHCommit>} All commits, null if commits could not be retrieved.
      */
     public void onAllCommitsRetrieved(boolean result, LinkedHashMap<String, GHCommit> commits);
+
+    public void onNewCommitsReceived(boolean b, Map<String, GitCommit> newCommits);
 }
