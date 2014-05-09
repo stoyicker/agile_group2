@@ -1,8 +1,12 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import org.kohsuke.github.GHBranch;
+
+
 import org.kohsuke.github.GHCommit;
 
 import java.io.IOException;
+
 
 public interface IGitHubBroker {
 
@@ -98,7 +102,7 @@ public interface IGitHubBroker {
 
 
     /**
-     * Asynchronously returns all commits in the working repository, giving response on the provided callback.
+     * Asynchronously returns all commits in the current branch, giving response on the provided callback.
      *
      * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
      * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
@@ -107,5 +111,22 @@ public interface IGitHubBroker {
     public void getAllCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
 
+
     public GHCommit getCommit(String hash) throws IOException;
+
+    /**
+     * Gets the selected branch.
+     * @return the selected branch or null if no branch is selected.
+     */
+    public GHBranch getSelectedBranch();
+
+    /**
+     * Sets the selected branch.
+     * @param selectedBranch the branch that should be selected.
+     */
+    public void setSelectedBranch(GHBranch selectedBranch);
+
+    public void getAllCommitsOld(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
+            GitHubBroker.AlreadyNotConnectedException;
+
 }

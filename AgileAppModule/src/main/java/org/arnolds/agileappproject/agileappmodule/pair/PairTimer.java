@@ -2,8 +2,9 @@ package org.arnolds.agileappproject.agileappmodule.pair;
 
 import android.app.Activity;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.widget.TextView;
+
+import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +19,7 @@ public class PairTimer {
      * @param newChronometerTime {@link String} Should be in format HH:mm:ss
      * @throws ParseException
      */
-    private static void setTimePreference(String newChronometerTime) throws ParseException {
+    public static void setTimePreference(String newChronometerTime) throws ParseException {
         initialValueAsDate = SDF.parse(newChronometerTime);
         String[] values = newChronometerTime.split("\\:");
         values[0] = ((Integer.parseInt(values[0]))) + "";
@@ -88,7 +89,6 @@ public class PairTimer {
         values[0] = ((Integer.parseInt(values[0]))) + "";
         StringBuilder x = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
-            Log.d("debug", values[i]);
             x.append(values[i]);
             x.append(i < (values.length - 1) ? ":" : "");
         }
@@ -164,12 +164,12 @@ public class PairTimer {
 
         @Override
         public void onFinish() {
-            Log.d("debug", "finish!");
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (chronometerTextView != null) {
                         chronometerTextView.setText(SDF.format(initialValueAsDate));
+                        TimerFragment.setPaused();
                     }
                 }
             });

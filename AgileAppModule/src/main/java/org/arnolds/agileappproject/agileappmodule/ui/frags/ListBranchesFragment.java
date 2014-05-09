@@ -18,6 +18,7 @@ import android.widget.Toast;
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.kohsuke.github.GHBranch;
@@ -253,6 +254,9 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            IGitHubBroker broker = GitHubBroker.getInstance();
+            GHBranch selectedBranch = listAdapter.getItem(position);
+            broker.setSelectedBranch(selectedBranch);
 
             Context context = view.getContext();
             TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
@@ -269,6 +273,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment {
                             listAdapter.getItem(position).getName().toString() + " selected",
                     Toast.LENGTH_SHORT
             ).show();
+
 
         }
 

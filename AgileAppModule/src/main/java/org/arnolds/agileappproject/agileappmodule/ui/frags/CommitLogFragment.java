@@ -21,6 +21,8 @@ import org.kohsuke.github.GHCommit;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -79,7 +81,6 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     @Override
     public void onNewRepositorySelected() {
-        Log.d("debug", "onNR");
     }
 
     public final class CommitAdapter extends BaseAdapter {
@@ -161,7 +162,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
             private boolean expanded = true;
 
             public void setExpandIconVisible(boolean visible) {
-                expandIconImageView.setAlpha(visible ? 1f : 0f);
+                expandIconImageView.setVisibility(visible ? ImageView.VISIBLE : ImageView.GONE);
             }
 
             public void toggleExpanded() {
@@ -202,22 +203,17 @@ public class CommitLogFragment extends ArnoldSupportFragment
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-
-        Log.d("debug", "Detaching");
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        new Exception().printStackTrace(System.err);
+//        new Exception().printStackTrace(System.err);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        populateList((List<GHCommit>) event.getNewValue());
+
+        LinkedHashMap<String, GHCommit> commits = (LinkedHashMap<String, GHCommit>) event.getNewValue();
+        populateList(new ArrayList<GHCommit>(commits.values()));
         if (event.getNewValue() != event.getOldValue()) {
             try {
                 ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
