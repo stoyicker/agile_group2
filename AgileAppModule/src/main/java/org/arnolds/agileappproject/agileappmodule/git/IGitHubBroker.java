@@ -10,6 +10,7 @@ import java.util.Map;
 
 
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHRepository;
 
 import java.io.IOException;
 
@@ -144,5 +145,11 @@ public interface IGitHubBroker {
      * @return List<GitCommit> the commits
      */
     public List<GitCommit> getCommitsFromSelectedBranch();
+
+    /**
+     *
+     * @return Map<String,GHRepository>, Contains all the user's repositories.
+     */
+    public Map<String,GHRepository> getCurrentRepositories();
 
 }
