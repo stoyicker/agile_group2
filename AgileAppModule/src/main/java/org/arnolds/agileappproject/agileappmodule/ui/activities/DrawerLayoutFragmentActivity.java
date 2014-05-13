@@ -34,6 +34,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.MonitoredFileSelectorFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
@@ -250,6 +251,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     target = new ListIssuesFragment();
                     break;
                 case 3:
+                    target = new MonitoredFileSelectorFragment();
+                    break;
+                case 4:
                     target = new TimerFragment();
                     break;
                 default:
