@@ -222,7 +222,6 @@ public class GitHubBroker implements IGitHubBroker {
     @Override
     public Map<String, GitBranch> getAllBranches() {
         return branches;
-
     }
 
     @Override

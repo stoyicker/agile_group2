@@ -219,8 +219,6 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
             t.setText(" Working on origin/" + selectedBranch.getName().toString() + " branch");
             Toast.makeText(context, selectedBranch.getName().toString() + " selected",
                     Toast.LENGTH_SHORT).show();
-
-
         }
 
     }
