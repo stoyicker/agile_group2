@@ -53,7 +53,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
     private Button eventCount;
-    private IDataModel dataModel;
+    private IDataModel dataModel = DataModel.getInstance();
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
     public static int getLastSelectedFragmentIndex() {
@@ -65,6 +65,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             new IndefiniteFancyProgressFragment();
     private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
+    private EventLogAdapter adapter;
+    ;
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -74,7 +76,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         final MenuItem eventMenuItem = menu.findItem(R.id.action_event_log);
         View count = eventMenuItem.getActionView();
         eventCount = (Button) count.findViewById(R.id.feed_event_count);
-        eventCount.setText("0");
+        eventCount.setText(adapter.getCount() + "");
 
         dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
@@ -148,10 +150,18 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = layoutInflater.inflate(R.layout.event_log, null);
-        ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+        Button clearButton = (Button) popupView.findViewById(R.id.dismiss_all_events);
+        final ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventCount.setText("0");
+                adapter.clear();
+            }
+        });
 
 
-        listView.setAdapter(new EventLogAdapter(this, dataModel.getEventList()));
+        listView.setAdapter(adapter);
 
         final PopupWindow popupWindow = new PopupWindow(
                 popupView, (int) getResources().getDimension(R.dimen.event_log_width),
@@ -335,8 +345,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        dataModel = DataModel.getInstance();
+        adapter = new EventLogAdapter(this, dataModel.getEventList());
 
         setContentView(savedInstanceState.getInt("layout"));
 
@@ -420,6 +429,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         public EventLogAdapter(Context context, List<GitEvent> events) {
             mEvents = events;
             mInflater = LayoutInflater.from(context);
+        }
+
+        public void clear() {
+            mEvents.clear();
+            eventCount.setText("0");
+            notifyDataSetChanged();
         }
 
         @Override
