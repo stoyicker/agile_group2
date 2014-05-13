@@ -91,6 +91,7 @@ public class GitHubBroker implements IGitHubBroker {
     private Map<String, GitCommit> commits= new HashMap<String, GitCommit>();
     private Map<String, GitCommit> newCommits= new HashMap<String, GitCommit>();
     private Map<String, GitBranch> branches = new HashMap<String, GitBranch>();
+    private Map<String, GHRepository> repositories = new HashMap<String, GHRepository>();
 
     private final Object asyncLock = new Object();
 
@@ -166,7 +167,8 @@ public class GitHubBroker implements IGitHubBroker {
     }
     private void selectDefaultRepo(){
         try {
-            repository = user.getRepositories().values().iterator().next();
+            repositories = user.getRepositories(); //stores all repositories
+            repository = repositories.values().iterator().next();
             fetchRepository();
         } catch (IOException e) {
         }
@@ -427,7 +429,7 @@ public class GitHubBroker implements IGitHubBroker {
             Map<String, GHBranch> ghBranchMap = repository.getBranches();
             for (GHBranch ghBranch : ghBranchMap.values()){
                 fetchCommits(ghBranch.getSHA1());
-                branches.put(ghBranch.getName(),new GitBranch(ghBranch.getName(),commits.get(ghBranch.getSHA1())));
+                branches.put(ghBranch.getName(), new GitBranch(ghBranch.getName(), commits.get(ghBranch.getSHA1())));
             }
             Log.wtf("broker commitlist", commits.size()+"");
         } catch (IOException e) {
@@ -466,6 +468,11 @@ public class GitHubBroker implements IGitHubBroker {
         List<GitCommit> commits = new ArrayList<GitCommit>();
         commits.add(head);
         return getCommitsFromSelectedBranch(commits);
+    }
+
+    @Override
+    public Map<String, GHRepository> getCurrentRepositories() {
+        return repositories;
     }
 
 
