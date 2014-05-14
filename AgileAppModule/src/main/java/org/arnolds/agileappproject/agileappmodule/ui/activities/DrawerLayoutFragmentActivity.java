@@ -468,6 +468,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 case ISSUE:
                     imageView.setImageResource(R.drawable.icon_section3);
                     break;
+                case TIMER_EVENT:
+                    imageView.setImageResource(R.drawable.icon_section4);
             }
 
             TextView textView = (TextView) view.findViewById(R.id.event_name);
