@@ -6,6 +6,7 @@ import android.util.Log;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
@@ -22,6 +23,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +94,7 @@ public class GitHubBroker implements IGitHubBroker {
     private Map<String, GitCommit> newCommits= new HashMap<String, GitCommit>();
     private Map<String, GitBranch> branches = new HashMap<String, GitBranch>();
     private Map<String, GHRepository> repositories = new HashMap<String, GHRepository>();
+    private List<GitIssue> issues = new ArrayList<GitIssue>();
 
     private final Object asyncLock = new Object();
 
@@ -170,6 +173,7 @@ public class GitHubBroker implements IGitHubBroker {
             repositories = user.getRepositories(); //stores all repositories
             repository = repositories.values().iterator().next();
             fetchRepository();
+            fetchIssues();
         } catch (IOException e) {
         }
     }
@@ -217,7 +221,9 @@ public class GitHubBroker implements IGitHubBroker {
         //Clear data from previous repo
         commits.clear();
         branches.clear();
+        issues.clear();
         fetchRepository();
+        fetchIssues();
         selectedBranch = branches.get(DEFAULT_BRANCH_NAME);
     }
 
@@ -484,6 +490,50 @@ public class GitHubBroker implements IGitHubBroker {
             commits = getCommitsFromSelectedBranch(commits);
         }
         return commits;
+    }
+
+    public void fetchNewIssues(IGitHubBrokerListener callback)throws RepositoryNotSelectedException, AlreadyNotConnectedException{
+        if (!isConnected()) {
+            throw new AlreadyNotConnectedException();
+        }
+        if (repository == null) {
+            throw new RepositoryNotSelectedException();
+        }
+
+        new AsyncTask<IGitHubBrokerListener, Void, Void>() {
+            @Override
+            protected Void doInBackground(IGitHubBrokerListener... params) {
+
+                List<GitIssue>oldIssues = issues;
+                fetchIssues();
+                if(params[0] != null) {
+                    params[0].onNewIssuesReceived(true, oldIssues, issues);
+
+                }
+                return null;
+            }
+        }.execute(callback);
+
+    }
+
+    @Override
+    public List<GitIssue> getCurrentIssues() {
+        return issues;
+    }
+
+    private void fetchIssues(){
+        List<GitIssue> newIssues = new ArrayList<GitIssue>();
+        Collection<GHIssue> ghIssues = new HashSet<GHIssue>();
+        try {
+            ghIssues = repository.getIssues(GHIssueState.OPEN);
+            ghIssues.addAll(repository.getIssues(GHIssueState.CLOSED));
+            for (GHIssue issue : ghIssues){
+                newIssues.add(new GitIssue(issue));
+            }
+            issues = newIssues;
+        } catch (IOException e) {
+            Log.wtf("debug", IO_EXCEPTION_LOG, e);
+        }
     }
 
 
