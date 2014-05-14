@@ -21,10 +21,10 @@ import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFrag
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +35,8 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
 
     private static final String DEFAULT_LOCATION = "/";
     private String currentLocation;
+
+    private TreeMap<String, GitFile> fileTree;
 
     public final static int MENU_INDEX = 3;
     private FragmentActivity mActivity;
@@ -67,24 +69,26 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         Map<String, GitCommit> commits = broker.getCurrentCommitList();
         Set<GitFile> files = NotificationUtils.filesOnBranch(selectedBranch, commits);
 
-        fileListAdapter.getFileList().clear();
         Pattern directoriesPattern = Pattern.compile(currentLocation+"(.+?)/");
         Pattern filesPattern = Pattern.compile(currentLocation+"(.+?)(?!/)");
 
-        List<GitFile> currentFiles = new LinkedList<GitFile>();
-        List<GitFile> currentFiles = new LinkedList<GitFile>();
+        List<ListItem> currentDirectories = new ArrayList<ListItem>();
+        List<ListItem> currentFiles = new ArrayList<ListItem>();
 
-        for(GitFile f : files){
-            Matcher dirMatcher = directoriesPattern.matcher(f.getFileName());
-            Matcher fileMatcher = filesPattern.matcher(f.getFileName());
-
+        for(GitFile file : files) {
+            Matcher dirMatcher = directoriesPattern.matcher(file.getFileName());
+            Matcher fileMatcher = filesPattern.matcher(file.getFileName());
 
             if(dirMatcher.matches()) {
-                fileListAdapter.getFileList().add(f);
+                currentDirectories.add(new ListItem(Type.DIR, dirMatcher.group(1), file));
             } else if(fileMatcher.matches()) {
-
+                currentFiles.add(new ListItem(Type.FILE, fileMatcher.group(1), file));
             }
         }
+
+        // Add files at the bottom of the directories list and send everything to the adapter.
+        currentDirectories.addAll(currentFiles);
+        fileListAdapter.setList(currentDirectories);
 
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -100,20 +104,25 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
     }
 
     public final class FileListAdapter extends BaseAdapter {
-        private final List<GitFile> fileList = new ArrayList<GitFile>();
+        private List<ListItem> list;
 
-        public List<GitFile> getFileList() {
-            return fileList;
+        public void clear() {
+            list.clear();
+        }
+
+        public void setList(List<ListItem> list) {
+            list = new ArrayList<ListItem>(list);
+
         }
 
         @Override
         public int getCount() {
-            return fileList.size();
+            return list.size();
         }
 
         @Override
-        public GitFile getItem(int position) {
-            return fileList.get(position);
+        public ListItem getItem(int position) {
+            return list.get(position);
         }
 
         @Override
@@ -143,7 +152,7 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
-            final GitCommit commit = getItem(position);
+
             return convertView;
         }
 
@@ -156,5 +165,34 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
     public void propertyChange(PropertyChangeEvent event) {
         populateList();
         ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
+    }
+
+    private class ListItem {
+        private Type type;
+        private String name;
+        private GitFile file;
+
+        public ListItem(final Type type, final String name, final GitFile file) {
+            this.type = type;
+            this.name = name;
+            this.file = file;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public GitFile getFile() {
+            return file;
+        }
+    }
+
+    private static enum Type {
+        DIR,
+        FILE
     }
 }
