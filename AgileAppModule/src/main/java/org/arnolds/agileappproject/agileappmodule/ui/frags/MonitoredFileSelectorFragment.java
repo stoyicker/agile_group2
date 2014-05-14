@@ -1,35 +1,40 @@
 package org.arnolds.agileappproject.agileappmodule.ui.frags;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
-import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.NotificationUtils;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         implements PropertyChangeListener {
     private Context mContext;
-    private CommitAdapter commitAdapter;
+    private FileListAdapter fileListAdapter;
+
+    private static final String DEFAULT_LOCATION = "/";
+    private String currentLocation;
 
     public final static int MENU_INDEX = 3;
     private FragmentActivity mActivity;
@@ -42,32 +47,49 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_commit_log, container, false);
+        View view = inflater.inflate(R.layout.fragment_list_files, container, false);
 
         mActivity = getActivity();
 
         mContext = getActivity().getApplicationContext();
-        ListView listView = (ListView) view.findViewById(R.id.commit_list_view);
-        commitAdapter = new CommitAdapter();
-        listView.setAdapter(commitAdapter);
-
-        GitHubNotificationService service = GitHubNotificationService.getInstance();
+        ListView listView = (ListView) view.findViewById(R.id.listFiles);
+        fileListAdapter = new FileListAdapter();
+        listView.setAdapter(fileListAdapter);
 
         populateList();
-        service.addCommitListener(this);
 
         return view;
     }
 
     private void populateList() {
         IGitHubBroker broker = GitHubBroker.getInstance();
+        GitBranch selectedBranch = broker.getSelectedBranch();
+        Map<String, GitCommit> commits = broker.getCurrentCommitList();
+        Set<GitFile> files = NotificationUtils.filesOnBranch(selectedBranch, commits);
 
-        commitAdapter.getCommitCollection().clear();
-        commitAdapter.getCommitCollection().addAll(broker.getCommitsFromSelectedBranch());
+        fileListAdapter.getFileList().clear();
+        Pattern directoriesPattern = Pattern.compile(currentLocation+"(.+?)/");
+        Pattern filesPattern = Pattern.compile(currentLocation+"(.+?)(?!/)");
+
+        List<GitFile> currentFiles = new LinkedList<GitFile>();
+        List<GitFile> currentFiles = new LinkedList<GitFile>();
+
+        for(GitFile f : files){
+            Matcher dirMatcher = directoriesPattern.matcher(f.getFileName());
+            Matcher fileMatcher = filesPattern.matcher(f.getFileName());
+
+
+            if(dirMatcher.matches()) {
+                fileListAdapter.getFileList().add(f);
+            } else if(fileMatcher.matches()) {
+
+            }
+        }
+
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                MonitoredFileSelectorFragment.this.commitAdapter.notifyDataSetChanged();
+                MonitoredFileSelectorFragment.this.fileListAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -77,21 +99,21 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         populateList();
     }
 
-    public final class CommitAdapter extends BaseAdapter {
-        private final List<GitCommit> commitCollection = new ArrayList<GitCommit>();
+    public final class FileListAdapter extends BaseAdapter {
+        private final List<GitFile> fileList = new ArrayList<GitFile>();
 
-        public List<GitCommit> getCommitCollection() {
-            return commitCollection;
+        public List<GitFile> getFileList() {
+            return fileList;
         }
 
         @Override
         public int getCount() {
-            return commitCollection.size();
+            return fileList.size();
         }
 
         @Override
-        public GitCommit getItem(int position) {
-            return commitCollection.get(position);
+        public GitFile getItem(int position) {
+            return fileList.get(position);
         }
 
         @Override

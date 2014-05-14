@@ -7,13 +7,12 @@
         android:id="@+id/file_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/file_name"
-
         />
     <TextView
         android:id="@+id/file_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:lsyout_padding="10dp"/>
+        android:layout_toRightOf="@id/file_icon"
+        android:paddingLeft="10dp"/>
 
 </RelativeLayout>
