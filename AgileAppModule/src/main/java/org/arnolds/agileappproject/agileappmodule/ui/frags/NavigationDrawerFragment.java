@@ -69,6 +69,8 @@ public class NavigationDrawerFragment extends Fragment {
     private class SelectionListener extends GitHubBrokerListener {
         @Override
         public void onRepoSelected(boolean result) {
+            Log.wtf("BLAH", "----- STOP LOAD ----");
+            mCallbacks.onStopLoad();
             try {
                 mCallbacks.onNewRepoSelected(latestSelectedRepoName);
             }
@@ -126,7 +128,8 @@ public class NavigationDrawerFragment extends Fragment {
                     catch (GitHubBroker.NullArgumentException e) {
                         Log.wtf("debug", e.getClass().getName(), e);
                     }
-                    //mCallbacks.onStartLoad();
+                    mCallbacks.onStartLoad();
+                    Log.wtf("BLAH", "----- START LOAD ----");
                 }
             }
 
@@ -298,6 +301,8 @@ public class NavigationDrawerFragment extends Fragment {
         void onNewRepoSelected(String repoName);
 
         void onStartLoad();
+
+        void onStopLoad();
     }
 
     private class NavigationDrawerArrayAdapter extends BaseAdapter {

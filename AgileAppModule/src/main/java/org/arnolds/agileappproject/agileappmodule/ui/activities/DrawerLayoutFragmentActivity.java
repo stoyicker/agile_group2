@@ -219,6 +219,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         });
     }
 
+    @Override
     public synchronized void onStopLoad() {
         try {
             getFragmentManager().beginTransaction().remove(progressFragment).commit();
