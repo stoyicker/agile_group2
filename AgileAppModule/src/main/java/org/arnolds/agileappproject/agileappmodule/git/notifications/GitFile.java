@@ -28,6 +28,11 @@ public final class GitFile {
         return fileName;
     }
 
+    public String getName() {
+        String[] parts = fileName.split("/");
+        return parts[parts.length - 1];
+    }
+
     public String getUrl() {
         return url;
     }

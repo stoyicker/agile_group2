@@ -103,7 +103,7 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
     }
 
     public final class FileListAdapter extends BaseAdapter {
-        private List<ListItem> list;
+        private final List<ListItem> list = new ArrayList<ListItem>();
 
         public void clear() {
             list.clear();
@@ -111,7 +111,6 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
 
         public void setList(List<ListItem> list) {
             list = new ArrayList<ListItem>(list);
-
         }
 
         @Override
