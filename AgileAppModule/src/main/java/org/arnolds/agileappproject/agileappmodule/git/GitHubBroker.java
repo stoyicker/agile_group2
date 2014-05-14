@@ -521,6 +521,8 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     private void fetchIssues(){
+        if (repository.isFork())
+            return;
         List<GitIssue> newIssues = new ArrayList<GitIssue>();
         Collection<GHIssue> ghIssues = new HashSet<GHIssue>();
         try {
@@ -531,7 +533,7 @@ public class GitHubBroker implements IGitHubBroker {
             }
             issues = newIssues;
         } catch (IOException e) {
-            Log.wtf("debug", IO_EXCEPTION_LOG, e);
+            //Log.wtf("debug", IO_EXCEPTION_LOG, e);
         }
     }
 

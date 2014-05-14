@@ -23,11 +23,6 @@ public class PokerGameFragment extends ArnoldSupportFragment {
     }
 
     @Override
-    public void onNewRepositorySelected() {
-        //Do nothing
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 

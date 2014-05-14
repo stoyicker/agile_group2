@@ -43,11 +43,6 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
     }
 
     @Override
-    public void onNewRepositorySelected() {
-        populateList();
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         branches = GitHubBroker.getInstance().getAllBranches();

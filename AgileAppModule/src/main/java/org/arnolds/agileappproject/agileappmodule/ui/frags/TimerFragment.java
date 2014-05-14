@@ -35,11 +35,6 @@ public class TimerFragment extends ArnoldSupportFragment {
     }
 
     @Override
-    public void onNewRepositorySelected() {
-        //Do nothing; it's not repository-dependent
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         PairTimer.setActivity(activity);

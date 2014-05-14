@@ -398,19 +398,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
     }
 
-    @Override
-    public void onNewRepoSelected(String repoName) {
-        for (ArnoldSupportFragment x : fragments) {
-            try {
-                x.onNewRepositorySelected();
-            }
-            catch (NullPointerException ex) {
-//            Log.wtf("debug", ex.getClass().getName(), ex);
-            }
-        }
-    }
-
-
     public void notifyIssueCreated() {
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.beginTransaction()

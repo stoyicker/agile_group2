@@ -86,11 +86,6 @@ public class CommitLogFragment extends ArnoldSupportFragment
         });
     }
 
-    @Override
-    public void onNewRepositorySelected() {
-        Log.wtf("BLAH", "new Repo");
-        populateList();
-    }
 
     public final class CommitAdapter extends BaseAdapter {
         private final List<GitCommit> commitCollection = new ArrayList<GitCommit>();

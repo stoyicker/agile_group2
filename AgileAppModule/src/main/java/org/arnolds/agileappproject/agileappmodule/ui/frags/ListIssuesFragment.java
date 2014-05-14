@@ -41,11 +41,6 @@ public class ListIssuesFragment extends ArnoldSupportFragment implements Adapter
         vh.toggleExpanded();
     }
 
-    @Override
-    public void onNewRepositorySelected() {
-        populateList();
-    }
-
     private void populateList() {
         getActivity().runOnUiThread(new Runnable() {
             @Override

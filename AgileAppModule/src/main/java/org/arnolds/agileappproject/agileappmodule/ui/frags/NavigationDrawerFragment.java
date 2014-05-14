@@ -71,11 +71,6 @@ public class NavigationDrawerFragment extends Fragment {
         public void onRepoSelected(boolean result) {
             Log.wtf("BLAH", "----- STOP LOAD ----");
             mCallbacks.onStopLoad();
-            try {
-                mCallbacks.onNewRepoSelected(latestSelectedRepoName);
-            }
-            catch (NullPointerException ex) {
-            }
         }
     }
 
@@ -297,8 +292,6 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
-
-        void onNewRepoSelected(String repoName);
 
         void onStartLoad();
 
