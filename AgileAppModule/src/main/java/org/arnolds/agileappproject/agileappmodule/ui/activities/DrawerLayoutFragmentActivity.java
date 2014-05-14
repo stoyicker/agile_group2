@@ -68,7 +68,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
     private EventLogAdapter adapter;
-    ;
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -88,7 +87,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 menu.performIdentifierAction(eventMenuItem.getItemId(), 0);
             }
         });
-
 
         switch (lastSelectedFragmentIndex) {
             case 2:
