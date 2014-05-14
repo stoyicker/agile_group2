@@ -35,6 +35,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgre
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.PokerGameFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
@@ -248,7 +249,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         ArnoldSupportFragment target = fragments[position];
 
-        if (target == null) {
+        if (target == null || position == 4) {
             switch (position) {
                 case 0:
                     target = new CommitLogFragment();
@@ -262,6 +263,8 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 case 3:
                     target = new TimerFragment();
                     break;
+                case 4:
+                    target = new PokerGameFragment();
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
                     break;

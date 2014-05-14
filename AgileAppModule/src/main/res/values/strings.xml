@@ -4,11 +4,11 @@
 	<string name="title_activity_main">AgileArnolds</string>
 	<string name="action_choose_project">Choose Project</string>
 	<string name="action_logout">Logout</string>
-	<string name="hello_blank_fragment">Hello blank fragment</string>
 	<string name="title_section1">Commits</string>
 	<string name="title_section2">Branches</string>
 	<string name="title_section3">Issues</string>
 	<string name="title_section4">Timer</string>
+	<string name="title_section5">Planning poker</string>
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 	<string name="ret_branches">Retrieve Branches</string>
@@ -39,8 +39,8 @@
 	<string name="creating_issue">Creating issue...</string>
 	<string name="issue_created">Issue created</string>
 	<item name="notification_new_commits" type="id">New commit:</item>
-    <item name="file_conflict" type="id">Commit with File Conflict!</item>
-    <string name="selected_branch">No branch selected</string>
+	<item name="file_conflict" type="id">Commit with File Conflict!</item>
+	<string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
 	<string name="event_log_title">Event Log</string>
 	<string name="clear_event_log">Clear</string>
