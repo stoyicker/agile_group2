@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,8 +34,6 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
 
     private static final String DEFAULT_LOCATION = "/";
     private String currentLocation;
-
-    private TreeMap<String, GitFile> fileTree;
 
     public final static int MENU_INDEX = 3;
     private FragmentActivity mActivity;
