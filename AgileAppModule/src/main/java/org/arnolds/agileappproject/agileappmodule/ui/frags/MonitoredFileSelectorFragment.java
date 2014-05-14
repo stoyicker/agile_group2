@@ -15,6 +15,7 @@ import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFileTree;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.NotificationUtils;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
@@ -22,12 +23,11 @@ import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFrag
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         implements PropertyChangeListener {
@@ -66,28 +66,23 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         IGitHubBroker broker = GitHubBroker.getInstance();
         GitBranch selectedBranch = broker.getSelectedBranch();
         Map<String, GitCommit> commits = broker.getCurrentCommitList();
-        Set<GitFile> files = NotificationUtils.filesOnBranch(selectedBranch, commits);
 
-        Pattern directoriesPattern = Pattern.compile(currentLocation+"(.+?)/");
-        Pattern filesPattern = Pattern.compile(currentLocation+"(.+?)(?!/)");
+        // TODO: Return List from getter method.
+        List<GitFile> files = new ArrayList<GitFile>(NotificationUtils.filesOnBranch(selectedBranch, commits));
 
-        List<ListItem> currentDirectories = new ArrayList<ListItem>();
-        List<ListItem> currentFiles = new ArrayList<ListItem>();
+        GitFileTree tree = new GitFileTree(files);
+        ArrayList<ListItem> list = new ArrayList<ListItem>();
 
-        for(GitFile file : files) {
-            Matcher dirMatcher = directoriesPattern.matcher(file.getFileName());
-            Matcher fileMatcher = filesPattern.matcher(file.getFileName());
-
-            if(dirMatcher.matches()) {
-                currentDirectories.add(new ListItem(Type.DIR, dirMatcher.group(1), file));
-            } else if(fileMatcher.matches()) {
-                currentFiles.add(new ListItem(Type.FILE, fileMatcher.group(1), file));
-            }
+        // Add up
+        list.add(new ListItem(Type.UP, "..", null));
+        // Add directories
+        for (String dirName : tree.getDirectories(currentLocation)) {
+            list.add(new ListItem(Type.DIR, dirName, null));
         }
-
-        // Add files at the bottom of the directories list and send everything to the adapter.
-        currentDirectories.addAll(currentFiles);
-        fileListAdapter.setList(currentDirectories);
+        // Add files
+        for (GitFile file : tree.getFiles(currentLocation)) {
+            list.add(new ListItem(Type.FILE, file.getName(), file));
+        }
 
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -212,6 +207,6 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
 
     private static enum Type {
         DIR,
-        FILE
+        UP, FILE
     }
 }
