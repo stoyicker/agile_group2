@@ -24,6 +24,12 @@ public interface IDataModel {
     public void addLateCommits(final List<GHCommit> commits);
 
     /**
+     * Creates a new timer event after the initial population.
+     * @param time the initial countdown.
+     */
+    public void addLateTimerEvent(String time);
+
+    /**
      * Adds a commit with associated files that conflicts with the selected branch.
      * @param commit - The commit that is associated with the file conflicts.
      * @param affectedFiles - The files that are in conflict.

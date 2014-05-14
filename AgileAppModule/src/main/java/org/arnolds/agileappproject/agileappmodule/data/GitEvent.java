@@ -1,6 +1,9 @@
 package org.arnolds.agileappproject.agileappmodule.data;
 
 
+import android.content.res.Resources;
+
+import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHCommit;
@@ -9,16 +12,19 @@ import org.kohsuke.github.GHIssue;
 import java.util.List;
 
 public class GitEvent {
+
     public enum EventType {
         COMMIT,
         ISSUE,
-        FILE_CONFLICT
+        FILE_CONFLICT,
+        TIMER_EVENT
     }
 
     private EventType type;
     private GitCommit commit;
     private GHIssue issue;
     private List<GitFile> fileConflicts;
+    private String time;
 
     public GitEvent(GitCommit commit) {
         this.type = EventType.COMMIT;
@@ -28,6 +34,11 @@ public class GitEvent {
     public GitEvent(GHIssue issue) {
         this.type = EventType.ISSUE;
         this.issue = issue;
+    }
+
+    public GitEvent(String time) {
+        this.type = EventType.TIMER_EVENT;
+        this.time = time;
     }
 
     public GitEvent(GitCommit commit, List<GitFile> fileConflicts) {
@@ -47,6 +58,10 @@ public class GitEvent {
                 break;
             case FILE_CONFLICT:
                 eventText = commit.getMessage();
+                break;
+            case TIMER_EVENT:
+                //TODO Fix hard coded string
+                eventText = "Timer \""+time+"\" has finished!";
                 break;
         }
 

@@ -42,6 +42,12 @@ public class DataModel implements IDataModel {
     }
 
     @Override
+    public void addLateTimerEvent(String time) {
+        eventList.add(new GitEvent(time));
+        firePropertyEvent();
+    }
+
+    @Override
     public void addLateIssue(GHIssue issue) {
         eventList.add(new GitEvent(issue));
         firePropertyEvent();
