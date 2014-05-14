@@ -476,6 +476,8 @@ public class GitHubBroker implements IGitHubBroker {
 
 
     private List<GitCommit> getCommitsFromSelectedBranch(List<GitCommit> commits) {
+        if (commits.size() > 50)
+            return commits;
         GitCommit newHead = commits.get(commits.size()-1);
         for (String parent : newHead.getParentsSHA1()) {
             commits.add(this.commits.get(parent));
