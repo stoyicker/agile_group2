@@ -51,7 +51,13 @@ public class GitIssue {
     }
 
     public Date getClosedAt() {
-        return new Date(closedAt.getTime());
+        if (closedAt != null){
+            return new Date(closedAt.getTime());
+        }
+        else {
+            return null;
+        }
+
     }
 
     public Date getUpdatedAt() {
@@ -59,6 +65,10 @@ public class GitIssue {
     }
 
     public GitUser getUser() {
+        return user;
+    }
+
+    public GitUser getAssignee(){
         return user;
     }
 

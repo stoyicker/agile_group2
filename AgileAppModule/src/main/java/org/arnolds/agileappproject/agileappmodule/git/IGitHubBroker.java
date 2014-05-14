@@ -2,6 +2,7 @@ package org.arnolds.agileappproject.agileappmodule.git;
 
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 
@@ -151,5 +152,15 @@ public interface IGitHubBroker {
      * @return Map<String,GHRepository>, Contains all the user's repositories.
      */
     public Map<String,GHRepository> getCurrentRepositories();
+
+
+    public void fetchNewIssues(IGitHubBrokerListener callback)throws GitHubBroker.RepositoryNotSelectedException,
+    GitHubBroker.AlreadyNotConnectedException;
+    /**
+     *
+     * @return List<GitIssue>, Contains all the issues in the repository.
+     */
+    public List<GitIssue> getCurrentIssues();
+
 
 }
