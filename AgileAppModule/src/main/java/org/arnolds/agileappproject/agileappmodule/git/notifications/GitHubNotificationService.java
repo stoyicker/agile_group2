@@ -15,6 +15,7 @@ import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
@@ -48,6 +49,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private Context context;
     private boolean firstRecieve = true;
+    private boolean firstRecieveIssue =true;
 
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
@@ -123,6 +125,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                     try {
                         if (!TextUtils.isEmpty(GitHubBroker.getInstance().getSelectedRepoName())) {
                             broker.fetchNewCommits(brokerListener);
+                            broker.fetchNewIssues(brokerListener);
                         }
                     }
                     catch (GitHubBroker.RepositoryNotSelectedException e) {
@@ -169,6 +172,16 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 commitChangeSupport.firePropertyChange("new commits", null, newCommits);
             }
             firstRecieve = false;
+        }
+
+        @Override
+        public void onNewIssuesReceived(boolean b, List<GitIssue> oldIssues, List<GitIssue> issues) {
+            if (!firstRecieveIssue && oldIssues.size()<issues.size()){ //If there are new issues
+                for (int i = 0; i < issues.size() - oldIssues.size(); i++) {
+                    dataModel.addLateIssue(issues.get(i));
+                }
+            }
+            firstRecieveIssue = false;
         }
 
         @Override

@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -22,7 +23,7 @@ public class GitEvent {
 
     private EventType type;
     private GitCommit commit;
-    private GHIssue issue;
+    private GitIssue issue;
     private List<GitFile> fileConflicts;
     private String time;
 
@@ -31,7 +32,7 @@ public class GitEvent {
         this.commit = commit;
     }
 
-    public GitEvent(GHIssue issue) {
+    public GitEvent(GitIssue issue) {
         this.type = EventType.ISSUE;
         this.issue = issue;
     }

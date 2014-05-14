@@ -503,7 +503,6 @@ public class GitHubBroker implements IGitHubBroker {
         new AsyncTask<IGitHubBrokerListener, Void, Void>() {
             @Override
             protected Void doInBackground(IGitHubBrokerListener... params) {
-
                 List<GitIssue>oldIssues = issues;
                 fetchIssues();
                 if(params[0] != null) {
