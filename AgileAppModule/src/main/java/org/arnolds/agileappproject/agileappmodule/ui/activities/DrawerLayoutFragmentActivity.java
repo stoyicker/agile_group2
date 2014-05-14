@@ -469,7 +469,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     imageView.setImageResource(R.drawable.warning);
                     break;
                 case ISSUE:
-                    imageView.setImageResource(R.drawable.icon_section3);
+                    imageView.setImageResource(R.drawable.issueyellow);
                     break;
                 case TIMER_EVENT:
                     imageView.setImageResource(R.drawable.alarm);

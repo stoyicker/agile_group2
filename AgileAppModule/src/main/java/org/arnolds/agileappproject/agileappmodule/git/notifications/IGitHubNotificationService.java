@@ -18,5 +18,17 @@ public interface IGitHubNotificationService {
      */
     public void removeCommitListener(PropertyChangeListener commitListener);
 
+    /**
+     *
+     * @param issueListener The PropertyChangeListener that will receive the issue updates.
+     */
+    public void addIssueListener(PropertyChangeListener issueListener);
+
+    /**
+     *
+     * @param issueListener
+     */
+    public void removeIssueListener(PropertyChangeListener issueListener);
+
 
 }

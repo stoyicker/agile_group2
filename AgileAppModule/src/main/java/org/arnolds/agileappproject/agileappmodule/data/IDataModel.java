@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule.data;
 
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -40,7 +41,7 @@ public interface IDataModel {
      * Adds a issue that has been polled after the initial population.
      * @param issue - The issue that should be stored.
      */
-    public void addLateIssue(final GHIssue issue);
+    public void addLateIssue(final GitIssue issue);
 
     /**
      * Removes an event from the stored events.
