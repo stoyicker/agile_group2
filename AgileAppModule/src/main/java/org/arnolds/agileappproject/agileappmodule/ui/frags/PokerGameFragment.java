@@ -64,7 +64,7 @@ public class PokerGameFragment extends ArnoldSupportFragment {
         public Fragment getItem(int position) {
             if (cards[position] == null) {
                 Bundle args = new Bundle();
-                args.putInt(PokerCardSupportFragment.KEY_VALUE, position + 1);
+                args.putInt(PokerCardSupportFragment.KEY_VALUE, position);
                 cards[position] = (PokerCardSupportFragment) PokerCardSupportFragment
                         .instantiate(getActivity().getApplicationContext(),
                                 PokerCardSupportFragment.class.getName());
