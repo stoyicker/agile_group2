@@ -15,7 +15,7 @@ public class PokerCardSupportFragment extends Fragment {
 
     private int value;
     static final String KEY_VALUE = "VALUE";
-    private final String CARD_PATTERN = "ic_poker_";
+    private final String CARD_PATTERN = "uno_card_";
 
     @Override
     public void onAttach(Activity activity) {
