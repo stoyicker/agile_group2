@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
@@ -135,8 +137,9 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                         .inflate(R.layout.list_item_commit, null);
                 viewHolder = new ViewHolder();
+                viewHolder.setImageView((ImageView) convertView.findViewById(R.id.file_icon));
+                viewHolder.setTextView((TextView) convertView.findViewById(R.id.file_name));
                 convertView.setTag(viewHolder);
-                // viewHolder.setExpanded(false);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
@@ -149,12 +152,32 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
+            viewHolder.getImageView().setImageResource(R.drawable.ic_arnold);
+            viewHolder.getTextView().setText(list.get(position).getName());
+
 
             return convertView;
         }
 
         private final class ViewHolder {
+            private ImageView imageView;
+            private TextView textView;
 
+            public TextView getTextView() {
+                return textView;
+            }
+
+            public void setTextView(TextView textView) {
+                this.textView = textView;
+            }
+
+            public ImageView getImageView() {
+                return imageView;
+            }
+
+            public void setImageView(ImageView imageView) {
+                this.imageView = imageView;
+            }
         }
     }
 
