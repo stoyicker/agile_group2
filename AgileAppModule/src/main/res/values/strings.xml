@@ -40,7 +40,8 @@
 	<string name="issue_created">Issue created</string>
 	<item name="notification_new_commits" type="id">New commit:</item>
 	<item name="file_conflict" type="id">Commit with File Conflict!</item>
-	<string name="selected_branch">No branch selected</string>
+    <item name="siging_out" type="id">Signing out</item>
+    <string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
 	<string name="event_log_title">Event Log</string>
 	<string name="clear_event_log">Clear</string>
@@ -49,4 +50,5 @@
 		setup
 	</string>
 	<string name="timer_done">Time is up!</string>
+    <string name="action_sign_out">Sign Out</string>
 </resources>

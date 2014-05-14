@@ -159,10 +159,10 @@ public class GitHubBroker implements IGitHubBroker {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
         }
-        session = null;
-        user = null;
-        repository = null;
+        instance = null;
     }
+
+
 
     @Override
     public String getSelectedRepoName() {

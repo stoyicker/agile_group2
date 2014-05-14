@@ -7,7 +7,15 @@
         android:orderInCategory="1"
         android:showAsAction="always"
         android:title="@string/event_log_title"/>
-	<item
+    <item
+        android:id="@+id/sign_out"
+        android:icon="@drawable/logout"
+        android:orderInCategory="90"
+        android:showAsAction="ifRoom"
+        android:onClick="signOut"
+        android:title="@string/action_sign_out"
+        />
+    <item
 		android:id="@+id/action_settings"
 		android:icon="@drawable/ic_action_settings"
 		android:orderInCategory="100"

@@ -31,4 +31,7 @@ public interface IGitHubNotificationService {
     public void removeIssueListener(PropertyChangeListener issueListener);
 
 
+    public void killService();
+
+
 }

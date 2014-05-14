@@ -1,5 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -23,11 +25,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.data.DataModel;
 import org.arnolds.agileappproject.agileappmodule.data.GitEvent;
 import org.arnolds.agileappproject.agileappmodule.data.IDataModel;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.auth.GitHubAuthenticatorService;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
@@ -41,6 +47,7 @@ import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.Authenticator;
 import java.util.List;
 import java.util.Stack;
 
@@ -99,8 +106,24 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     newIssueItem.setVisible(Boolean.FALSE);
                 }
         }
-
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void signOut(MenuItem item) {
+        Toast.makeText(this, R.id.siging_out, 2).show();
+        final AccountManager accountManager = AccountManager.get(this);
+        Account account = accountManager.getAccountsByType(LoginActivity.ACCOUNT_TYPE)[0];
+        accountManager.removeAccount(account, null, null);
+        Intent login = new Intent(this, LoginActivity.class);
+        login.putExtra(LoginActivity.LAUNCH_HOME_ACTIVITY, true);
+        GitHubNotificationService.getInstance().killService();
+        try {
+            GitHubBroker.getInstance().disconnect();
+        } catch (GitHubBroker.AlreadyNotConnectedException e) {
+            e.printStackTrace();
+        }
+        startActivity(login);
+        finish();
     }
 
     @Override
