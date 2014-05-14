@@ -1,6 +1,9 @@
 package org.arnolds.agileappproject.agileappmodule.data;
 
 
+import android.content.res.Resources;
+
+import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.kohsuke.github.GHCommit;
@@ -57,7 +60,8 @@ public class GitEvent {
                 eventText = commit.getMessage();
                 break;
             case TIMER_EVENT:
-                eventText = time;
+                //TODO Fix hard coded string
+                eventText = "Timer \""+time+"\" has finished!";
                 break;
         }
 
