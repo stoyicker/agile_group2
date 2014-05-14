@@ -28,6 +28,7 @@ import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.data.DataModel;
 import org.arnolds.agileappproject.agileappmodule.data.GitEvent;
 import org.arnolds.agileappproject.agileappmodule.data.IDataModel;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
@@ -88,10 +89,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             }
         });
 
+
         switch (lastSelectedFragmentIndex) {
             case 2:
-                if (newIssueItem != null) {
+                if (newIssueItem != null && !GitHubBroker.getInstance().isFork()) {
                     newIssueItem.setVisible(Boolean.TRUE);
+                }
+                else if (GitHubBroker.getInstance().isFork()) {
+                    newIssueItem.setVisible(Boolean.FALSE);
                 }
                 break;
             default:

@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 
@@ -29,6 +30,7 @@ public class ListIssuesFragment extends ArnoldSupportFragment implements Adapter
     private final static int MENU_INDEX = 2;
     private IssuesListAdapter listAdapter;
     private ListView issuesListView;
+    private TextView forkedTextView;
 
     public ListIssuesFragment() {
         super(MENU_INDEX);
@@ -233,6 +235,13 @@ public class ListIssuesFragment extends ArnoldSupportFragment implements Adapter
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View ret = inflater.inflate(R.layout.fragment_list_issues, container, Boolean.FALSE);
+
+        if (GitHubBroker.getInstance().isFork()) {
+            forkedTextView = (TextView) ret.findViewById(R.id.issues_if_forked);
+            forkedTextView.setVisibility(1);
+            forkedTextView.setText(R.string.repo_is_fork);
+        }
+
 
         issuesListView = (ListView) ret.findViewById(R.id.issue_list);
         listAdapter = new IssuesListAdapter();

@@ -49,4 +49,5 @@
 		setup
 	</string>
 	<string name="timer_done">Time is up!</string>
+    <string name="repo_is_fork">This repository is a fork. It cannot contain issues.</string>
 </resources>

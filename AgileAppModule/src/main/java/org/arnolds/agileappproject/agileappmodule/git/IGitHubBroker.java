@@ -162,5 +162,9 @@ public interface IGitHubBroker {
      */
     public List<GitIssue> getCurrentIssues();
 
-
+    /**
+     *
+     * @return Boolean, True if the selected repository is a fork.
+     */
+    public Boolean isFork();
 }
