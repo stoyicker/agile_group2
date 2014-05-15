@@ -165,7 +165,7 @@ public class GitHubBroker implements IGitHubBroker {
 
 
     @Override
-    public String getSelectedRepoName() {
+    public synchronized String getSelectedRepoName() {
         return this.repository == null ? null : this.repository.getName();
     }
     private void selectDefaultRepo(){
@@ -427,7 +427,8 @@ public class GitHubBroker implements IGitHubBroker {
 
     }
 
-    private void fetchRepository() {
+    private synchronized void fetchRepository() {
+
         branches.clear();
         newCommits.clear();
         try {

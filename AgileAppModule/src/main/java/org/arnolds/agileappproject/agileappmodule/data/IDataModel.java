@@ -68,4 +68,10 @@ public interface IDataModel {
      * @return the stored eventList.
      */
     public List<GitEvent> getEventList();
+
+    public void addMonitoredFile(GitFile file);
+
+    public void removeMonitoredFile(GitFile file);
+
+    public List<GitFile> getAllMonitoredFiles();
 }
