@@ -119,9 +119,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             case R.id.action_event_log:
                 eventLogPressed();
                 break;
-            case R.id.action_settings:
-//  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
-                break;
+//            case R.id.action_settings:
+//  //TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
+//                break;
             case R.id.action_create:
                 switch (lastSelectedFragmentIndex) {
                     case 2:
@@ -269,6 +269,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     break;
                 case 4:
                     target = new PokerGameFragment();
+                    break;
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
                     break;
@@ -295,13 +296,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     .remove(fragments[lastSelectedFragmentIndex]).commit();
             getFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER,
                     progressFragment).commit();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().executePendingTransactions();
-                    getSupportFragmentManager().executePendingTransactions();
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    getFragmentManager().executePendingTransactions();
+//                    getSupportFragmentManager().executePendingTransactions();
+//                }
+//            });
         }
 
         lastSelectedFragmentIndex = position;

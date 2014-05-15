@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -34,11 +33,7 @@ import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 import org.kohsuke.github.GHRepository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class NavigationDrawerFragment extends Fragment {
 
@@ -339,11 +334,8 @@ public class NavigationDrawerFragment extends Fragment {
             ImageView imageView =
                     (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
 
-            Log.d("debug", "selected item es " +
-                    DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex() +
-                    " and position is " + position);
             if (position == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())) {
-                convertView.setBackgroundColor(Color.GRAY);
+                convertView.setBackgroundColor(getResources().getColor(R.color.theme_orange));
                 textView.setTypeface(null, Typeface.BOLD);
             }
 
