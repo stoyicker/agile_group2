@@ -159,10 +159,10 @@ public class GitHubBroker implements IGitHubBroker {
         if (!isConnected()) {
             throw new AlreadyNotConnectedException();
         }
-        session = null;
-        user = null;
-        repository = null;
+        instance = null;
     }
+
+
 
     @Override
     public String getSelectedRepoName() {
@@ -427,7 +427,6 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     private void fetchRepository() {
-        Log.d("broker", "fetchRepository");
         branches.clear();
         newCommits.clear();
         try {
@@ -436,7 +435,6 @@ public class GitHubBroker implements IGitHubBroker {
                 fetchCommits(ghBranch.getSHA1());
                 branches.put(ghBranch.getName(), new GitBranch(ghBranch.getName(), commits.get(ghBranch.getSHA1())));
             }
-            Log.d("broker commitlist", commits.size()+"");
         } catch (IOException e) {
             e.printStackTrace();
         }

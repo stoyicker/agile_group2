@@ -124,6 +124,12 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     }
 
     @Override
+    public void killService() {
+        terminateCommitPoller();
+        instance = null;
+    }
+
+    @Override
     public synchronized void removeCommitListener(PropertyChangeListener commitListener) {
         commitChangeSupport.removePropertyChangeListener(commitListener);
 

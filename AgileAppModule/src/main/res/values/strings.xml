@@ -9,6 +9,7 @@
 	<string name="title_section3">Issues</string>
 	<string name="title_section4">Timer</string>
 	<string name="title_section5">Planning poker</string>
+    <string name="title_section6">Sign out</string>
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 	<string name="ret_branches">Retrieve Branches</string>
@@ -40,7 +41,8 @@
 	<string name="issue_created">Issue created</string>
 	<item name="notification_new_commits" type="id">New commit:</item>
 	<item name="file_conflict" type="id">Commit with File Conflict!</item>
-	<string name="selected_branch">No branch selected</string>
+    <item name="siging_out" type="id">Signing out</item>
+    <string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
 	<string name="event_log_title">Event Log</string>
 	<string name="clear_event_log">Clear</string>
@@ -49,5 +51,9 @@
 		setup
 	</string>
 	<string name="timer_done">Time is up!</string>
+<<<<<<< HEAD
     <string name="repo_is_fork">This repository is a fork. It cannot contain issues.</string>
+=======
+    <string name="action_sign_out">Sign Out</string>
+>>>>>>> feat/signOut
 </resources>

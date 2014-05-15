@@ -7,7 +7,7 @@
         android:orderInCategory="1"
         android:showAsAction="always"
         android:title="@string/event_log_title"/>
-	<item
+    <item
 		android:id="@+id/action_settings"
 		android:icon="@drawable/ic_action_settings"
 		android:orderInCategory="100"
