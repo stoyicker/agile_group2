@@ -1,6 +1,9 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
 
+import android.util.Log;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,11 +31,15 @@ public class GitFileTree {
             files.add(gitFile);
         }
 
-        public void addDirectory(Node dir) {
+        public Node addDirectory(final Node dir) {
             Node existingNode = directories.get(dir.getDirName());
             if (existingNode == null) {
                 directories.put(dir.getDirName(), dir);
+            } else {
+                return existingNode;
             }
+
+            return dir;
         }
 
         public String getDirName() {
@@ -66,19 +73,17 @@ public class GitFileTree {
     private Node root;
 
     public GitFileTree(List<GitFile> gitFiles) {
-        root = new Node("/");
+        root = new Node("root");
 
         for(GitFile file : gitFiles) {
-
-            String path = file.getFileName();
+            String path = normalisePath(file.getFileName());
             String[] stringParts = path.split("/");
             Node previousNode = root;
             for (int i = 0; i < stringParts.length; i++) {
                 if (i != stringParts.length-1) {
                     // Directory
                     Node newNode = new Node(stringParts[i]);
-                    previousNode.addDirectory(newNode);
-                    previousNode = newNode;
+                    previousNode = previousNode.addDirectory(newNode);
                 } else {
                     // File
                     previousNode.addFile(file);
@@ -89,12 +94,17 @@ public class GitFileTree {
     }
 
     public List<GitFile> getFiles(final String path) {
-        String[] pathParts = path.split("/");
+        String cleanedPath = normalisePath(path);
+
+        String[] pathParts = cleanedPath.split("/");
         Node currentNode = root;
-        for (int i = 0; i < pathParts.length; i++) {
-            currentNode = currentNode.getDirectory(pathParts[i]);
-            if (currentNode == null) {
-                throw new IllegalArgumentException(path + " is not a valid path.");
+
+        if (cleanedPath.length() != 0) {
+            for (int i = 0; i < pathParts.length; i++) {
+                currentNode = currentNode.getDirectory(pathParts[i]);
+                if (currentNode == null) {
+                    throw new IllegalArgumentException(path + " is not a valid path.");
+                }
             }
         }
 
@@ -102,15 +112,32 @@ public class GitFileTree {
     }
 
     public List<String> getDirectories(final String path) {
-        String[] pathParts = path.split("/");
+        String cleanedPath = normalisePath(path);
+
+        String[] pathParts = cleanedPath.split("/");
         Node currentNode = root;
-        for (int i = 0; i < pathParts.length - 1; i++) {
-            currentNode = currentNode.getDirectory(pathParts[i]);
-            if (currentNode == null) {
-                throw new IllegalArgumentException(path + " is not a valid path.");
+
+        if (cleanedPath.length() != 0) {
+            for (int i = 0; i < pathParts.length; i++) {
+                currentNode = currentNode.getDirectory(pathParts[i]);
+                if (currentNode == null) {
+                    throw new IllegalArgumentException(path + " is not a valid path.");
+                }
             }
         }
 
         return currentNode.getDirectories();
+    }
+
+    private String normalisePath(final String path) {
+        String returnPath = path;
+
+        if (returnPath.equals("/")) {
+            returnPath = "";
+        } else if (returnPath.startsWith("/")) {
+            returnPath = returnPath.substring(1);
+        }
+
+        return returnPath;
     }
 }
