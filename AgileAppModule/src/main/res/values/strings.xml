@@ -51,9 +51,6 @@
 		setup
 	</string>
 	<string name="timer_done">Time is up!</string>
-<<<<<<< HEAD
     <string name="repo_is_fork">This repository is a fork. It cannot contain issues.</string>
-=======
     <string name="action_sign_out">Sign Out</string>
->>>>>>> feat/signOut
 </resources>
