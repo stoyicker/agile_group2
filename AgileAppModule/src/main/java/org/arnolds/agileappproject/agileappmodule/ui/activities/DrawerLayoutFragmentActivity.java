@@ -479,7 +479,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
             switch (event.getType()) {
                 case COMMIT:
-                    imageView.setImageResource(R.drawable.icon_section1);
+                    imageView.setImageResource(R.drawable.new_commit_event);
                     break;
                 case FILE_CONFLICT:
                     imageView.setImageResource(R.drawable.warning);
