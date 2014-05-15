@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_branch"
+    android:id="@+id/selected_file_item_fragment"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/selected_file_name"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:textSize="14dp"
+        android:layout_toLeftOf="@+id/remove_watched_file"
+        android:text="[LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONG_FILE_NAME]"/>
+
+    <ImageView
+        android:id="@+id/remove_watched_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/xmark"
+        android:layout_alignParentRight="true"
+        />
+
+</RelativeLayout>
