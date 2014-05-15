@@ -379,7 +379,8 @@ public class GitHubBroker implements IGitHubBroker {
 
     @Override
     public GitBranch getSelectedBranch() {
-        if (selectedBranch != null) {
+        if (selectedBranch != null && !branches.isEmpty()) {
+            selectedBranch = branches.get(selectedBranch.getName()); //Updates the head of selected branch
             return selectedBranch;
         }
         return  branches.get(DEFAULT_BRANCH_NAME);

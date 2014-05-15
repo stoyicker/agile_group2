@@ -15,9 +15,10 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:paddingLeft="20dp"
-		android:text="Medium Text"
+		android:text=""
 		android:textAppearance="?android:attr/textAppearanceMedium"
-		android:layout_toRightOf="@id/event_icon"/>
+        android:layout_toLeftOf="@+id/dismiss_event"
+        android:layout_toRightOf="@+id/event_icon" />
 	<ImageButton
 		android:id="@+id/dismiss_event"
 		android:layout_width="wrap_content"
