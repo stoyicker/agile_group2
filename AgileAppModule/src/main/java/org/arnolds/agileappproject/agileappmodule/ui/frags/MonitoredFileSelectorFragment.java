@@ -67,6 +67,8 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         GitBranch selectedBranch = broker.getSelectedBranch();
         Map<String, GitCommit> commits = broker.getCurrentCommitList();
 
+        currentLocation = DEFAULT_LOCATION;
+
         // TODO: Return List from getter method.
         List<GitFile> files = new ArrayList<GitFile>(NotificationUtils.filesOnBranch(selectedBranch, commits));
 
