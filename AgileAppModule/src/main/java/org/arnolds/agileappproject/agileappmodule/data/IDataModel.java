@@ -74,4 +74,6 @@ public interface IDataModel {
     public void removeMonitoredFile(GitFile file);
 
     public List<GitFile> getAllMonitoredFiles();
+
+    public void addMonitoredFileConflict(GitFile commitFile);
 }

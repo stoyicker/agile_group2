@@ -498,6 +498,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     break;
                 case TIMER_EVENT:
                     imageView.setImageResource(R.drawable.alarm);
+                    break;
+                case MONITORED_FILE_CONFLICT:
+                    imageView.setImageResource(R.drawable.warning);
+                    break;
             }
 
             TextView textView = (TextView) view.findViewById(R.id.event_name);

@@ -46,6 +46,7 @@
 	<string name="issue_created">Issue created</string>
 	<string name="notification_new_commits">New commit:</string>
 	<string name="file_conflict">Commit with File Conflict!</string>
+    <string name="file_conflict_on_monitored">File conflict on:</string>
 	<string name="siging_out">Signing out</string>
 	<string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>

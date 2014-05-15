@@ -104,6 +104,12 @@ public class DataModel implements IDataModel {
         return monitoredFiles;
     }
 
+    @Override
+    public void addMonitoredFileConflict(GitFile commitFile) {
+        eventList.add(new GitEvent(commitFile));
+        firePropertyEvent();
+    }
+
     private void firePropertyEvent() {
         pcs.firePropertyChange("New Event List", null, eventList);
     }
