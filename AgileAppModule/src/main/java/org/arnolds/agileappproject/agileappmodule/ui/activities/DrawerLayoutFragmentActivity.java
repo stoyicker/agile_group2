@@ -109,7 +109,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void signOut(MenuItem item) {
+    private void signOut() {
         Toast.makeText(this, R.id.siging_out, 2).show();
         final AccountManager accountManager = AccountManager.get(this);
         Account account = accountManager.getAccountsByType(LoginActivity.ACCOUNT_TYPE)[0];
@@ -123,7 +123,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             e.printStackTrace();
         }
         startActivity(login);
-        finish();
+        System.exit(0);
     }
 
     @Override
@@ -289,6 +289,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     break;
                 case 4:
                     target = new PokerGameFragment();
+                    break;
+                case 5:
+                    signOut();
+                    break;
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
                     break;

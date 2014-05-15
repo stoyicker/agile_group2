@@ -427,7 +427,6 @@ public class GitHubBroker implements IGitHubBroker {
     }
 
     private void fetchRepository() {
-        Log.wtf("broker", "fetchRepository");
         branches.clear();
         newCommits.clear();
         try {
@@ -436,7 +435,6 @@ public class GitHubBroker implements IGitHubBroker {
                 fetchCommits(ghBranch.getSHA1());
                 branches.put(ghBranch.getName(), new GitBranch(ghBranch.getName(), commits.get(ghBranch.getSHA1())));
             }
-            Log.wtf("broker commitlist", commits.size()+"");
         } catch (IOException e) {
             e.printStackTrace();
         }
