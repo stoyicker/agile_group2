@@ -69,11 +69,12 @@ public class GitFileTree {
         root = new Node("/");
 
         for(GitFile file : gitFiles) {
+
             String path = file.getFileName();
             String[] stringParts = path.split("/");
             Node previousNode = root;
             for (int i = 0; i < stringParts.length; i++) {
-                if (i != stringParts.length) {
+                if (i != stringParts.length-1) {
                     // Directory
                     Node newNode = new Node(stringParts[i]);
                     previousNode.addDirectory(newNode);
