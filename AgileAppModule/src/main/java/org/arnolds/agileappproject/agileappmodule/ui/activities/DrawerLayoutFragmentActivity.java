@@ -18,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -530,6 +532,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     @Override
                     public void run() {
                         button.setText(eventList.size() + "");
+                        Animation animationBounce = AnimationUtils
+                                .loadAnimation(getApplicationContext(),
+                                        R.anim.bounce);
+                        button.startAnimation(animationBounce);
                     }
                 });
 
