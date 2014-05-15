@@ -16,16 +16,14 @@ public class NotificationUtils {
 
         for (GitFile file : newCommit.getFiles()){
             newFiles.add(file);
-
         }
 
         branchFiles.retainAll(newFiles);
         return branchFiles;
     }
 
-    private static Set<GitFile> filesOnBranch(final GitBranch branch, final Map<String, GitCommit> commits) {
-
-        GitCommit commit = commits.get(branch.getSHA1());
+    public static Set<GitFile> filesOnBranch(final GitBranch branch, final Map<String, GitCommit> commits) {
+        GitCommit commit = branch.getCommit();
 
         Set<GitFile> files = new HashSet<GitFile>();
         getFiles(commit, files, commits);
