@@ -152,7 +152,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                                             new CreateIssueFragment())
                                     .addToBackStack("")
                                     .commit();
-                            getSupportFragmentManager().executePendingTransactions();
+//                            getSupportFragmentManager().executePendingTransactions();
                         }
                         break;
                     default:
@@ -234,13 +234,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_container, progressFragment)
                 .commit();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getFragmentManager().executePendingTransactions();
-                getSupportFragmentManager().executePendingTransactions();
-            }
-        });
+//        runOnUiThread(new Runnable() {
+//        @Override
+//            public void run() {
+//                getFragmentManager().executePendingTransactions();
+//                getSupportFragmentManager().executePendingTransactions();
+//            }
+//        });
     }
 
     @Override
@@ -250,13 +250,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
                     .commit();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().executePendingTransactions();
-                    getSupportFragmentManager().executePendingTransactions();
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    getFragmentManager().executePendingTransactions();
+//                    getSupportFragmentManager().executePendingTransactions();
+//                }
+//            });
         }
         catch (IllegalStateException ex) {
         }
@@ -317,7 +317,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 fragmentManager.beginTransaction()
                         .replace(MAIN_FRAGMENT_CONTAINER, target)
                         .addToBackStack("").commit();
-                fragmentManager.executePendingTransactions();
             }
             catch (NullPointerException ex) {
 //                Log.wtf("debug", ex.getClass().getName(),ex);
@@ -423,7 +422,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container,
                 fragments[CommitLogFragment.DRAWER_POSITION])
                 .commit();
-        getSupportFragmentManager().executePendingTransactions();
+//        getSupportFragmentManager().executePendingTransactions();
     }
 
     public void onSectionAttached(int number) {
@@ -438,14 +437,14 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.beginTransaction()
                 .replace(R.id.main_fragment_container, fragments[2]).commit();
-        if (supportFragmentManager != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    supportFragmentManager.executePendingTransactions();
-                }
-            });
-        }
+//        if (supportFragmentManager != null) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    supportFragmentManager.executePendingTransactions();
+//                }
+//            });
+//        }
     }
 
     private class EventLogAdapter extends BaseAdapter {
@@ -487,7 +486,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
             switch (event.getType()) {
                 case COMMIT:
-                    imageView.setImageResource(R.drawable.icon_section1);
+                    imageView.setImageResource(R.drawable.new_commit_event);
                     break;
                 case FILE_CONFLICT:
                     imageView.setImageResource(R.drawable.warning);

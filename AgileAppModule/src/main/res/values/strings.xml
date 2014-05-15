@@ -58,4 +58,6 @@
 	<string name="timer_done">Time is up!</string>
 	<string name="repo_is_fork">This repository is a fork. It cannot contain issues.</string>
 	<string name="action_sign_out">Sign Out</string>
+    <item name="notification_new_commits" type="id">New commits!</item>
+    <item name="file_conflict" type="id">File conflict</item>
 </resources>
