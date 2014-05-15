@@ -110,7 +110,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     private void signOut() {
-        Toast.makeText(this, R.string.siging_out, 2).show();
+        Toast.makeText(this, R.string.siging_out, Toast.LENGTH_SHORT).show();
         final AccountManager accountManager = AccountManager.get(this);
         Account account = accountManager.getAccountsByType(LoginActivity.ACCOUNT_TYPE)[0];
         accountManager.removeAccount(account, null, null);
