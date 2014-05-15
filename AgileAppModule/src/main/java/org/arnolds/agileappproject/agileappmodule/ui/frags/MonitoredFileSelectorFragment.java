@@ -84,6 +84,8 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
             list.add(new ListItem(Type.FILE, file.getName(), file));
         }
 
+        fileListAdapter.setList(list);
+
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -129,7 +131,7 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
             if (convertView == null) {
                 convertView = ((LayoutInflater) mContext
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                        .inflate(R.layout.list_item_commit, null);
+                        .inflate(R.layout.list_item_file, null);
                 viewHolder = new ViewHolder();
                 viewHolder.setImageView((ImageView) convertView.findViewById(R.id.file_icon));
                 viewHolder.setTextView((TextView) convertView.findViewById(R.id.file_name));
@@ -139,16 +141,15 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
             }
 
             if (position % 2 == 0) {
-                convertView.findViewById(R.id.commit_fragment)
+                convertView.findViewById(R.layout.list_item_file)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background1));
             } else {
-                convertView.findViewById(R.id.commit_fragment)
+                convertView.findViewById(R.layout.list_item_file)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
             viewHolder.getImageView().setImageResource(R.drawable.ic_arnold);
             viewHolder.getTextView().setText(list.get(position).getName());
-
 
             return convertView;
         }
