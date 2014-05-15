@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -133,8 +132,9 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView
-                .setAdapter(new NavigationDrawerArrayAdapter());
+
+        final NavigationDrawerArrayAdapter navigationAdapter = new NavigationDrawerArrayAdapter();
+        mDrawerListView.setAdapter(navigationAdapter);
 
 
         return ret;
@@ -217,11 +217,23 @@ public class NavigationDrawerFragment extends Fragment {
             mDrawerListView.setItemChecked(position, true);
 
         }
-        if (mDrawerLayout != null) {
+        if (mDrawerLayout != null && (!(position == 0 || position == 4 || position == 7))) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+            if (!(position == 0 || position == 4 || position == 7)) {
+                int aux;
+                if (position < 4) {
+                    aux = position - 1;
+                }
+                else if (position < 7) {
+                    aux = position - 2;
+                }
+                else {
+                    aux = position - 3;
+                }
+                mCallbacks.onNavigationDrawerItemSelected(aux);
+            }
         }
     }
 
@@ -293,23 +305,32 @@ public class NavigationDrawerFragment extends Fragment {
         void onStopLoad();
     }
 
-    private class NavigationDrawerArrayAdapter extends BaseAdapter {
+    private class NavigationDrawerArrayAdapter extends ArrayAdapter<String> {
 
-        private final int mResource = R.layout.list_item_navigation_drawer_list;
+        private static final int mEntryResource = R.layout.list_item_navigation_drawer_list,
+                mDividerResource = R.layout.list_item_navigation_drawer_list_divider;
+
+        public NavigationDrawerArrayAdapter() {
+            super(getActivity().getApplicationContext(), mEntryResource);
+        }
 
         @Override
         public int getCount() {
             Context context = getActivity().getApplicationContext();
             for (int i = 1; ; i++) {
                 if (AgileAppModuleUtils.getString(context, "title_section" + i, null) == null) {
-                    return i - 1;
+                    return i - 1 + 3;//3 is the number of sections
                 }
             }
         }
 
         @Override
-        public Object getItem(int i) {
+        public String getItem(int i) {
             int temp = i + 1;
+            if (i == 0 | i == 4 | i == 7) {
+                return AgileAppModuleUtils
+                        .getString(getActivity().getApplicationContext(), "title_header" + i, null);
+            }
             return AgileAppModuleUtils
                     .getString(getActivity().getApplicationContext(), "title_section" + temp, "");
         }
@@ -324,17 +345,35 @@ public class NavigationDrawerFragment extends Fragment {
             LayoutInflater inflater =
                     (LayoutInflater) getActivity().getApplicationContext().getSystemService(
                             Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(mResource, parent, false);
-
+            Log.d("debug", "position on getView:" + position);
+            if (position == 0 || position == 4 || position == 7) {
+                String text = AgileAppModuleUtils
+                        .getString(getActivity().getApplicationContext(), "title_header" + position,
+                                null);
+                convertView = inflater.inflate(mDividerResource, parent, false);
+                ((TextView) convertView.findViewById(R.id.divider_title_view)).setText(text);
+                return convertView;
+            }
+            convertView = inflater.inflate(mEntryResource, parent, false);
 
             int temp = position + 1;
+
+            if (position < 4) {
+                temp = temp - 1;
+            }
+            else if (position < 7) {
+                temp = temp - 2;
+            }
+            else {
+                temp = temp - 3;
+            }
 
             TextView textView =
                     (TextView) convertView.findViewById(R.id.navigation_drawer_item_title);
             ImageView imageView =
                     (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
 
-            if (position == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())) {
+            if (temp == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex() + 1)) {
                 convertView.setBackgroundColor(getResources().getColor(R.color.theme_orange));
                 textView.setTypeface(null, Typeface.BOLD);
             }

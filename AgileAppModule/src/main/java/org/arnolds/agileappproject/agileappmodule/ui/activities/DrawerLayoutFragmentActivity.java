@@ -274,7 +274,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         ArnoldSupportFragment target = fragments[position];
 
-        if (target == null || position == 4) {
+        if (target == null || position == 6) {
             switch (position) {
                 case 0:
                     target = new CommitLogFragment();
@@ -286,12 +286,20 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     target = new ListIssuesFragment();
                     break;
                 case 3:
-                    target = new TimerFragment();
+                    //TODO
+                    System.exit(-1);
                     break;
                 case 4:
-                    target = new PokerGameFragment();
+                    //TODO
+                    System.exit(-1);
                     break;
                 case 5:
+                    target = new TimerFragment();
+                    break;
+                case 6:
+                    target = new PokerGameFragment();
+                    break;
+                case 7:
                     signOut();
                     break;
                 default:

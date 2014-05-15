@@ -21,9 +21,8 @@ import org.kohsuke.github.GHCommit;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedHashMap;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +44,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private Context context;
     private boolean firstRecieve = true;
-    private boolean firstRecieveIssue =true;
+    private boolean firstRecieveIssue = true;
 
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
@@ -171,23 +170,27 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
 
         @Override
-        public void onNewCommitsReceived(boolean result, Map<String, GitCommit> newCommits, Map<String, GitCommit> commits) {
+        public void onNewCommitsReceived(boolean result, Map<String, GitCommit> newCommits,
+                                         Map<String, GitCommit> commits) {
 
-            if (!firstRecieve && !newCommits.isEmpty() ){
+            if (!firstRecieve && !newCommits.isEmpty()) {
 
                 GitBranch selectedBranch = broker.getSelectedBranch();
 
                 for (GitCommit commit : newCommits.values()) {
                     Set<GitFile> conflictingFiles = null;
                     if (selectedBranch != null) {
-                        conflictingFiles = NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
+                        conflictingFiles =
+                                NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
                     }
 
-                    if (conflictingFiles !=  null && conflictingFiles.size() > 0) {
-                        makeToast(context.getString(R.id.file_conflict));
+                    if (conflictingFiles != null && conflictingFiles.size() > 0) {
+                        makeToast(context.getString(R.string.file_conflict));
                         dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
-                    } else {
-                        makeToast(context.getString(R.id.notification_new_commits) +" " + commit.getMessage());
+                    }
+                    else {
+                        makeToast(context.getString(R.string.notification_new_commits) + " " +
+                                commit.getMessage());
                         dataModel.addLateCommit(commit);
                     }
                 }
@@ -197,8 +200,9 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         }
 
         @Override
-        public void onNewIssuesReceived(boolean b, List<GitIssue> oldIssues, List<GitIssue> issues) {
-            if (!firstRecieveIssue && oldIssues.size()<issues.size()){ //If there are new issues
+        public void onNewIssuesReceived(boolean b, List<GitIssue> oldIssues,
+                                        List<GitIssue> issues) {
+            if (!firstRecieveIssue && oldIssues.size() < issues.size()) { //If there are new issues
                 for (int i = 0; i < issues.size() - oldIssues.size(); i++) {
                     dataModel.addLateIssue(issues.get(i));
                 }

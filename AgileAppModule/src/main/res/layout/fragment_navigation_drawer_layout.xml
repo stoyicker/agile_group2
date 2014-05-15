@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
+	android:layout_height="match_parent"
 	android:background="@color/theme_navigation_drawer_background"
 	android:orientation="vertical">
 	<ListView
 		android:id="@+id/navigation_drawer_list_view"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
+		android:scrollbarAlwaysDrawVerticalTrack="true"
+		android:layout_height="0dp"
+		android:layout_weight="1.0"
 		android:choiceMode="singleChoice"/>
+	<TextView
+		android:id="@+id/selected_branch"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:padding="2dp"
+		android:paddingBottom="10dp"
+		android:gravity="center"
+		android:textSize="16sp"
+		android:textColor="@color/theme_white"
+		android:text="@string/selected_branch"
+		style="@style/BranchNameStyle"/>
 	<Spinner
 		android:id="@+id/repo_selector_view"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:layout_marginBottom="@dimen/repo_selector_spinner_to_bottom_margin"/>
-    <TextView
-        android:id="@+id/selected_branch"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="90dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="#999"
-        android:text="@string/selected_branch"
-        style="@style/BranchNameStyle"/>
-        />
-
-</RelativeLayout>
+		android:paddingBottom="10dp"/>
+</LinearLayout>

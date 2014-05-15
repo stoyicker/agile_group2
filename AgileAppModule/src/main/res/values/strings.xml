@@ -7,9 +7,14 @@
 	<string name="title_section1">Commits</string>
 	<string name="title_section2">Branches</string>
 	<string name="title_section3">Issues</string>
-	<string name="title_section4">Timer</string>
-	<string name="title_section5">Planning poker</string>
-	<string name="title_section6">Sign out</string>
+	<string name="title_section4">Placeholder 1</string>
+	<string name="title_section5">Placeholder 2</string>
+	<string name="title_section6">Timer</string>
+	<string name="title_section7">Planning poker</string>
+	<string name="title_section8">Sign out</string>
+	<string name="title_header0">Git</string>
+	<string name="title_header4">Files</string>
+	<string name="title_header7">Utilities</string>
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 	<string name="ret_branches">Retrieve Branches</string>
