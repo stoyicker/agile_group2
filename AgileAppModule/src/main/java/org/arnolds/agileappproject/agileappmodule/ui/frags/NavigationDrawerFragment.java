@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -34,11 +33,7 @@ import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 import org.kohsuke.github.GHRepository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class NavigationDrawerFragment extends Fragment {
 
@@ -69,11 +64,8 @@ public class NavigationDrawerFragment extends Fragment {
     private class SelectionListener extends GitHubBrokerListener {
         @Override
         public void onRepoSelected(boolean result) {
-            try {
-                mCallbacks.onNewRepoSelected(latestSelectedRepoName);
-            }
-            catch (NullPointerException ex) {
-            }
+            Log.wtf("BLAH", "----- STOP LOAD ----");
+            mCallbacks.onStopLoad();
         }
     }
 
@@ -85,6 +77,30 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerListView = (ListView) ret.findViewById(R.id.navigation_drawer_list_view);
 
         mRepoSelectionSpinner = (Spinner) ret.findViewById(R.id.repo_selector_view);
+
+        mRepoSelectionSpinner.setBackgroundColor(getResources().getColor(R.color.theme_white));
+
+        final List<String> allRepositories = new ArrayList<String>();
+        for (GHRepository repository : GitHubBroker.getInstance().getCurrentRepositories().values())
+            allRepositories.add(repository.getName());
+
+        final ArrayAdapter<String> adapter =
+                new ArrayAdapter<String>(
+                        getActivity().getApplicationContext(),
+                        R.layout.repo_selector_spinner_selected_item,
+                        allRepositories);
+        adapter.setDropDownViewResource(
+                R.layout.repo_selector_dropdown_item);
+        final String newSelectedRepoName =
+                mRepoSelectionSpinner.getSelectedItem() == null ? "" :
+                        mRepoSelectionSpinner.getSelectedItem().toString();
+
+        mRepoSelectionSpinner.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        if (newSelectedRepoName.isEmpty()) {
+            mRepoSelectionSpinner
+                    .setSelection(LAST_SELECTED_ITEM_INDEX, false);
+        }
 
         mRepoSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -102,7 +118,8 @@ public class NavigationDrawerFragment extends Fragment {
                     catch (GitHubBroker.NullArgumentException e) {
                         Log.wtf("debug", e.getClass().getName(), e);
                     }
-                    //mCallbacks.onStartLoad();
+                    mCallbacks.onStartLoad();
+                    Log.wtf("BLAH", "----- START LOAD ----");
                 }
             }
 
@@ -110,9 +127,6 @@ public class NavigationDrawerFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
-        mRepoSelectionSpinner.setBackgroundColor(getResources().getColor(R.color.theme_white));
-
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -122,64 +136,8 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerListView
                 .setAdapter(new NavigationDrawerArrayAdapter());
 
-        initializeAutoUpdaterRepoSelector(mRepoSelectionSpinner);
 
         return ret;
-    }
-
-    private final void initializeAutoUpdaterRepoSelector(final Spinner selectionSpinner) {
-        final ScheduledExecutorService reposFetchService = Executors
-                .newScheduledThreadPool(1);
-
-        reposFetchService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                if (isDrawerOpen()) {
-                    return;
-                }
-                try {
-                    GitHubBroker.getInstance().getAllRepos(new GitHubBrokerListener() {
-                        @Override
-                        public void onAllReposRetrieved(boolean success,
-                                                        Collection<GHRepository> repositories) {
-                            if (success) {
-                                final List<String> allRepositories = new ArrayList<String>();
-                                for (GHRepository repository : repositories)
-                                    allRepositories.add(repository.getName());
-                                try {
-                                    final ArrayAdapter<String> adapter =
-                                            new ArrayAdapter<String>(
-                                                    getActivity().getApplicationContext(),
-                                                    R.layout.repo_selector_spinner_selected_item,
-                                                    allRepositories);
-                                    adapter.setDropDownViewResource(
-                                            R.layout.repo_selector_dropdown_item);
-                                    final String newSelectedRepoName =
-                                            selectionSpinner.getSelectedItem() == null ? "" :
-                                                    selectionSpinner.getSelectedItem().toString();
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            selectionSpinner.setAdapter(adapter);
-                                            adapter.notifyDataSetChanged();
-                                            if (newSelectedRepoName.isEmpty()) {
-                                                selectionSpinner
-                                                        .setSelection(LAST_SELECTED_ITEM_INDEX);
-                                            }
-                                        }
-                                    });
-                                }
-                                catch (NullPointerException ex) {
-                                }
-                            }
-                        }
-                    });
-                }
-                catch (GitHubBroker.AlreadyNotConnectedException e) {
-                    Log.wtf("debug", e.getClass().getName(), e);
-                }
-            }
-        }, 0, REPOS_POLL_RATE_SECONDS, TimeUnit.SECONDS);
     }
 
     public boolean isDrawerOpen() {
@@ -330,9 +288,9 @@ public class NavigationDrawerFragment extends Fragment {
          */
         void onNavigationDrawerItemSelected(int position);
 
-        void onNewRepoSelected(String repoName);
-
         void onStartLoad();
+
+        void onStopLoad();
     }
 
     private class NavigationDrawerArrayAdapter extends BaseAdapter {
@@ -376,11 +334,8 @@ public class NavigationDrawerFragment extends Fragment {
             ImageView imageView =
                     (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
 
-            Log.d("debug", "selected item es " +
-                    DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex() +
-                    " and position is " + position);
             if (position == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())) {
-                convertView.setBackgroundColor(Color.GRAY);
+                convertView.setBackgroundColor(getResources().getColor(R.color.theme_orange));
                 textView.setTypeface(null, Typeface.BOLD);
             }
 

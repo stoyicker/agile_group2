@@ -15,15 +15,13 @@ import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
-import org.kohsuke.github.GHBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import java.util.Map;
@@ -36,21 +34,22 @@ public class GitHubNotificationService implements IGitHubNotificationService {
 
     private static GitHubNotificationService instance;
     private PropertyChangeSupport commitChangeSupport;
+    private PropertyChangeSupport issueChangeSupport;
     private LinkedHashMap<String, GHCommit> commits;
     private IGitHubBroker broker;
     private IGitHubBrokerListener brokerListener;
     private Thread commitPollerThread;
-    private String repoName = "";
-    private String branchName = "";
     private IDataModel dataModel;
 
     private volatile boolean commitPollerRunning;
 
     private Context context;
     private boolean firstRecieve = true;
+    private boolean firstRecieveIssue =true;
 
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
+        issueChangeSupport = new PropertyChangeSupport(this);
 
         commits = new LinkedHashMap<String, GHCommit>();
         brokerListener = new MyGitHubBrokerListener();
@@ -106,6 +105,31 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     }
 
     @Override
+    public synchronized void addIssueListener(PropertyChangeListener issueListener) {
+
+        if (issueListener == null) {
+            return;
+        }
+        issueChangeSupport.addPropertyChangeListener(issueListener);
+    }
+
+    @Override
+    public synchronized void removeIssueListener(PropertyChangeListener issueListener) {
+        issueChangeSupport.removePropertyChangeListener(issueListener);
+
+        //If no more listeners, destroy polling thread
+        if (issueChangeSupport.getPropertyChangeListeners().length <= 0) {
+            terminateCommitPoller();
+        }
+    }
+
+    @Override
+    public void killService() {
+        terminateCommitPoller();
+        instance = null;
+    }
+
+    @Override
     public synchronized void removeCommitListener(PropertyChangeListener commitListener) {
         commitChangeSupport.removePropertyChangeListener(commitListener);
 
@@ -123,6 +147,7 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                     try {
                         if (!TextUtils.isEmpty(GitHubBroker.getInstance().getSelectedRepoName())) {
                             broker.fetchNewCommits(brokerListener);
+                            broker.fetchNewIssues(brokerListener);
                         }
                     }
                     catch (GitHubBroker.RepositoryNotSelectedException e) {
@@ -169,6 +194,17 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 commitChangeSupport.firePropertyChange("new commits", null, newCommits);
             }
             firstRecieve = false;
+        }
+
+        @Override
+        public void onNewIssuesReceived(boolean b, List<GitIssue> oldIssues, List<GitIssue> issues) {
+            if (!firstRecieveIssue && oldIssues.size()<issues.size()){ //If there are new issues
+                for (int i = 0; i < issues.size() - oldIssues.size(); i++) {
+                    dataModel.addLateIssue(issues.get(i));
+                }
+                issueChangeSupport.firePropertyChange("new issues", null, issues);
+            }
+            firstRecieveIssue = false;
         }
 
         @Override

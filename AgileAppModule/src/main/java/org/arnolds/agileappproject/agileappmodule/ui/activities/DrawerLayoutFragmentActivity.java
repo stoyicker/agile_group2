@@ -1,5 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -23,11 +25,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.data.DataModel;
 import org.arnolds.agileappproject.agileappmodule.data.GitEvent;
 import org.arnolds.agileappproject.agileappmodule.data.IDataModel;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
@@ -36,6 +41,7 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.MonitoredFileSelectorFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.PokerGameFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
@@ -54,7 +60,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
     private Button eventCount;
-    private IDataModel dataModel;
+    private IDataModel dataModel = DataModel.getInstance();
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
     public static int getLastSelectedFragmentIndex() {
@@ -66,6 +72,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             new IndefiniteFancyProgressFragment();
     private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
+    private EventLogAdapter adapter;
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -75,7 +82,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         final MenuItem eventMenuItem = menu.findItem(R.id.action_event_log);
         View count = eventMenuItem.getActionView();
         eventCount = (Button) count.findViewById(R.id.feed_event_count);
-        eventCount.setText("0");
+        eventCount.setText(adapter.getCount() + "");
 
         dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
@@ -88,8 +95,11 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         switch (lastSelectedFragmentIndex) {
             case 2:
-                if (newIssueItem != null) {
+                if (newIssueItem != null && !GitHubBroker.getInstance().isFork()) {
                     newIssueItem.setVisible(Boolean.TRUE);
+                }
+                else if (GitHubBroker.getInstance().isFork()) {
+                    newIssueItem.setVisible(Boolean.FALSE);
                 }
                 break;
             default:
@@ -97,8 +107,25 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     newIssueItem.setVisible(Boolean.FALSE);
                 }
         }
-
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void signOut() {
+        Toast.makeText(this, R.string.siging_out, 2).show();
+        final AccountManager accountManager = AccountManager.get(this);
+        Account account = accountManager.getAccountsByType(LoginActivity.ACCOUNT_TYPE)[0];
+        accountManager.removeAccount(account, null, null);
+        Intent login = new Intent(this, LoginActivity.class);
+        login.putExtra(LoginActivity.LAUNCH_HOME_ACTIVITY, true);
+        GitHubNotificationService.getInstance().killService();
+        try {
+            GitHubBroker.getInstance().disconnect();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            e.printStackTrace();
+        }
+        startActivity(login);
+        System.exit(0);
     }
 
     @Override
@@ -114,9 +141,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             case R.id.action_event_log:
                 eventLogPressed();
                 break;
-            case R.id.action_settings:
-//  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
-                break;
+//            case R.id.action_settings:
+//  //TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
+//                break;
             case R.id.action_create:
                 switch (lastSelectedFragmentIndex) {
                     case 2:
@@ -149,10 +176,18 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = layoutInflater.inflate(R.layout.event_log, null);
-        ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+        Button clearButton = (Button) popupView.findViewById(R.id.dismiss_all_events);
+        final ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventCount.setText("0");
+                adapter.clear();
+            }
+        });
 
 
-        listView.setAdapter(new EventLogAdapter(this, dataModel.getEventList()));
+        listView.setAdapter(adapter);
 
         final PopupWindow popupWindow = new PopupWindow(
                 popupView, (int) getResources().getDimension(R.dimen.event_log_width),
@@ -209,6 +244,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         });
     }
 
+    @Override
     public synchronized void onStopLoad() {
         try {
             getFragmentManager().beginTransaction().remove(progressFragment).commit();
@@ -239,7 +275,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         ArnoldSupportFragment target = fragments[position];
 
-        if (target == null) {
+        if (target == null || position == 6) {
             switch (position) {
                 case 0:
                     target = new CommitLogFragment();
@@ -251,10 +287,21 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     target = new ListIssuesFragment();
                     break;
                 case 3:
-                    target = new MonitoredFileSelectorFragment();
+                    //TODO
+                    System.exit(-1);
                     break;
                 case 4:
+                    //TODO
+                    System.exit(-1);
+                    break;
+                case 5:
                     target = new TimerFragment();
+                    break;
+                case 6:
+                    target = new PokerGameFragment();
+                    break;
+                case 7:
+                    signOut();
                     break;
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
@@ -282,13 +329,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     .remove(fragments[lastSelectedFragmentIndex]).commit();
             getFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER,
                     progressFragment).commit();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().executePendingTransactions();
-                    getSupportFragmentManager().executePendingTransactions();
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    getFragmentManager().executePendingTransactions();
+//                    getSupportFragmentManager().executePendingTransactions();
+//                }
+//            });
         }
 
         lastSelectedFragmentIndex = position;
@@ -339,8 +386,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        dataModel = DataModel.getInstance();
+        adapter = new EventLogAdapter(this, dataModel.getEventList());
 
         setContentView(savedInstanceState.getInt("layout"));
 
@@ -389,19 +435,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
     }
 
-    @Override
-    public void onNewRepoSelected(String repoName) {
-        for (ArnoldSupportFragment x : fragments) {
-            try {
-                x.onNewRepositorySelected();
-            }
-            catch (NullPointerException ex) {
-//            Log.wtf("debug", ex.getClass().getName(), ex);
-            }
-        }
-    }
-
-
     public void notifyIssueCreated() {
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.beginTransaction()
@@ -424,6 +457,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         public EventLogAdapter(Context context, List<GitEvent> events) {
             mEvents = events;
             mInflater = LayoutInflater.from(context);
+        }
+
+        public void clear() {
+            mEvents.clear();
+            eventCount.setText("0");
+            notifyDataSetChanged();
         }
 
         @Override
@@ -449,14 +488,16 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
             switch (event.getType()) {
                 case COMMIT:
-                    imageView.setImageResource(R.drawable.icon_section1);
+                    imageView.setImageResource(R.drawable.new_commit_event);
                     break;
                 case FILE_CONFLICT:
                     imageView.setImageResource(R.drawable.warning);
                     break;
                 case ISSUE:
-                    imageView.setImageResource(R.drawable.icon_section3);
+                    imageView.setImageResource(R.drawable.issueyellow);
                     break;
+                case TIMER_EVENT:
+                    imageView.setImageResource(R.drawable.alarm);
             }
 
             TextView textView = (TextView) view.findViewById(R.id.event_name);

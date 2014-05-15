@@ -4,12 +4,16 @@
 	<string name="title_activity_main">AgileArnolds</string>
 	<string name="action_choose_project">Choose Project</string>
 	<string name="action_logout">Logout</string>
-	<string name="hello_blank_fragment">Hello blank fragment</string>
 	<string name="title_section1">Commits</string>
 	<string name="title_section2">Branches</string>
 	<string name="title_section3">Issues</string>
 	<string name="title_section4">Timer</string>
+<<<<<<< HEAD
     <string name="title_section5">File Browser</string>
+=======
+	<string name="title_section5">Planning poker</string>
+	<string name="title_section6">Sign out</string>
+>>>>>>> dev
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 	<string name="ret_branches">Retrieve Branches</string>
@@ -37,11 +41,12 @@
 	<string name="prompt_optional">Optional</string>
 	<string name="prompt_title">Title</string>
 	<string name="action_create_issue">Create issue</string>
-	<string name="creating_issue">Creating issue...</string>
+	<string name="creating_issue">Creating issue…</string>
 	<string name="issue_created">Issue created</string>
-	<item name="notification_new_commits" type="id">New commit:</item>
-    <item name="file_conflict" type="id">Commit with File Conflict!</item>
-    <string name="selected_branch">No branch selected</string>
+	<string name="notification_new_commits">New commit:</string>
+	<string name="file_conflict">Commit with File Conflict!</string>
+	<string name="siging_out">Signing out</string>
+	<string name="selected_branch">No branch selected</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
 	<string name="event_log_title">Event Log</string>
 	<string name="clear_event_log">Clear</string>
@@ -50,4 +55,8 @@
 		setup
 	</string>
 	<string name="timer_done">Time is up!</string>
+	<string name="repo_is_fork">This repository is a fork. It cannot contain issues.</string>
+	<string name="action_sign_out">Sign Out</string>
+    <item name="notification_new_commits" type="id">New commits!</item>
+    <item name="file_conflict" type="id">File conflict</item>
 </resources>

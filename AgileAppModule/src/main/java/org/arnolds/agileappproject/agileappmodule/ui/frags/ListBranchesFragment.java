@@ -43,11 +43,6 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
     }
 
     @Override
-    public void onNewRepositorySelected() {
-        populateList();
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         branches = GitHubBroker.getInstance().getAllBranches();
@@ -136,7 +131,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
                 TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
                 t.setText("Working on origin/" + branch.getName().toString() + " branch");
                 convertView.findViewById(R.id.branch_fragment)
-                        .setBackgroundColor(getResources().getColor(R.color.orange));
+                        .setBackgroundColor(getResources().getColor(R.color.theme_orange));
             }
 
             viewHolder.getNameView().setText(branch.getName());
@@ -208,7 +203,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
                 parent.getChildAt(chosen).setBackgroundColor(Color.TRANSPARENT);
 
             }
-            view.setBackgroundColor(getResources().getColor(R.color.orange));
+            view.setBackgroundColor(getResources().getColor(R.color.theme_orange));
             posPicked = position;
             Toast.makeText(context, "Branch " +
                             listAdapter.getItem(position).getName().toString() + " selected",
@@ -219,8 +214,6 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
             t.setText(" Working on origin/" + selectedBranch.getName().toString() + " branch");
             Toast.makeText(context, selectedBranch.getName().toString() + " selected",
                     Toast.LENGTH_SHORT).show();
-
-
         }
 
     }

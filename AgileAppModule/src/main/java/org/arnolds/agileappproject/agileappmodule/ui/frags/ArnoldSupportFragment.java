@@ -6,8 +6,7 @@ import android.support.v4.app.Fragment;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
 import org.arnolds.agileappproject.agileappmodule.utils.IRepositorySelectionSensitiveFragment;
 
-public abstract class ArnoldSupportFragment extends Fragment
-        implements IRepositorySelectionSensitiveFragment {
+public abstract class ArnoldSupportFragment extends Fragment {
 
     private final int menuIndex;
 

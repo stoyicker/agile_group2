@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
+import org.arnolds.agileappproject.agileappmodule.data.DataModel;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 
 import java.text.ParseException;
@@ -178,6 +179,7 @@ public class PairTimer {
                     Toast.makeText(activity, R.string.timer_done,Toast.LENGTH_LONG).show();
                 }
             });
+            DataModel.getInstance().addLateTimerEvent(SDF.format(initialValueAsDate)); //Adds a new timer event
             isChronometerRunning = Boolean.FALSE;
         }
     }
