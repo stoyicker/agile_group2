@@ -70,5 +70,18 @@
 		<item name="android:shadowRadius">2</item>
 		<item name="android:gravity">center</item>
 	</style>
-	<dimen name="chronometer_text_size">90sp</dimen>
+
+    <style name="filebrowser_path">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:textColor">@color/theme_black</item>
+        <item name="android:textSize">@dimen/filebrowser_text_size</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">#999</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+    </style>
+
+    <dimen name="chronometer_text_size">90sp</dimen>
 </resources>

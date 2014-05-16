@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/filebrowser_path_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/file_browser_path_height"
+        android:textAppearance="@style/filebrowser_path"
+        android:text="FilePath"
+        android:style="@style/filebrowser_path"
+
+    />
     <ListView
         android:id="@+id/listFiles"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
     </ListView>
 
-</RelativeLayout>
+</LinearLayout>

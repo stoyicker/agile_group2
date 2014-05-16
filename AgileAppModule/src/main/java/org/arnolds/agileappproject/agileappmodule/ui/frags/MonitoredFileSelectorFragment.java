@@ -41,6 +41,7 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
 
     public final static int MENU_INDEX = 3;
     private FragmentActivity mActivity;
+    private TextView pathTextView;
 
     public MonitoredFileSelectorFragment() {
         super(MENU_INDEX);
@@ -55,6 +56,8 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         mActivity = getActivity();
 
         mContext = getActivity().getApplicationContext();
+        pathTextView = (TextView) view.findViewById(R.id.filebrowser_path_text);
+        pathTextView.setText(DEFAULT_LOCATION);
         ListView listView = (ListView) view.findViewById(R.id.listFiles);
         fileListAdapter = new FileListAdapter();
         listView.setAdapter(fileListAdapter);
@@ -64,7 +67,18 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         return view;
     }
 
+    private void updatePathText() {
+        if (currentLocation.equals("")) {
+            pathTextView.setText("/");
+        } else {
+            pathTextView.setText("/"+currentLocation);
+        }
+    }
+
     private void populateList() {
+        // Update Path Text
+        updatePathText();
+
         IGitHubBroker broker = GitHubBroker.getInstance();
         GitBranch selectedBranch = broker.getSelectedBranch();
         Map<String, GitCommit> commits = broker.getCurrentCommitList();
@@ -138,6 +152,9 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                 final ListItem currentListItem = list.get(position);
 
                 if (currentListItem.getType() == Type.DIR){
+                    viewHolder.getCheckBox().setVisibility(View.GONE);
+                    viewHolder.getImageView().setImageResource(R.drawable.folder_128);
+
                     convertView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -147,6 +164,9 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                     });
                 }
                 else if(currentListItem.getType() == Type.UP){
+                    viewHolder.getCheckBox().setVisibility(View.GONE);
+                    viewHolder.getImageView().setImageResource(R.drawable.blank_file_128);
+
                     convertView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -156,6 +176,8 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                     });
                 }
                 else {
+                    viewHolder.getImageView().setImageResource(R.drawable.blank_file_128);
+
                     viewHolder.getCheckBox().setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -180,7 +202,6 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
-            viewHolder.getImageView().setImageResource(R.drawable.ic_arnold);
             viewHolder.getTextView().setText(list.get(position).getName());
 
             return convertView;
