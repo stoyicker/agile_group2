@@ -70,15 +70,16 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     private void populateList() {
         IGitHubBroker broker = GitHubBroker.getInstance();
-
-        commitAdapter.getCommitCollection().clear();
-        commitAdapter.getCommitCollection().addAll(broker.getCommitsFromSelectedBranch());
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
-            }
-        });
+        if (!GitHubBroker.getRepositoryStatus()) {
+            commitAdapter.getCommitCollection().clear();
+            commitAdapter.getCommitCollection().addAll(broker.getCommitsFromSelectedBranch());
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
 
