@@ -51,10 +51,6 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
 
 
         }
-        Log.wtf("BLAH", GitHubBroker.getInstance().getSelectedBranch().getName());
-
-        Log.wtf("BLAH", posPicked+"");
-
     }
 
     @Override
