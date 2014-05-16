@@ -90,7 +90,9 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         ArrayList<ListItem> list = new ArrayList<ListItem>();
 
         // Add up
-        list.add(new ListItem(Type.UP, "..", null));
+        if(!currentLocation.equals("")){
+            list.add(new ListItem(Type.UP, "..", null));
+        }
         // Add directories
         for (String dirName : tree.getDirectories(currentLocation)) {
             list.add(new ListItem(Type.DIR, dirName, null));
@@ -140,59 +142,60 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             final ViewHolder viewHolder;
-            if (convertView == null) {
-                convertView = ((LayoutInflater) mContext
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                        .inflate(R.layout.list_item_file, null);
-                viewHolder = new ViewHolder();
-                viewHolder.setImageView((ImageView) convertView.findViewById(R.id.file_icon));
-                viewHolder.setTextView((TextView) convertView.findViewById(R.id.file_name));
-                viewHolder.setCheckBox((CheckBox) convertView.findViewById(R.id.file_checkbox));
 
-                final ListItem currentListItem = list.get(position);
+            convertView = ((LayoutInflater) mContext
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                    .inflate(R.layout.list_item_file, null);
+            viewHolder = new ViewHolder();
+            viewHolder.setImageView((ImageView) convertView.findViewById(R.id.file_icon));
+            viewHolder.setTextView((TextView) convertView.findViewById(R.id.file_name));
+            viewHolder.setCheckBox((CheckBox) convertView.findViewById(R.id.file_checkbox));
 
-                if (currentListItem.getType() == Type.DIR){
-                    viewHolder.getCheckBox().setVisibility(View.GONE);
-                    viewHolder.getImageView().setImageResource(R.drawable.folder_128);
+            final ListItem currentListItem = list.get(position);
 
-                    convertView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            currentLocation +="/"+currentListItem.getName();
-                            populateList();
-                        }
-                    });
-                }
-                else if(currentListItem.getType() == Type.UP){
-                    viewHolder.getCheckBox().setVisibility(View.GONE);
-                    viewHolder.getImageView().setImageResource(R.drawable.blank_file_128);
+            if (currentListItem.getType() == Type.DIR){
+                viewHolder.getCheckBox().setVisibility(View.GONE);
+                viewHolder.getImageView().setImageResource(R.drawable.folder_128);
 
-                    convertView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            currentLocation = currentLocation.substring(0, currentLocation.lastIndexOf('/'));
-                            populateList();
-                        }
-                    });
-                }
-                else {
-                    viewHolder.getImageView().setImageResource(R.drawable.blank_file_128);
-
-                    viewHolder.getCheckBox().setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!viewHolder.getCheckBox().isChecked()) {
-                                DataModel.getInstance().removeMonitoredFile(list.get(position).getFile());
-                            } else {
-                                DataModel.getInstance().addMonitoredFile(list.get(position).getFile());
-                            }
-                        }
-                    });
-                }
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        currentLocation +="/"+currentListItem.getName();
+                        populateList();
+                    }
+                });
             }
+            else if(currentListItem.getType() == Type.UP){
+                viewHolder.getCheckBox().setVisibility(View.GONE);
+                viewHolder.getImageView().setImageResource(R.drawable.arrow_up_128);
+
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        currentLocation = currentLocation.substring(0, currentLocation.lastIndexOf('/'));
+                        populateList();
+                    }
+                });
+            }
+            else {
+                viewHolder.getImageView().setImageResource(R.drawable.blank_file_128);
+
+                if(DataModel.getInstance().getAllMonitoredFiles().contains(currentListItem.getFile())){
+                    viewHolder.getCheckBox().setChecked(true);
+                }
+
+                viewHolder.getCheckBox().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!viewHolder.getCheckBox().isChecked()) {
+                            DataModel.getInstance().removeMonitoredFile(list.get(position).getFile());
+                        } else {
+                            DataModel.getInstance().addMonitoredFile(list.get(position).getFile());
+                        }
+                    }
+                });
+            }
+            convertView.setTag(viewHolder);
 
             if (position % 2 == 0) {
                 convertView.findViewById(R.id.list_item_file)

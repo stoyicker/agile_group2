@@ -8,9 +8,8 @@
         android:id="@+id/filebrowser_path_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/file_browser_path_height"
-        android:textAppearance="@style/filebrowser_path"
         android:text="FilePath"
-        android:style="@style/filebrowser_path"
+        style="@style/filebrowser_path"
 
     />
     <ListView
