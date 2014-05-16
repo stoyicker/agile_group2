@@ -19,6 +19,7 @@
         android:text="Asdf asdf asdf"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/file_icon"
+        android:textColor="@color/theme_black"
         android:paddingLeft="10dp"/>
 
     <CheckBox

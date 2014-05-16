@@ -97,6 +97,7 @@ public class GitHubBroker implements IGitHubBroker {
     private List<GitIssue> issues = new ArrayList<GitIssue>();
 
     private final Object asyncLock = new Object();
+    private final Object branchesLock = new Object();
 
     private GitHubBroker() {
     }
@@ -385,11 +386,13 @@ public class GitHubBroker implements IGitHubBroker {
 
     @Override
     public GitBranch getSelectedBranch() {
-        if (selectedBranch != null && !branches.isEmpty()) {
-            selectedBranch = branches.get(selectedBranch.getName()); //Updates the head of selected branch
-        } else if (!branches.isEmpty())
-            selectedBranch = branches.get(DEFAULT_BRANCH_NAME);
-        return selectedBranch;
+        synchronized (branchesLock) {
+            if (selectedBranch != null && !branches.isEmpty()) {
+                selectedBranch = branches.get(selectedBranch.getName()); //Updates the head of selected branch
+            } else if (!branches.isEmpty())
+                selectedBranch = branches.get(DEFAULT_BRANCH_NAME);
+            return selectedBranch;
+        }
     }
 
     @Override
@@ -433,16 +436,20 @@ public class GitHubBroker implements IGitHubBroker {
 
     }
 
-    private synchronized void fetchRepository() {
+    private void fetchRepository() {
 
-        branches.clear();
+        Map<String, GitBranch> newBranches = new HashMap<String, GitBranch>();
         newCommits.clear();
         try {
             Map<String, GHBranch> ghBranchMap = repository.getBranches();
             for (GHBranch ghBranch : ghBranchMap.values()) {
                 fetchCommits(ghBranch.getSHA1());
-                branches.put(ghBranch.getName(), new GitBranch(ghBranch.getName(), commits.get(ghBranch.getSHA1())));
+                newBranches.put(ghBranch.getName(), new GitBranch(ghBranch.getName(), commits.get(ghBranch.getSHA1())));
             }
+            synchronized (branchesLock){
+                branches = newBranches;
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
