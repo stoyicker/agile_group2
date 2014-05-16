@@ -13,41 +13,42 @@ import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.GitHubBrokerListener;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener;
-import org.kohsuke.github.GHBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
 public class GitHubNotificationService implements IGitHubNotificationService {
     public static final int POLL_TIMEOUT_SECONDS = 5;
-    private GHRepository repo;
 
     private static GitHubNotificationService instance;
     private PropertyChangeSupport commitChangeSupport;
+    private PropertyChangeSupport issueChangeSupport;
     private LinkedHashMap<String, GHCommit> commits;
     private IGitHubBroker broker;
     private IGitHubBrokerListener brokerListener;
     private Thread commitPollerThread;
-    private String repoName = "";
-    private String branchName = "";
     private IDataModel dataModel;
 
     private volatile boolean commitPollerRunning;
 
     private Context context;
+    private boolean firstRecieve = true;
+    private boolean firstRecieveIssue = true;
 
     private GitHubNotificationService() {
         commitChangeSupport = new PropertyChangeSupport(this);
+        issueChangeSupport = new PropertyChangeSupport(this);
 
         commits = new LinkedHashMap<String, GHCommit>();
         brokerListener = new MyGitHubBrokerListener();
@@ -103,6 +104,31 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     }
 
     @Override
+    public synchronized void addIssueListener(PropertyChangeListener issueListener) {
+
+        if (issueListener == null) {
+            return;
+        }
+        issueChangeSupport.addPropertyChangeListener(issueListener);
+    }
+
+    @Override
+    public synchronized void removeIssueListener(PropertyChangeListener issueListener) {
+        issueChangeSupport.removePropertyChangeListener(issueListener);
+
+        //If no more listeners, destroy polling thread
+        if (issueChangeSupport.getPropertyChangeListeners().length <= 0) {
+            terminateCommitPoller();
+        }
+    }
+
+    @Override
+    public void killService() {
+        terminateCommitPoller();
+        instance = null;
+    }
+
+    @Override
     public synchronized void removeCommitListener(PropertyChangeListener commitListener) {
         commitChangeSupport.removePropertyChangeListener(commitListener);
 
@@ -119,7 +145,8 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 try {
                     try {
                         if (!TextUtils.isEmpty(GitHubBroker.getInstance().getSelectedRepoName())) {
-                            broker.getAllCommitsOld(brokerListener);
+                            broker.fetchNewCommits(brokerListener);
+                            broker.fetchNewIssues(brokerListener);
                         }
                     }
                     catch (GitHubBroker.RepositoryNotSelectedException e) {
@@ -141,56 +168,64 @@ public class GitHubNotificationService implements IGitHubNotificationService {
     }
 
     private class MyGitHubBrokerListener extends GitHubBrokerListener {
+
         @Override
-        public void onAllCommitsRetrieved(boolean result, final LinkedHashMap<String, GHCommit> remoteCommits) {
-            String currentRepo = broker.getSelectedRepoName();
-            String currentBranch = broker.getSelectedBranch().getName();
-            //If no previous list or repo change.
+        public void onNewCommitsReceived(boolean result, Map<String, GitCommit> newCommits,
+                                         Map<String, GitCommit> commits) {
 
-            if (commits == null || !branchName.equals(currentBranch) || !repoName.equals(currentRepo)) {
-                commits = remoteCommits;
-                try {   //TODO Why is this necessary?
-                    commitChangeSupport
-                            .firePropertyChange("New ", null, commits); //TODO: don't send pointer.
-                }catch (NullPointerException np){
+            if (!firstRecieve && !newCommits.isEmpty()) {
 
-                }
-                repoName = currentRepo;
-                branchName = currentBranch;//TODO: don't store repoName locally.
-            }
-            else if (remoteCommits.size() > commits.size()) {
+                GitBranch selectedBranch = broker.getSelectedBranch();
 
-                //Filter out new commits
-                //Removes old commits from remoteCommits
-                for (GHCommit commit : commits.values()) {
-                    remoteCommits.remove(commit.getSHA1());
-                }
-
-                GHBranch selectedBranch = broker.getSelectedBranch();
-
-                for (GHCommit commit : remoteCommits.values()) {
-                    Set<GitFile> conflictingFiles = null;
-                    if (selectedBranch != null) {
-                        conflictingFiles = NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
+                for (GitCommit commit : newCommits.values()) {
+                    List<GitFile> monitoredFiles = DataModel.getInstance().getAllMonitoredFiles();
+                    if (monitoredFiles.size() > 0){
+                        for (GitFile file : monitoredFiles){
+                            for (GitFile commitFile : commit.getFiles())
+                            if (file.equals(commitFile)){
+                                dataModel.addMonitoredFileConflict(commitFile);
+                                makeToast(context.getString(R.string.file_conflict_on_monitored)+" "+commitFile.getName());
+                            }
+                        }
                     }
+                    else {
+                        Set<GitFile> conflictingFiles = null;
+                        if (selectedBranch != null) {
+                            conflictingFiles =
+                                    NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
+                        }
 
-                    if (conflictingFiles !=  null && conflictingFiles.size() > 0) {
-                        makeToast(context.getString(R.id.file_conflict));
-                        dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
-                    } else {
-                        makeToast(context.getString(R.id.notification_new_commits) +" " + commit.getCommitShortInfo().getMessage());
-                        dataModel.addLateCommit(commit);
+                        if (conflictingFiles != null && conflictingFiles.size() > 0) {
+                            makeToast(context.getString(R.string.file_conflict));
+                            dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
+                        } else {
+                            makeToast(context.getString(R.string.notification_new_commits) + " " +
+                                    commit.getMessage());
+                            dataModel.addLateCommit(commit);
+                        }
                     }
                 }
-
-                commits.putAll(remoteCommits);
-                commitChangeSupport.firePropertyChange("New ", null, commits); //TODO: don't send pointer.
+                commitChangeSupport.firePropertyChange("new commits", null, newCommits);
             }
+            firstRecieve = false;
+        }
+
+        @Override
+        public void onNewIssuesReceived(boolean b, List<GitIssue> oldIssues,
+                                        List<GitIssue> issues) {
+            if (!firstRecieveIssue && oldIssues.size() < issues.size()) { //If there are new issues
+                for (int i = 0; i < issues.size() - oldIssues.size(); i++) {
+                    dataModel.addLateIssue(issues.get(i));
+                }
+                issueChangeSupport.firePropertyChange("new issues", null, issues);
+            }
+            firstRecieveIssue = false;
         }
 
         @Override
         public void onRepoSelected(boolean result) {
-            commits = null;
+
+
         }
 
         private void makeToast(final String toastString) {
@@ -209,7 +244,4 @@ public class GitHubNotificationService implements IGitHubNotificationService {
         return commits.isEmpty();
     }
 
-    public List<GHCommit> getCurrentCommitList() {
-        return new ArrayList<GHCommit>(commits.values());
-    }
 }

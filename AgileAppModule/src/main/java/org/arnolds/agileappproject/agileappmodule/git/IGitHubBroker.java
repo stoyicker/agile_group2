@@ -1,9 +1,17 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
+
+import java.util.List;
+import java.util.Map;
 
 
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHRepository;
 
 import java.io.IOException;
 
@@ -70,15 +78,10 @@ public interface IGitHubBroker {
             throws GitHubBroker.AlreadyNotConnectedException, GitHubBroker.NullArgumentException;
 
     /**
-     * Asynchronously return all branches of the working repository, giving response on the provided callback.
-     *
-     * @param callback {@link org.arnolds.agileappproject.agileappmodule.git.IGitHubBrokerListener} Callback receiver, if null no callback will be made.
-     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.RepositoryNotSelectedException} If there is not a working repo selected.
-     * @throws {@link org.arnolds.agileappproject.agileappmodule.git.GitHubBroker.AlreadyNotConnectedException} If there is not a connected session.
+     * Returns all branches in the select repo.
      */
-    public void getAllBranches(IGitHubBrokerListener callback)
-            throws GitHubBroker.RepositoryNotSelectedException,
-            GitHubBroker.AlreadyNotConnectedException;
+    public Map<String, GitBranch> getAllBranches();
+
 
     /**
      * Asynchronously return all repos of the currently logged in user, giving response on the provided callback.
@@ -118,15 +121,50 @@ public interface IGitHubBroker {
      * Gets the selected branch.
      * @return the selected branch or null if no branch is selected.
      */
-    public GHBranch getSelectedBranch();
+    public GitBranch getSelectedBranch();
 
     /**
      * Sets the selected branch.
-     * @param selectedBranch the branch that should be selected.
+     * @param branchName the name of the branch that should be selected.
      */
-    public void setSelectedBranch(GHBranch selectedBranch);
+    public void setSelectedBranch(String branchName);
 
-    public void getAllCommitsOld(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
+
+
+    public void fetchNewCommits(IGitHubBrokerListener callback) throws GitHubBroker.RepositoryNotSelectedException,
             GitHubBroker.AlreadyNotConnectedException;
 
+    /**
+     *
+     * @return Map<String,GHCommit>, Contains all commits in selected repo. Returns empty if there are no commits.
+     */
+    public Map<String,GitCommit> getCurrentCommitList();
+
+    /**
+     * Get all commits from the currently selected branch.
+     *
+     * @return List<GitCommit> the commits
+     */
+    public List<GitCommit> getCommitsFromSelectedBranch();
+
+    /**
+     *
+     * @return Map<String,GHRepository>, Contains all the user's repositories.
+     */
+    public Map<String,GHRepository> getCurrentRepositories();
+
+
+    public void fetchNewIssues(IGitHubBrokerListener callback)throws GitHubBroker.RepositoryNotSelectedException,
+    GitHubBroker.AlreadyNotConnectedException;
+    /**
+     *
+     * @return List<GitIssue>, Contains all the issues in the repository.
+     */
+    public List<GitIssue> getCurrentIssues();
+
+    /**
+     *
+     * @return Boolean, True if the selected repository is a fork.
+     */
+    public Boolean isFork();
 }

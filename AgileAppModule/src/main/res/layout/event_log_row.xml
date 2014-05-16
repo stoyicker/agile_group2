@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFFFFF">
-    <ImageView
-        android:id="@+id/event_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"/>
-    <TextView
-        android:id="@+id/event_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:text="Medium Text"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toRightOf="@id/event_icon"/>
-    <ImageButton
-        android:id="@+id/dismiss_event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/xmark"
-        android:layout_alignParentRight="true"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF">
+	<ImageView
+		android:id="@+id/event_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingLeft="4dp"
+		android:gravity="center"
+		android:layout_alignParentLeft="true"/>
+	<TextView
+		android:id="@+id/event_name"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingLeft="20dp"
+		android:text=""
+		android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_toLeftOf="@+id/dismiss_event"
+        android:layout_toRightOf="@+id/event_icon" />
+	<ImageButton
+		android:id="@+id/dismiss_event"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="@drawable/xmark"
+		android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

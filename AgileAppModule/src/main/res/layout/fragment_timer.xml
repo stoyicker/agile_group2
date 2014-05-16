@@ -17,6 +17,7 @@
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
 			android:hint="HH"
+			android:text="00"
 			android:inputType="number"
 			android:nextFocusRight="@+id/minutes_edit_time_view"
 			style="@style/ChronometerStyle"
@@ -40,6 +41,7 @@
 			android:inputType="number"
 			style="@style/ChronometerStyle"
 			android:textSize="40sp"
+			android:text="00"
 			android:paddingBottom="@dimen/timer_view_padding"/>
 		<TextView
 			android:layout_width="wrap_content"
@@ -56,6 +58,7 @@
 			android:layout_gravity="center"
 			android:inputType="number"
 			android:hint="ss"
+			android:text="00"
 			style="@style/ChronometerStyle"
 			android:textSize="40sp"
 			android:paddingBottom="@dimen/timer_view_padding"/>

@@ -1,8 +1,12 @@
 package org.arnolds.agileappproject.agileappmodule.data;
 
 
+import android.util.Log;
+
 import org.apache.commons.lang.NotImplementedException;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -15,6 +19,7 @@ public class DataModel implements IDataModel {
     private PropertyChangeSupport pcs;
     private List<GitEvent> eventList;
     private static IDataModel model = null;
+    private List<GitFile> monitoredFiles = new ArrayList<GitFile>();
 
     private DataModel() {
         pcs = new PropertyChangeSupport(this);
@@ -30,7 +35,7 @@ public class DataModel implements IDataModel {
     }
 
     @Override
-    public void addLateCommit(GHCommit commit) {
+    public void addLateCommit(GitCommit commit) {
         eventList.add(new GitEvent(commit));
         firePropertyEvent();
     }
@@ -41,13 +46,19 @@ public class DataModel implements IDataModel {
     }
 
     @Override
-    public void addLateIssue(GHIssue issue) {
+    public void addLateTimerEvent(String time) {
+        eventList.add(new GitEvent(time));
+        firePropertyEvent();
+    }
+
+    @Override
+    public void addLateIssue(GitIssue issue) {
         eventList.add(new GitEvent(issue));
         firePropertyEvent();
     }
 
     @Override
-    public void addFileConflict(GHCommit commit, List<GitFile> affectedFiles) {
+    public void addFileConflict(GitCommit commit, List<GitFile> affectedFiles) {
         eventList.add(new GitEvent(commit, affectedFiles));
         firePropertyEvent();
     }
@@ -71,6 +82,32 @@ public class DataModel implements IDataModel {
     @Override
     public List<GitEvent> getEventList() {
         return eventList;
+    }
+
+    @Override
+    public void addMonitoredFile(GitFile file) {
+        if(!monitoredFiles.contains(file)){
+            monitoredFiles.add(file);
+        }
+        else{
+            Log.wtf("addMonitoredFile", "file already exists");
+        }
+    }
+
+    @Override
+    public void removeMonitoredFile(GitFile file) {
+        monitoredFiles.remove(file);
+    }
+
+    @Override
+    public List<GitFile> getAllMonitoredFiles() {
+        return monitoredFiles;
+    }
+
+    @Override
+    public void addMonitoredFileConflict(GitFile commitFile) {
+        eventList.add(new GitEvent(commitFile));
+        firePropertyEvent();
     }
 
     private void firePropertyEvent() {

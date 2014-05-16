@@ -1,5 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.git;
 
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
@@ -53,4 +55,14 @@ public abstract class GitHubBrokerListener implements IGitHubBrokerListener {
     public void onIssueCreation(boolean result, GHIssue issue) {
 
     }
+
+    @Override
+    public void onNewCommitsReceived(boolean result, Map<String, GitCommit> newCommits, Map<String, GitCommit> commits){
+
+    }
+
+    public void onNewIssuesReceived(boolean b, List<GitIssue> oldIssues, List<GitIssue> issues){
+
+    }
+
 }

@@ -27,8 +27,7 @@ android {
 }
 
 dependencies {
-    compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:+'
-    compile 'org.kohsuke:github-api:+'
+    compile 'org.kohsuke:github-api:1.51'
     compile 'com.android.support:support-v4:+'
     compile 'org.mockito:mockito-all:+'
     compile 'com.github.castorflex.smoothprogressbar:library:+'

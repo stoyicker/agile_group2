@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -20,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -34,11 +32,7 @@ import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 import org.kohsuke.github.GHRepository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class NavigationDrawerFragment extends Fragment {
 
@@ -51,7 +45,6 @@ public class NavigationDrawerFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
-    private int latestMenuItemSelected = -1;
     private Spinner mRepoSelectionSpinner;
     private String latestSelectedRepoName = "";
     private final SelectionListener selectionListener = new SelectionListener();
@@ -63,14 +56,15 @@ public class NavigationDrawerFragment extends Fragment {
         setHasOptionsMenu(Boolean.TRUE);
     }
 
+    public void invalidateListView() {
+        mDrawerListView.invalidateViews();
+    }
+
     private class SelectionListener extends GitHubBrokerListener {
         @Override
         public void onRepoSelected(boolean result) {
-            try {
-                mCallbacks.onNewRepoSelected(latestSelectedRepoName);
-            }
-            catch (NullPointerException ex) {
-            }
+            Log.wtf("BLAH", "----- STOP LOAD ----");
+            mCallbacks.onStopLoad();
         }
     }
 
@@ -82,6 +76,32 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerListView = (ListView) ret.findViewById(R.id.navigation_drawer_list_view);
 
         mRepoSelectionSpinner = (Spinner) ret.findViewById(R.id.repo_selector_view);
+
+        mRepoSelectionSpinner.setBackgroundColor(getResources().getColor(R.color.theme_white));
+
+
+
+        final List<String> allRepositories = new ArrayList<String>();
+        for (GHRepository repository : GitHubBroker.getInstance().getCurrentRepositories().values())
+            allRepositories.add(repository.getName());
+
+        final ArrayAdapter<String> adapter =
+                new ArrayAdapter<String>(
+                        getActivity().getApplicationContext(),
+                        R.layout.repo_selector_spinner_selected_item,
+                        allRepositories);
+        adapter.setDropDownViewResource(
+                R.layout.repo_selector_dropdown_item);
+        final String newSelectedRepoName =
+                mRepoSelectionSpinner.getSelectedItem() == null ? "" :
+                        mRepoSelectionSpinner.getSelectedItem().toString();
+
+        mRepoSelectionSpinner.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        if (newSelectedRepoName.isEmpty()) {
+            mRepoSelectionSpinner
+                    .setSelection(LAST_SELECTED_ITEM_INDEX, false);
+        }
 
         mRepoSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -100,6 +120,7 @@ public class NavigationDrawerFragment extends Fragment {
                         Log.wtf("debug", e.getClass().getName(), e);
                     }
                     mCallbacks.onStartLoad();
+                    Log.wtf("BLAH", "----- START LOAD ----");
                 }
             }
 
@@ -107,77 +128,18 @@ public class NavigationDrawerFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
-        mRepoSelectionSpinner.setBackgroundColor(getResources().getColor(R.color.theme_white));
-
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectItem(position);
-                latestMenuItemSelected = position;
             }
         });
-        mDrawerListView
-                .setAdapter(new NavigationDrawerArrayAdapter());
 
-        initializeAutoUpdaterRepoSelector(mRepoSelectionSpinner);
+        final NavigationDrawerArrayAdapter navigationAdapter = new NavigationDrawerArrayAdapter();
+        mDrawerListView.setAdapter(navigationAdapter);
+
 
         return ret;
-    }
-
-    private final void initializeAutoUpdaterRepoSelector(final Spinner selectionSpinner) {
-        final ScheduledExecutorService reposFetchService = Executors
-                .newScheduledThreadPool(1);
-
-        reposFetchService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                if (isDrawerOpen()) {
-                    return;
-                }
-                try {
-                    GitHubBroker.getInstance().getAllRepos(new GitHubBrokerListener() {
-                        @Override
-                        public void onAllReposRetrieved(boolean success,
-                                                        Collection<GHRepository> repositories) {
-                            if (success) {
-                                final List<String> allRepositories = new ArrayList<String>();
-                                for (GHRepository repository : repositories)
-                                    allRepositories.add(repository.getName());
-                                try {
-                                    final ArrayAdapter<String> adapter =
-                                            new ArrayAdapter<String>(
-                                                    getActivity().getApplicationContext(),
-                                                    R.layout.repo_selector_spinner_selected_item,
-                                                    allRepositories);
-                                    adapter.setDropDownViewResource(
-                                            R.layout.repo_selector_dropdown_item);
-                                    final String newSelectedRepoName =
-                                            selectionSpinner.getSelectedItem() == null ? "" :
-                                                    selectionSpinner.getSelectedItem().toString();
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            selectionSpinner.setAdapter(adapter);
-                                            adapter.notifyDataSetChanged();
-                                            if (newSelectedRepoName.isEmpty()) {
-                                                selectionSpinner
-                                                        .setSelection(LAST_SELECTED_ITEM_INDEX);
-                                            }
-                                        }
-                                    });
-                                }
-                                catch (NullPointerException ex) {
-                                }
-                            }
-                        }
-                    });
-                }
-                catch (GitHubBroker.AlreadyNotConnectedException e) {
-                    Log.wtf("debug", e.getClass().getName(), e);
-                }
-            }
-        }, 0, REPOS_POLL_RATE_SECONDS, TimeUnit.SECONDS);
     }
 
     public boolean isDrawerOpen() {
@@ -257,11 +219,23 @@ public class NavigationDrawerFragment extends Fragment {
             mDrawerListView.setItemChecked(position, true);
 
         }
-        if (mDrawerLayout != null) {
+        if (mDrawerLayout != null && (!(position == 0 || position == 4 || position == 7))) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+            if (!(position == 0 || position == 4 || position == 7)) {
+                int aux;
+                if (position < 4) {
+                    aux = position - 1;
+                }
+                else if (position < 7) {
+                    aux = position - 2;
+                }
+                else {
+                    aux = position - 3;
+                }
+                mCallbacks.onNavigationDrawerItemSelected(aux);
+            }
         }
     }
 
@@ -328,28 +302,37 @@ public class NavigationDrawerFragment extends Fragment {
          */
         void onNavigationDrawerItemSelected(int position);
 
-        void onNewRepoSelected(String repoName);
-
         void onStartLoad();
+
+        void onStopLoad();
     }
 
-    private class NavigationDrawerArrayAdapter extends BaseAdapter {
+    private class NavigationDrawerArrayAdapter extends ArrayAdapter<String> {
 
-        private final int mResource = R.layout.list_item_navigation_drawer_list;
+        private static final int mEntryResource = R.layout.list_item_navigation_drawer_list,
+                mDividerResource = R.layout.list_item_navigation_drawer_list_divider;
+
+        public NavigationDrawerArrayAdapter() {
+            super(getActivity().getApplicationContext(), mEntryResource);
+        }
 
         @Override
         public int getCount() {
             Context context = getActivity().getApplicationContext();
             for (int i = 1; ; i++) {
                 if (AgileAppModuleUtils.getString(context, "title_section" + i, null) == null) {
-                    return i - 1;
+                    return i - 1 + 3;//3 is the number of sections
                 }
             }
         }
 
         @Override
-        public Object getItem(int i) {
+        public String getItem(int i) {
             int temp = i + 1;
+            if (i == 0 | i == 4 | i == 7) {
+                return AgileAppModuleUtils
+                        .getString(getActivity().getApplicationContext(), "title_header" + i, null);
+            }
             return AgileAppModuleUtils
                     .getString(getActivity().getApplicationContext(), "title_section" + temp, "");
         }
@@ -364,22 +347,38 @@ public class NavigationDrawerFragment extends Fragment {
             LayoutInflater inflater =
                     (LayoutInflater) getActivity().getApplicationContext().getSystemService(
                             Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(mResource, parent, false);
-
+            Log.d("debug", "position on getView:" + position);
+            if (position == 0 || position == 4 || position == 7) {
+                String text = AgileAppModuleUtils
+                        .getString(getActivity().getApplicationContext(), "title_header" + position,
+                                null);
+                convertView = inflater.inflate(mDividerResource, parent, false);
+                ((TextView) convertView.findViewById(R.id.divider_title_view)).setText(text);
+                return convertView;
+            }
+            convertView = inflater.inflate(mEntryResource, parent, false);
 
             int temp = position + 1;
+
+            if (position < 4) {
+                temp = temp - 1;
+            }
+            else if (position < 7) {
+                temp = temp - 2;
+            }
+            else {
+                temp = temp - 3;
+            }
 
             TextView textView =
                     (TextView) convertView.findViewById(R.id.navigation_drawer_item_title);
             ImageView imageView =
                     (ImageView) convertView.findViewById(R.id.navigation_drawer_item_icon);
 
-            if (latestMenuItemSelected != -1)
-                if (position==(DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex())){
-                    convertView.setBackgroundColor(Color.GRAY);
-                    textView.setTypeface(null, Typeface.BOLD);
-                }
-
+            if (temp == (DrawerLayoutFragmentActivity.getLastSelectedFragmentIndex() + 1)) {
+                convertView.setBackgroundColor(getResources().getColor(R.color.theme_orange));
+                textView.setTypeface(null, Typeface.BOLD);
+            }
 
             textView.setText(AgileAppModuleUtils
                     .getString(getActivity().getApplicationContext(), "title_section" + +temp, ""));

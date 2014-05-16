@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.arnolds.agileappproject.agileappmodule.R;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
-import org.kohsuke.github.GHCommit;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class CommitLogFragment extends ArnoldSupportFragment
@@ -60,7 +59,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
         listView.setAdapter(commitAdapter);
 
         GitHubNotificationService service = GitHubNotificationService.getInstance();
-        populateList(service.getCurrentCommitList());
+
+        populateList();
         service.addCommitListener(this);
 
         listView.setOnItemClickListener(this);
@@ -68,25 +68,25 @@ public class CommitLogFragment extends ArnoldSupportFragment
         return view;
     }
 
-    private void populateList(List<GHCommit> commitList) {
-        commitAdapter.getCommitCollection().clear();
-        commitAdapter.getCommitCollection().addAll(commitList);
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
-            }
-        });
+    private void populateList() {
+        IGitHubBroker broker = GitHubBroker.getInstance();
+        if (!GitHubBroker.getRepositoryStatus()) {
+            commitAdapter.getCommitCollection().clear();
+            commitAdapter.getCommitCollection().addAll(broker.getCommitsFromSelectedBranch());
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    CommitLogFragment.this.commitAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
-    @Override
-    public void onNewRepositorySelected() {
-    }
 
     public final class CommitAdapter extends BaseAdapter {
-        private final List<GHCommit> commitCollection = new LinkedList<GHCommit>();
+        private final List<GitCommit> commitCollection = new ArrayList<GitCommit>();
 
-        public List<GHCommit> getCommitCollection() {
+        public List<GitCommit> getCommitCollection() {
             return commitCollection;
         }
 
@@ -96,7 +96,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
         }
 
         @Override
-        public GHCommit getItem(int position) {
+        public GitCommit getItem(int position) {
             return commitCollection.get(position);
         }
 
@@ -119,24 +119,32 @@ public class CommitLogFragment extends ArnoldSupportFragment
                         (ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 convertView.setTag(viewHolder);
                 // viewHolder.setExpanded(false);
-            } else {
+            }
+            else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
             if (position % 2 == 0) {
                 convertView.findViewById(R.id.commit_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background1));
-            } else {
+            }
+            else {
                 convertView.findViewById(R.id.commit_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
 
-            final GHCommit commit = getItem(position);
+            final GitCommit commit = getItem(position);
 
             // Set commit and commenter texts
-            viewHolder.getCommentView().setText(commit.getCommitShortInfo().getMessage());
+            viewHolder.getCommentView().setText(commit.getMessage());
             viewHolder.getCommitterView()
-                    .setText(commit.getCommitShortInfo().getCommitter().getName());
+                    .setText(commit.getCommitter().getName());
+            if (commit.getCommitter().getName().isEmpty()) {
+                viewHolder.getCommitterView().setVisibility(View.INVISIBLE);
+            }
+            else {
+                viewHolder.getCommitterView().setVisibility(View.VISIBLE);
+            }
 
             // All expand-buttons are hidden by default
             viewHolder.setExpandIconVisible(false);
@@ -150,7 +158,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
                     }
                 }
             });
-            // Per default, all comments are collapsed
+            // By default, all comments are collapsed
             viewHolder.setExpanded(false);
             return convertView;
         }
@@ -174,7 +182,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
                 if (expanded) {
                     commentView.setMaxLines(Integer.MAX_VALUE);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_maximized);
-                } else {
+                }
+                else {
                     commentView.setMaxLines(1);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_minimized);
                 }
@@ -211,16 +220,9 @@ public class CommitLogFragment extends ArnoldSupportFragment
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
+        populateList();
+        ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
 
-        LinkedHashMap<String, GHCommit> commits = (LinkedHashMap<String, GHCommit>) event.getNewValue();
-        populateList(new ArrayList<GHCommit>(commits.values()));
-        if (event.getNewValue() != event.getOldValue()) {
-            try {
-                ((DrawerLayoutFragmentActivity) mActivity).onStopLoad();
-            } catch (IllegalStateException e) {
-
-            }
-        }
     }
 
 }

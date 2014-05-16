@@ -35,11 +35,6 @@ public class TimerFragment extends ArnoldSupportFragment {
     }
 
     @Override
-    public void onNewRepositorySelected() {
-        //Do nothing; it's not repository-dependent
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         PairTimer.setActivity(activity);
@@ -85,11 +80,10 @@ public class TimerFragment extends ArnoldSupportFragment {
 
         hoursEditTimeView.addTextChangedListener(new TextWatcher() {
 
-            String originalText;
+            String originalText = "00";
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                originalText = hoursEditTimeView.getText().toString();
             }
 
             @Override
@@ -124,11 +118,10 @@ public class TimerFragment extends ArnoldSupportFragment {
 
         minutesEditTimeView.addTextChangedListener(new TextWatcher() {
 
-            String originalText;
+            String originalText = "00";
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                originalText = minutesEditTimeView.getText().toString();
             }
 
             @Override
@@ -141,7 +134,7 @@ public class TimerFragment extends ArnoldSupportFragment {
                 int value;
                 try {
                     value = Integer.parseInt(s.toString());
-                    if (value < 0 || value > 59 || s.length() > 2) {
+                    if (value < 0 || value > 59) {
                         Toast.makeText(getActivity().getApplicationContext(),
                                 R.string.wrong_time_format,
                                 Toast.LENGTH_SHORT).show();
@@ -163,11 +156,10 @@ public class TimerFragment extends ArnoldSupportFragment {
 
         secondsEditTimeView.addTextChangedListener(new TextWatcher() {
 
-            String originalText;
+            String originalText = "00";
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                originalText = secondsEditTimeView.getText().toString();
             }
 
             @Override
@@ -180,7 +172,7 @@ public class TimerFragment extends ArnoldSupportFragment {
                 int value;
                 try {
                     value = Integer.parseInt(s.toString());
-                    if (value < 0 || value > 59 || s.length() > 2) {
+                    if (value < 0 || value > 59) {
                         secondsEditTimeView.setText(originalText);
                         Toast.makeText(getActivity().getApplicationContext(),
                                 R.string.wrong_time_format,

@@ -1,5 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.ui.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -23,27 +27,33 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.data.DataModel;
 import org.arnolds.agileappproject.agileappmodule.data.GitEvent;
 import org.arnolds.agileappproject.agileappmodule.data.IDataModel;
+import org.arnolds.agileappproject.agileappmodule.git.GitHubBroker;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ArnoldSupportFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CommitLogFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
+
+import org.arnolds.agileappproject.agileappmodule.ui.frags.MonitoredFileSelectorFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.ListSelectedFilesFragment;
+
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.PokerGameFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
 import org.arnolds.agileappproject.agileappmodule.utils.AgileAppModuleUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
 
 
 public abstract class DrawerLayoutFragmentActivity extends FragmentActivity implements
@@ -54,9 +64,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;
     private ArnoldSupportFragment[] fragments;
-    private MenuItem mEventLogButton;
     private Button eventCount;
-    private IDataModel dataModel;
+    private IDataModel dataModel = DataModel.getInstance();
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     public static int getLastSelectedFragmentIndex() {
         return lastSelectedFragmentIndex;
@@ -67,18 +77,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             new IndefiniteFancyProgressFragment();
     private static final Stack<Integer> selectedItemsQueue = new Stack<Integer>();
     private Boolean isLoading = Boolean.FALSE;
-
-    public static int getLastSelectedNavDavIndex() {
-        Integer ret;
-        if (selectedItemsQueue.isEmpty()) {
-            ret = 0;
-        }
-        else {
-            ret = selectedItemsQueue.peek();
-        }
-
-        return ret.intValue();
-    }
+    private EventLogAdapter adapter;
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -88,11 +87,11 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         final MenuItem eventMenuItem = menu.findItem(R.id.action_event_log);
         View count = eventMenuItem.getActionView();
         eventCount = (Button) count.findViewById(R.id.feed_event_count);
-        eventCount.setText("0");
+        eventCount.setText(adapter.getCount() + "");
 
         dataModel.addPropertyChangeListener(new EventLogListener(eventCount));
 
-        eventCount.setOnClickListener( new View.OnClickListener() {
+        eventCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 menu.performIdentifierAction(eventMenuItem.getItemId(), 0);
@@ -101,8 +100,11 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         switch (lastSelectedFragmentIndex) {
             case 2:
-                if (newIssueItem != null) {
+                if (newIssueItem != null && !GitHubBroker.getInstance().isFork()) {
                     newIssueItem.setVisible(Boolean.TRUE);
+                }
+                else if (GitHubBroker.getInstance().isFork()) {
+                    newIssueItem.setVisible(Boolean.FALSE);
                 }
                 break;
             default:
@@ -110,8 +112,25 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     newIssueItem.setVisible(Boolean.FALSE);
                 }
         }
-
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void signOut() {
+        Toast.makeText(this, R.string.siging_out, Toast.LENGTH_SHORT).show();
+        final AccountManager accountManager = AccountManager.get(this);
+        Account account = accountManager.getAccountsByType(LoginActivity.ACCOUNT_TYPE)[0];
+        accountManager.removeAccount(account, null, null);
+        Intent login = new Intent(this, LoginActivity.class);
+        login.putExtra(LoginActivity.LAUNCH_HOME_ACTIVITY, true);
+        GitHubNotificationService.getInstance().killService();
+        try {
+            GitHubBroker.getInstance().disconnect();
+        }
+        catch (GitHubBroker.AlreadyNotConnectedException e) {
+            e.printStackTrace();
+        }
+        startActivity(login);
+        System.exit(0);
     }
 
     @Override
@@ -127,9 +146,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             case R.id.action_event_log:
                 eventLogPressed();
                 break;
-            case R.id.action_settings:
-//  TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
-                break;
+//            case R.id.action_settings:
+//  //TODO make settings startActivity(new Intent(getApplicationContext(), SettingsPreferenceActivity.class));
+//                break;
             case R.id.action_create:
                 switch (lastSelectedFragmentIndex) {
                     case 2:
@@ -139,7 +158,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                                             new CreateIssueFragment())
                                     .addToBackStack("")
                                     .commit();
-                            getSupportFragmentManager().executePendingTransactions();
+//                            getSupportFragmentManager().executePendingTransactions();
                         }
                         break;
                     default:
@@ -159,16 +178,25 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         Log.wtf("event", "event pressed");
 
         LayoutInflater layoutInflater
-                = (LayoutInflater)getBaseContext()
+                = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = layoutInflater.inflate(R.layout.event_log, null);
-        ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+        Button clearButton = (Button) popupView.findViewById(R.id.dismiss_all_events);
+        final ListView listView = (ListView) popupView.findViewById(R.id.event_log_list);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventCount.setText("0");
+                adapter.clear();
+            }
+        });
 
 
-        listView.setAdapter(new EventLogAdapter(this, dataModel.getEventList()));
+        listView.setAdapter(adapter);
 
         final PopupWindow popupWindow = new PopupWindow(
-                popupView, (int) getResources().getDimension(R.dimen.event_log_width),(int) getResources().getDimension(R.dimen.event_log_height));
+                popupView, (int) getResources().getDimension(R.dimen.event_log_width),
+                (int) getResources().getDimension(R.dimen.event_log_height));
 
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -199,10 +227,6 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
-//        navigatedItemsStack.add(0, navigatedItemsStack.get(0));
-////        recreate();
-//        onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
-        //TODO
     }
 
     @Override
@@ -216,28 +240,29 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_container, progressFragment)
                 .commit();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getFragmentManager().executePendingTransactions();
-                getSupportFragmentManager().executePendingTransactions();
-            }
-        });
+//        runOnUiThread(new Runnable() {
+//        @Override
+//            public void run() {
+//                getFragmentManager().executePendingTransactions();
+//                getSupportFragmentManager().executePendingTransactions();
+//            }
+//        });
     }
 
+    @Override
     public synchronized void onStopLoad() {
         try {
             getFragmentManager().beginTransaction().remove(progressFragment).commit();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_fragment_container, fragments[lastSelectedFragmentIndex])
                     .commit();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().executePendingTransactions();
-                    getSupportFragmentManager().executePendingTransactions();
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    getFragmentManager().executePendingTransactions();
+//                    getSupportFragmentManager().executePendingTransactions();
+//                }
+//            });
         }
         catch (IllegalStateException ex) {
         }
@@ -245,7 +270,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(final int position) {
         if (position == lastSelectedFragmentIndex) {
             //We don't want to perform an unnecessary Activity reload
             return;
@@ -255,7 +280,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         ArnoldSupportFragment target = fragments[position];
 
-        if (target == null) {
+        if (target == null || position == 6) {
             switch (position) {
                 case 0:
                     target = new CommitLogFragment();
@@ -267,7 +292,19 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     target = new ListIssuesFragment();
                     break;
                 case 3:
+                    target = new MonitoredFileSelectorFragment();
+                    break;
+                case 4:
+                    target = new ListSelectedFilesFragment();
+                    break;
+                case 5:
                     target = new TimerFragment();
+                    break;
+                case 6:
+                    target = new PokerGameFragment();
+                    break;
+                case 7:
+                    signOut();
                     break;
                 default:
                     Log.wtf("debug", "Should never happen - position is " + position);
@@ -284,10 +321,9 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                 fragmentManager.beginTransaction()
                         .replace(MAIN_FRAGMENT_CONTAINER, target)
                         .addToBackStack("").commit();
-                fragmentManager.executePendingTransactions();
             }
             catch (NullPointerException ex) {
-//                Log.wtf("debug", ex.getClass().getName(),ex);
+                Log.wtf("debug", ex.getClass().getName(),ex);
             }
         }
         else if (fragmentManager != null && isLoading && position != 3) {
@@ -295,13 +331,13 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     .remove(fragments[lastSelectedFragmentIndex]).commit();
             getFragmentManager().beginTransaction().replace(MAIN_FRAGMENT_CONTAINER,
                     progressFragment).commit();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().executePendingTransactions();
-                    getSupportFragmentManager().executePendingTransactions();
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    getFragmentManager().executePendingTransactions();
+//                    getSupportFragmentManager().executePendingTransactions();
+//                }
+//            });
         }
 
         lastSelectedFragmentIndex = position;
@@ -339,9 +375,12 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             else {
                 Integer x = selectedItemsQueue.pop();
                 onNavigationDrawerItemSelected(x == null ? 0 : x);
+                Log.d("debug", "Am I in the else?");
+                lastSelectedFragmentIndex = (x == null) ? 0 : x;
                 selectedItemsQueue.pop();
             }
 
+            mNavigationDrawerFragment.invalidateListView();
             restoreActionBar();
         }
     }
@@ -349,8 +388,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        dataModel = DataModel.getInstance();
+        adapter = new EventLogAdapter(this, dataModel.getEventList());
 
         setContentView(savedInstanceState.getInt("layout"));
 
@@ -371,7 +409,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        NavigationDrawerFragment mNavigationDrawerFragment = (NavigationDrawerFragment)
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
                 fragmentManager.findFragmentById(R.id.navigation_drawer_fragment);
 
         mNavigationDrawerFragment.setHasOptionsMenu(Boolean.TRUE);
@@ -388,7 +426,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container,
                 fragments[CommitLogFragment.DRAWER_POSITION])
                 .commit();
-        getSupportFragmentManager().executePendingTransactions();
+//        getSupportFragmentManager().executePendingTransactions();
     }
 
     public void onSectionAttached(int number) {
@@ -399,45 +437,34 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
         }
     }
 
-    @Override
-    public void onNewRepoSelected(String repoName) {
-        for (ArnoldSupportFragment x : fragments) {
-            try {
-                x.onNewRepositorySelected();
-            }
-            catch (NullPointerException ex) {
-//            Log.wtf("debug", ex.getClass().getName(), ex);
-            }
-//            getSupportFragmentManager()
-//                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//            selectedItemsQueue.clear();
-//            onNavigationDrawerItemSelected(lastSelectedFragmentIndex);
-        }
-    }
-
-
     public void notifyIssueCreated() {
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         supportFragmentManager.beginTransaction()
                 .replace(R.id.main_fragment_container, fragments[2]).commit();
-        if (supportFragmentManager != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    supportFragmentManager.executePendingTransactions();
-                }
-            });
-        }
+//        if (supportFragmentManager != null) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    supportFragmentManager.executePendingTransactions();
+//                }
+//            });
+//        }
     }
 
-    private class EventLogAdapter extends BaseAdapter{
+    private class EventLogAdapter extends BaseAdapter {
 
         private List<GitEvent> mEvents;
         private LayoutInflater mInflater;
 
-        public EventLogAdapter(Context context, List<GitEvent> events){
+        public EventLogAdapter(Context context, List<GitEvent> events) {
             mEvents = events;
             mInflater = LayoutInflater.from(context);
+        }
+
+        public void clear() {
+            mEvents.clear();
+            eventCount.setText("0");
+            notifyDataSetChanged();
         }
 
         @Override
@@ -463,13 +490,19 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
             ImageView imageView = (ImageView) view.findViewById(R.id.event_icon);
             switch (event.getType()) {
                 case COMMIT:
-                    imageView.setImageResource(R.drawable.icon_section1);
+                    imageView.setImageResource(R.drawable.new_commit_event);
                     break;
                 case FILE_CONFLICT:
                     imageView.setImageResource(R.drawable.warning);
                     break;
                 case ISSUE:
-                    imageView.setImageResource(R.drawable.icon_section3);
+                    imageView.setImageResource(R.drawable.issueyellow);
+                    break;
+                case TIMER_EVENT:
+                    imageView.setImageResource(R.drawable.alarm);
+                    break;
+                case MONITORED_FILE_CONFLICT:
+                    imageView.setImageResource(R.drawable.warning);
                     break;
             }
 
@@ -499,12 +532,16 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            if(event.getNewValue() != null && event.getNewValue() instanceof List) {
+            if (event.getNewValue() != null && event.getNewValue() instanceof List) {
                 final List<GitEvent> eventList = (List<GitEvent>) event.getNewValue();
                 DrawerLayoutFragmentActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        button.setText(eventList.size()+"");
+                        button.setText(eventList.size() + "");
+                        Animation animationBounce = AnimationUtils
+                                .loadAnimation(getApplicationContext(),
+                                        R.anim.bounce);
+                        button.startAnimation(animationBounce);
                     }
                 });
 

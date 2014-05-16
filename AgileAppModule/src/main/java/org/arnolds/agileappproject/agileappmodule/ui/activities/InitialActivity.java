@@ -21,6 +21,8 @@ public class InitialActivity extends Activity {
 
         @Override
         public void onConnected() {
+            Log.d("debug", "onConnected Initial");
+            Log.d("debug", "Size: " + GitHubBroker.getInstance().getAllBranches().size());
             Intent home = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(home);
             InitialActivity.this.finish();

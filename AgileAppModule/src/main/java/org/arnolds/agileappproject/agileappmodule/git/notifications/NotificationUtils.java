@@ -1,8 +1,7 @@
 package org.arnolds.agileappproject.agileappmodule.git.notifications;
 
-
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -10,39 +9,35 @@ import java.util.Set;
 
 public class NotificationUtils {
 
-    public static Set<GitFile> conflictingFiles(final GHBranch branch, final GHCommit newCommit,
-                                                final Map<String, GHCommit> oldCommits) {
-        Set<GitFile> newFiles = new HashSet<GitFile>();
-        Set<GitFile> branchFiles = filesOnBranch(branch, oldCommits);
+    public static Set<GitFile> conflictingFiles(final GitBranch branch, final GitCommit newCommit, final Map<String, GitCommit> commits) {
 
-        for (GHCommit.File file : newCommit.getFiles()) {
-            newFiles.add(new GitFile(file.getFileName(), file.getBlobUrl().getPath()));
+        Set<GitFile> newFiles = new HashSet<GitFile>();
+        Set<GitFile> branchFiles = filesOnBranch(branch, commits);
+
+        for (GitFile file : newCommit.getFiles()){
+            newFiles.add(file);
         }
 
         branchFiles.retainAll(newFiles);
         return branchFiles;
     }
 
-    private static Set<GitFile> filesOnBranch(final GHBranch branch,
-                                              final Map<String, GHCommit> oldCommits) {
-
-        GHCommit commit = oldCommits.get(branch.getSHA1());
+    public static Set<GitFile> filesOnBranch(final GitBranch branch, final Map<String, GitCommit> commits) {
+        GitCommit commit = branch.getCommit();
 
         Set<GitFile> files = new HashSet<GitFile>();
-        getFiles(commit, files, oldCommits);
+        getFiles(commit, files, commits);
 
         return files;
     }
 
-    private static Set<GitFile> getFiles(GHCommit commit, Set<GitFile> files,
-                                         final Map<String, GHCommit> oldCommits) {
-        if (commit != null) {
-            for (GHCommit.File file : commit.getFiles()) {
-                files.add(new GitFile(file.getFileName(), file.getBlobUrl().getPath()));
-            }
-            for (String commitParentSHA1 : commit.getParentSHA1s()) {
-                getFiles(oldCommits.get(commitParentSHA1), files, oldCommits);
-            }
+
+    private static Set<GitFile> getFiles(GitCommit commit, Set<GitFile> files, final Map<String, GitCommit> commits) {
+        for (GitFile file : commit.getFiles()) {
+            files.add(file);
+        }
+        for (String commitParentSHA1 : commit.getParentsSHA1()) {
+            getFiles(commits.get(commitParentSHA1), files, commits);
         }
 
         return files;

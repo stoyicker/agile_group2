@@ -2,6 +2,8 @@ package org.arnolds.agileappproject.agileappmodule.data;
 
 
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
+import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssue;
 
@@ -14,7 +16,7 @@ public interface IDataModel {
      * Stores a commit that has been polled after the initial population.
      * @param commit the commit that should be stored.
      */
-    public void addLateCommit(final GHCommit commit);
+    public void addLateCommit(final GitCommit commit);
 
     /**
      * Stores commits that has been polled after the initial population.
@@ -23,17 +25,23 @@ public interface IDataModel {
     public void addLateCommits(final List<GHCommit> commits);
 
     /**
+     * Creates a new timer event after the initial population.
+     * @param time the initial countdown.
+     */
+    public void addLateTimerEvent(String time);
+
+    /**
      * Adds a commit with associated files that conflicts with the selected branch.
      * @param commit - The commit that is associated with the file conflicts.
      * @param affectedFiles - The files that are in conflict.
      */
-    public void addFileConflict(final GHCommit commit, final List<GitFile> affectedFiles);
+    public void addFileConflict(final GitCommit commit, final List<GitFile> affectedFiles);
 
     /**
      * Adds a issue that has been polled after the initial population.
      * @param issue - The issue that should be stored.
      */
-    public void addLateIssue(final GHIssue issue);
+    public void addLateIssue(final GitIssue issue);
 
     /**
      * Removes an event from the stored events.
@@ -60,4 +68,12 @@ public interface IDataModel {
      * @return the stored eventList.
      */
     public List<GitEvent> getEventList();
+
+    public void addMonitoredFile(GitFile file);
+
+    public void removeMonitoredFile(GitFile file);
+
+    public List<GitFile> getAllMonitoredFiles();
+
+    public void addMonitoredFileConflict(GitFile commitFile);
 }
