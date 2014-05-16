@@ -41,6 +41,10 @@ import org.arnolds.agileappproject.agileappmodule.ui.frags.CreateIssueFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.IndefiniteFancyProgressFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListBranchesFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.ListIssuesFragment;
+
+import org.arnolds.agileappproject.agileappmodule.ui.frags.MonitoredFileSelectorFragment;
+import org.arnolds.agileappproject.agileappmodule.ui.frags.ListSelectedFilesFragment;
+
 import org.arnolds.agileappproject.agileappmodule.ui.frags.NavigationDrawerFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.PokerGameFragment;
 import org.arnolds.agileappproject.agileappmodule.ui.frags.TimerFragment;
@@ -288,12 +292,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     target = new ListIssuesFragment();
                     break;
                 case 3:
-                    //TODO
-                    System.exit(-1);
+                    target = new MonitoredFileSelectorFragment();
                     break;
                 case 4:
-                    //TODO
-                    System.exit(-1);
+                    target = new ListSelectedFilesFragment();
                     break;
                 case 5:
                     target = new TimerFragment();
@@ -321,7 +323,7 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                         .addToBackStack("").commit();
             }
             catch (NullPointerException ex) {
-//                Log.wtf("debug", ex.getClass().getName(),ex);
+                Log.wtf("debug", ex.getClass().getName(),ex);
             }
         }
         else if (fragmentManager != null && isLoading && position != 3) {
@@ -498,6 +500,10 @@ public abstract class DrawerLayoutFragmentActivity extends FragmentActivity impl
                     break;
                 case TIMER_EVENT:
                     imageView.setImageResource(R.drawable.alarm);
+                    break;
+                case MONITORED_FILE_CONFLICT:
+                    imageView.setImageResource(R.drawable.warning);
+                    break;
             }
 
             TextView textView = (TextView) view.findViewById(R.id.event_name);

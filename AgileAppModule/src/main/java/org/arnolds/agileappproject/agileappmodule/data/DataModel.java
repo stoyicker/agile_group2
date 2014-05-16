@@ -1,6 +1,8 @@
 package org.arnolds.agileappproject.agileappmodule.data;
 
 
+import android.util.Log;
+
 import org.apache.commons.lang.NotImplementedException;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
@@ -17,6 +19,7 @@ public class DataModel implements IDataModel {
     private PropertyChangeSupport pcs;
     private List<GitEvent> eventList;
     private static IDataModel model = null;
+    private List<GitFile> monitoredFiles = new ArrayList<GitFile>();
 
     private DataModel() {
         pcs = new PropertyChangeSupport(this);
@@ -79,6 +82,32 @@ public class DataModel implements IDataModel {
     @Override
     public List<GitEvent> getEventList() {
         return eventList;
+    }
+
+    @Override
+    public void addMonitoredFile(GitFile file) {
+        if(!monitoredFiles.contains(file)){
+            monitoredFiles.add(file);
+        }
+        else{
+            Log.wtf("addMonitoredFile", "file already exists");
+        }
+    }
+
+    @Override
+    public void removeMonitoredFile(GitFile file) {
+        monitoredFiles.remove(file);
+    }
+
+    @Override
+    public List<GitFile> getAllMonitoredFiles() {
+        return monitoredFiles;
+    }
+
+    @Override
+    public void addMonitoredFileConflict(GitFile commitFile) {
+        eventList.add(new GitEvent(commitFile));
+        firePropertyEvent();
     }
 
     private void firePropertyEvent() {

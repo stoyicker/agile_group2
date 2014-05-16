@@ -7,8 +7,8 @@
 	<string name="title_section1">Commits</string>
 	<string name="title_section2">Branches</string>
 	<string name="title_section3">Issues</string>
-	<string name="title_section4">Placeholder 1</string>
-	<string name="title_section5">Placeholder 2</string>
+	<string name="title_section4">File browser</string>
+	<string name="title_section5">Watch list</string>
 	<string name="title_section6">Timer</string>
 	<string name="title_section7">Planning poker</string>
 	<string name="title_section8">Sign out</string>
@@ -46,6 +46,7 @@
 	<string name="issue_created">Issue created</string>
 	<string name="notification_new_commits">New commit:</string>
 	<string name="file_conflict">Commit with File Conflict!</string>
+    <string name="file_conflict_on_monitored">File conflict on:</string>
 	<string name="siging_out">Signing out</string>
 	<string name="selected_branch">Working on master branch</string>
 	<string name="error_retri_commit">Error retrieving commits</string>
