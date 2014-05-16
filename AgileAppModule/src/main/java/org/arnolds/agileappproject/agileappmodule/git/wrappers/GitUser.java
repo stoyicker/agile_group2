@@ -20,18 +20,29 @@ public class GitUser {
     public GitUser() {}
 
     public GitUser(GHUser apiUser) {
-        this.userId = apiUser.getId();
-        this.login = apiUser.getLogin();
-        this.avatarUrl = apiUser.getAvatarUrl();
+        if (apiUser != null ) {
 
-        try {
-            this.name = apiUser.getName();
-            this.email = apiUser.getEmail();
-        } catch (IOException e) {
-            e.printStackTrace();
+            this.userId = apiUser.getId();
+            this.login = apiUser.getLogin();
+            this.avatarUrl = apiUser.getAvatarUrl();
+            try {
+                this.name = apiUser.getName();
+                this.email = apiUser.getEmail();
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.name = "Unable to retrieve username";
+                this.email = "Unable to retrieve email";
+            }
+
+        }
+        else {
+            this.userId = 0;
+            this.login = "";
+            this.avatarUrl = "";
             this.name = "Unable to retrieve username";
             this.email = "Unable to retrieve email";
         }
+
     }
 
     @Override
