@@ -3,6 +3,7 @@ package org.arnolds.agileappproject.agileappmodule.ui.frags;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,10 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
     private FragmentActivity mActivity;
     private TextView pathTextView;
 
+    private String repoName = "";
+
+    private GitFileTree tree;
+
     public MonitoredFileSelectorFragment() {
         super(MENU_INDEX);
     }
@@ -71,22 +76,33 @@ public class MonitoredFileSelectorFragment extends ArnoldSupportFragment
         if (currentLocation.equals("")) {
             pathTextView.setText("/");
         } else {
-            pathTextView.setText("/"+currentLocation);
+            pathTextView.setText(currentLocation);
         }
     }
 
     private void populateList() {
+
+        IGitHubBroker broker = GitHubBroker.getInstance();
+        String newRepoName = broker.getSelectedRepoName();
+
+        // If repo has changed, set default path.
+        if (repoName.equals("") || !repoName.equals(newRepoName)) {
+            currentLocation = DEFAULT_LOCATION;
+            repoName = newRepoName;
+
+            GitBranch selectedBranch = broker.getSelectedBranch();
+            Map<String, GitCommit> commits = broker.getCurrentCommitList();
+
+            // TODO: Return List from getter method.
+            List<GitFile> files = new ArrayList<GitFile>(NotificationUtils.filesOnBranch(selectedBranch, commits));
+
+            tree = new GitFileTree(files);
+        }
+
+
         // Update Path Text
         updatePathText();
 
-        IGitHubBroker broker = GitHubBroker.getInstance();
-        GitBranch selectedBranch = broker.getSelectedBranch();
-        Map<String, GitCommit> commits = broker.getCurrentCommitList();
-
-        // TODO: Return List from getter method.
-        List<GitFile> files = new ArrayList<GitFile>(NotificationUtils.filesOnBranch(selectedBranch, commits));
-
-        GitFileTree tree = new GitFileTree(files);
         ArrayList<ListItem> list = new ArrayList<ListItem>();
 
         // Add up
