@@ -178,20 +178,31 @@ public class GitHubNotificationService implements IGitHubNotificationService {
                 GitBranch selectedBranch = broker.getSelectedBranch();
 
                 for (GitCommit commit : newCommits.values()) {
-                    Set<GitFile> conflictingFiles = null;
-                    if (selectedBranch != null) {
-                        conflictingFiles =
-                                NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
-                    }
-
-                    if (conflictingFiles != null && conflictingFiles.size() > 0) {
-                        makeToast(context.getString(R.string.file_conflict));
-                        dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
+                    List<GitFile> monitoredFiles = DataModel.getInstance().getAllMonitoredFiles();
+                    if (monitoredFiles.size() > 0){
+                        for (GitFile file : monitoredFiles){
+                            for (GitFile commitFile : commit.getFiles())
+                            if (file.equals(commitFile)){
+                                dataModel.addMonitoredFileConflict(commitFile);
+                                makeToast(context.getString(R.string.file_conflict_on_monitored)+" "+commitFile.getName());
+                            }
+                        }
                     }
                     else {
-                        makeToast(context.getString(R.string.notification_new_commits) + " " +
-                                commit.getMessage());
-                        dataModel.addLateCommit(commit);
+                        Set<GitFile> conflictingFiles = null;
+                        if (selectedBranch != null) {
+                            conflictingFiles =
+                                    NotificationUtils.conflictingFiles(selectedBranch, commit, commits);
+                        }
+
+                        if (conflictingFiles != null && conflictingFiles.size() > 0) {
+                            makeToast(context.getString(R.string.file_conflict));
+                            dataModel.addFileConflict(commit, new ArrayList<GitFile>(conflictingFiles));
+                        } else {
+                            makeToast(context.getString(R.string.notification_new_commits) + " " +
+                                    commit.getMessage());
+                            dataModel.addLateCommit(commit);
+                        }
                     }
                 }
                 commitChangeSupport.firePropertyChange("new commits", null, newCommits);

@@ -5,6 +5,7 @@ import android.content.res.Resources;
 
 import org.arnolds.agileappproject.agileappmodule.R;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFile;
+import org.arnolds.agileappproject.agileappmodule.git.notifications.GitFileTree;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitIssue;
 import org.kohsuke.github.GHCommit;
@@ -18,7 +19,8 @@ public class GitEvent {
         COMMIT,
         ISSUE,
         FILE_CONFLICT,
-        TIMER_EVENT
+        TIMER_EVENT,
+        MONITORED_FILE_CONFLICT
     }
 
     private EventType type;
@@ -26,6 +28,12 @@ public class GitEvent {
     private GitIssue issue;
     private List<GitFile> fileConflicts;
     private String time;
+    private GitFile monitoredFile;
+
+    public GitEvent(GitFile commitFile) {
+        monitoredFile=commitFile;
+        this.type = EventType.MONITORED_FILE_CONFLICT;
+    }
 
     public GitEvent(GitCommit commit) {
         this.type = EventType.COMMIT;
@@ -63,6 +71,9 @@ public class GitEvent {
             case TIMER_EVENT:
                 //TODO Fix hard coded string
                 eventText = "Timer \""+time+"\" has finished!";
+                break;
+            case MONITORED_FILE_CONFLICT:
+                eventText = "File conflict on: "+monitoredFile.getFileName();
                 break;
         }
 
