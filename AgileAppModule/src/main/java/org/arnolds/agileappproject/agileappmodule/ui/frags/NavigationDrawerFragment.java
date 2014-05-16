@@ -79,6 +79,8 @@ public class NavigationDrawerFragment extends Fragment {
 
         mRepoSelectionSpinner.setBackgroundColor(getResources().getColor(R.color.theme_white));
 
+
+
         final List<String> allRepositories = new ArrayList<String>();
         for (GHRepository repository : GitHubBroker.getInstance().getCurrentRepositories().values())
             allRepositories.add(repository.getName());

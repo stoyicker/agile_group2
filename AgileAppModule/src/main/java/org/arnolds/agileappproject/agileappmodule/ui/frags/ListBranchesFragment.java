@@ -23,8 +23,10 @@ import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitBranch;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ListBranchesFragment extends ArnoldSupportFragment implements PropertyChangeListener {
 
@@ -33,13 +35,26 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
 
     private ListView branchesListView;
 
-    private Integer posPicked = 0;
+    private Integer posPicked;
 
     private Map<String, GitBranch> branches;
 
 
     public ListBranchesFragment() {
         super(MENU_INDEX);
+        Set<String> branchNames = GitHubBroker.getInstance().getAllBranches().keySet();
+        Integer i = 0;
+        for (String b : branchNames) {
+            if (b.contentEquals(GitHubBroker.getInstance().getSelectedBranch().getName()))
+                posPicked = i;
+            i++;
+
+
+        }
+        Log.wtf("BLAH", GitHubBroker.getInstance().getSelectedBranch().getName());
+
+        Log.wtf("BLAH", posPicked+"");
+
     }
 
     @Override
@@ -129,7 +144,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
             }
             else {
                 TextView t = (TextView) getActivity().findViewById(R.id.selected_branch);
-                t.setText("Working on origin/" + branch.getName().toString() + " branch");
+                t.setText("Working on " + branch.getName().toString() + " branch");
                 convertView.findViewById(R.id.branch_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.theme_orange));
             }
@@ -211,9 +226,7 @@ public class ListBranchesFragment extends ArnoldSupportFragment implements Prope
             ).show();
 
 
-            t.setText(" Working on origin/" + selectedBranch.getName().toString() + " branch");
-            Toast.makeText(context, selectedBranch.getName().toString() + " selected",
-                    Toast.LENGTH_SHORT).show();
+            t.setText(" Working on " + selectedBranch.getName().toString() + " branch");
         }
 
     }
