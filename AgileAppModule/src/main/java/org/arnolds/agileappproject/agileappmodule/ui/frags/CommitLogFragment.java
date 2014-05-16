@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,15 +19,11 @@ import org.arnolds.agileappproject.agileappmodule.git.IGitHubBroker;
 import org.arnolds.agileappproject.agileappmodule.git.notifications.GitHubNotificationService;
 import org.arnolds.agileappproject.agileappmodule.git.wrappers.GitCommit;
 import org.arnolds.agileappproject.agileappmodule.ui.activities.DrawerLayoutFragmentActivity;
-import org.kohsuke.github.GHCommit;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class CommitLogFragment extends ArnoldSupportFragment
         implements PropertyChangeListener, AdapterView.OnItemClickListener {
@@ -123,14 +118,16 @@ public class CommitLogFragment extends ArnoldSupportFragment
                         (ImageView) convertView.findViewById(R.id.commit_expander_icon));
                 convertView.setTag(viewHolder);
                 // viewHolder.setExpanded(false);
-            } else {
+            }
+            else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
             if (position % 2 == 0) {
                 convertView.findViewById(R.id.commit_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background1));
-            } else {
+            }
+            else {
                 convertView.findViewById(R.id.commit_fragment)
                         .setBackgroundColor(getResources().getColor(R.color.list_row_background2));
             }
@@ -141,6 +138,12 @@ public class CommitLogFragment extends ArnoldSupportFragment
             viewHolder.getCommentView().setText(commit.getMessage());
             viewHolder.getCommitterView()
                     .setText(commit.getCommitter().getName());
+            if (commit.getCommitter().getName().isEmpty()) {
+                viewHolder.getCommitterView().setVisibility(View.INVISIBLE);
+            }
+            else {
+                viewHolder.getCommitterView().setVisibility(View.VISIBLE);
+            }
 
             // All expand-buttons are hidden by default
             viewHolder.setExpandIconVisible(false);
@@ -154,7 +157,7 @@ public class CommitLogFragment extends ArnoldSupportFragment
                     }
                 }
             });
-            // Per default, all comments are collapsed
+            // By default, all comments are collapsed
             viewHolder.setExpanded(false);
             return convertView;
         }
@@ -178,7 +181,8 @@ public class CommitLogFragment extends ArnoldSupportFragment
                 if (expanded) {
                     commentView.setMaxLines(Integer.MAX_VALUE);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_maximized);
-                } else {
+                }
+                else {
                     commentView.setMaxLines(1);
                     expandIconImageView.setImageResource(R.drawable.expander_ic_minimized);
                 }
